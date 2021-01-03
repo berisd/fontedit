@@ -13,7 +13,7 @@ typedef struct ApplicationConfig {
 typedef struct ApplicationState {
     BRS_VideoContext *videoContext;
     BRS_Font *defaultFont;
-    BRS_GUI_MenuBar *menuBar;
+    BRS_GUI_WidgetList *widgets;
 } ApplicationState;
 
 typedef enum APP_ACTION {
@@ -38,30 +38,54 @@ static ApplicationState *createApplicationState() {
 
 static void freeApplicationState(ApplicationState *applicationState) {
     BRS_freeFont(applicationState->defaultFont);
+    BRS_GUI_WidgetListEntry *entry = applicationState->widgets->firstEntry;
+    while (entry != NULL) {
+        BRS_GUI_destroyWidget(entry->value);
+        BRS_GUI_WidgetListEntry *tmp = entry;
+        entry = entry->next;
+        free(tmp);
+    }
     free(applicationState);
 }
 
-static BRS_GUI_Menu *createFileMenu() {
+static BRS_GUI_Menu *createFileMenu(BRS_GUI_MenuBar *menuBar) {
     BRS_GUI_MenuItem *menuItemNew = malloc(sizeof(BRS_GUI_MenuItem));
     menuItemNew->label = "New";
 
     BRS_GUI_Menu *menu = malloc(sizeof(BRS_GUI_Menu));
     menu->label = "File";
+    menu->font = menuBar->font;
     menu->itemList = BRS_GUI_MenuItemList_create();
+    menu->color = &COLOR_WHITE;
     BRS_GUI_MenuItemList_push(menuItemNew, menu->itemList);
     return menu;
 }
 
-static BRS_GUI_MenuBar *createMenuBar() {
+static BRS_GUI_Widget *createMenuBar(ApplicationState *applicationState) {
     BRS_Point *menuBarPosition = malloc(sizeof(BRS_Point));
     menuBarPosition->x = 0;
     menuBarPosition->y = 0;
     BRS_Dimension *menuBarDimension = malloc(sizeof(struct BRS_Dimension));
     menuBarDimension->width = 800;
     menuBarDimension->height = 20;
-    BRS_GUI_MenuBar *menuBar = BRS_GUI_createMenuBar(menuBarPosition, menuBarDimension, &COLOR_BLUE);
-    BRS_GUI_MenuList_push(createFileMenu(), menuBar->menuList);
-    return menuBar;
+    BRS_GUI_Widget *widget = BRS_GUI_createMenuBar(menuBarPosition, menuBarDimension, &COLOR_BLUE,
+                                                     applicationState->defaultFont);
+    BRS_GUI_MenuList_push(createFileMenu(widget->object->menuBar), widget->object->menuBar->menuList);
+    return widget;
+}
+
+static BRS_GUI_WidgetList *createWidgets(ApplicationState *applicationState) {
+    BRS_GUI_WidgetList *list = BRS_GUI_WidgetList_create();
+
+    BRS_Point *labelPosition = malloc(sizeof(BRS_Point));
+    labelPosition->x = 100;
+    labelPosition->y = 150;
+
+    BRS_GUI_WidgetList_push(
+            BRS_GUI_createLabel(labelPosition, &COLOR_RED, "Hello World", applicationState->defaultFont), list);
+    BRS_GUI_WidgetList_push(createMenuBar(applicationState), list);
+
+    return list;
 }
 
 static ApplicationState *initApplication(const ApplicationConfig *config) {
@@ -72,7 +96,7 @@ static ApplicationState *initApplication(const ApplicationConfig *config) {
     }
     applicationState->videoContext = videoContext;
     applicationState->defaultFont = createDefaultFont();
-    applicationState->menuBar = createMenuBar();
+    applicationState->widgets = createWidgets(applicationState);
     atexit(SDL_Quit);
     return applicationState;
 }
@@ -96,14 +120,24 @@ static APP_ACTION processEvent(SDL_Event event) {
     return NONE;
 }
 
+static void handleVideo(ApplicationState *applicationState) {
+    BRS_setColor(applicationState->videoContext, &COLOR_BLACK);
+    BRS_clearVideo(applicationState->videoContext);
+
+    BRS_GUI_WidgetListEntry *listEnty = applicationState->widgets->firstEntry;
+    while (listEnty != NULL) {
+        BRS_GUI_renderWidget(applicationState->videoContext, listEnty->value);
+        listEnty = listEnty->next;
+    }
+
+    BRS_updateVideo(applicationState->videoContext);
+}
+
 static void runApplication(ApplicationState *applicationState) {
     bool quit = false;
     SDL_Event event;
 
-    BRS_Point labelStart = {.x = 100, .y= 150};
-
     while (!quit) {
-
         if (SDL_PollEvent(&event) != 0) {
             enum APP_ACTION action = processEvent(event);
             if (action != NONE) {
@@ -111,15 +145,7 @@ static void runApplication(ApplicationState *applicationState) {
                 continue;
             }
         }
-        BRS_setColor(applicationState->videoContext, &COLOR_BLACK);
-        BRS_clearVideo(applicationState->videoContext);
-
-        BRS_GUI_renderMenuBar(applicationState->videoContext, applicationState->menuBar, applicationState->defaultFont);
-
-        BRS_drawString(applicationState->videoContext, "Hello World!", applicationState->defaultFont, &labelStart,
-                       &COLOR_RED);
-
-        BRS_updateVideo(applicationState->videoContext);
+        handleVideo(applicationState);
     }
 }
 

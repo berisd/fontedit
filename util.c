@@ -8,7 +8,7 @@
 
 #define DEFAULT_FONT_SIZE 4096
 
-static uint8_t defaultFontData[DEFAULT_FONT_SIZE] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 126, 129,
+static const uint8_t defaultFontData[DEFAULT_FONT_SIZE] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 126, 129,
                                                      165, 129, 129,
                                                      189, 153, 129, 129, 126, 0, 0, 0, 0, 0, 0, 126, 255, 219, 255, 255,
                                                      195, 231,

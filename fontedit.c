@@ -16,10 +16,6 @@ typedef struct ApplicationState {
     BRS_GUI_WidgetList *widgets;
 } ApplicationState;
 
-typedef enum APP_ACTION {
-    NONE, QUIT_APP
-} APP_ACTION;
-
 static ApplicationConfig *createConfig() {
     ApplicationConfig *config = malloc(sizeof(ApplicationConfig));
     config->screenWidth = 800;
@@ -57,8 +53,13 @@ static BRS_GUI_Menu *createFileMenu(BRS_GUI_MenuBar *menuBar) {
     menu->font = menuBar->font;
     menu->itemList = BRS_GUI_MenuItemList_create();
     menu->color = &COLOR_WHITE;
+    menu->expanded = true;
     BRS_GUI_MenuItemList_push(menuItemNew, menu->itemList);
     return menu;
+}
+
+static void onClickMenuBar(BRS_GUI_MenuBar *menuBar) {
+    menuBar->color = menuBar->color == &COLOR_BLUE ? &COLOR_BLACK : &COLOR_BLUE;
 }
 
 static BRS_GUI_Widget *createMenuBar(ApplicationState *applicationState) {
@@ -69,8 +70,13 @@ static BRS_GUI_Widget *createMenuBar(ApplicationState *applicationState) {
     menuBarDimension->width = 800;
     menuBarDimension->height = 20;
     BRS_GUI_Widget *widget = BRS_GUI_createMenuBar(menuBarPosition, menuBarDimension, &COLOR_BLUE,
-                                                     applicationState->defaultFont);
+                                                   applicationState->defaultFont);
+
+    BRS_GUI_setMenuBarClickHandler(widget, &onClickMenuBar);
+
     BRS_GUI_MenuList_push(createFileMenu(widget->object->menuBar), widget->object->menuBar->menuList);
+
+
     return widget;
 }
 
@@ -106,18 +112,26 @@ static void shutdownApplication(ApplicationState *applicationState) {
     freeApplicationState(applicationState);
 }
 
-static APP_ACTION processEvent(SDL_Event event) {
-    if (event.type == SDL_QUIT) {
-        return QUIT_APP;
-    } else if (event.type == SDL_KEYDOWN) {
-        switch (event.key.keysym.sym) {
-            case SDLK_ESCAPE:
-                return QUIT_APP;
-            default:
-                break;
-        }
+static bool checkQuitApplication(SDL_Event event) {
+    switch (event.type) {
+        case SDL_QUIT:
+            return true;
+        case SDL_KEYDOWN:
+            switch (event.key.keysym.sym) {
+                case SDLK_ESCAPE:
+                    return true;
+            }
     }
-    return NONE;
+    return false;
+}
+
+static void processEvent(SDL_Event event, ApplicationState *applicationState) {
+    BRS_GUI_WidgetList *widgetList = applicationState->widgets;
+    BRS_GUI_WidgetListEntry *entry = widgetList->firstEntry;
+    while (entry != NULL) {
+        BRS_GUI_processEvent(entry->value, event);
+        entry = entry->next;
+    }
 }
 
 static void handleVideo(ApplicationState *applicationState) {
@@ -134,16 +148,12 @@ static void handleVideo(ApplicationState *applicationState) {
 }
 
 static void runApplication(ApplicationState *applicationState) {
-    bool quit = false;
     SDL_Event event;
-
+    bool quit = false;
     while (!quit) {
         if (SDL_PollEvent(&event) != 0) {
-            enum APP_ACTION action = processEvent(event);
-            if (action != NONE) {
-                quit = true;
-                continue;
-            }
+            quit = checkQuitApplication(event);
+            processEvent(event, applicationState);
         }
         handleVideo(applicationState);
     }

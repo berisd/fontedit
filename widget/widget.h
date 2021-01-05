@@ -5,51 +5,22 @@
 #ifndef BRS_GUI_WIDGET_H
 #define BRS_GUI_WIDGET_H
 
-#include "video.h"
-#include "list.h"
+#include "../video.h"
+#include "../list.h"
+#include "label.h"
+#include "menu_item.h"
+#include "menu.h"
+#include "menu_bar.h"
 
 typedef enum _BRS_GUI_WidgetType BRS_GUI_WidgetType;
 
-typedef struct _BRS_GUI_Label BRS_GUI_Label;
-typedef struct _BRS_GUI_MenuItem BRS_GUI_MenuItem;
-typedef struct _BRS_GUI_Menu BRS_GUI_Menu;
-typedef struct _BRS_GUI_MenuBar BRS_GUI_MenuBar;
 typedef union _BRS_GUI_Widget_Object BRS_GUI_Widget_Object;
 
 typedef struct _BRS_GUI_Widget BRS_GUI_Widget;
 
 typedef void (*BRS_GUI_MenuBar_ClickHandler)(BRS_GUI_MenuBar *);
 
-BRS_LIST_DECL(BRS_GUI_MenuItemList, BRS_GUI_MenuItem)
-BRS_LIST_DECL(BRS_GUI_MenuList, BRS_GUI_Menu)
 BRS_LIST_DECL(BRS_GUI_WidgetList, BRS_GUI_Widget)
-
-struct _BRS_GUI_Label {
-    BRS_Point *position;
-    const char *text;
-    BRS_Font *font;
-    const BRS_Color *color;
-};
-
-struct _BRS_GUI_MenuItem {
-    char *label;
-};
-
-struct _BRS_GUI_Menu {
-    char *label;
-    const BRS_Color *color;
-    BRS_Font *font;
-    bool expanded;
-    BRS_GUI_MenuItemList *itemList;
-};
-
-struct _BRS_GUI_MenuBar {
-    BRS_Font *font;
-    BRS_Point *position;
-    BRS_Dimension *dimension;
-    const BRS_Color *color;
-    BRS_GUI_MenuList *menuList;
-};
 
 enum _BRS_GUI_WidgetType {
     BRS_GUI_WIDGET_LABEL,
@@ -78,13 +49,9 @@ void BRS_GUI_destroyWidget(BRS_GUI_Widget *widget);
 
 void BRS_GUI_processEvent(BRS_GUI_Widget *widget, SDL_Event event);
 
-BRS_GUI_Widget *BRS_GUI_createMenuBar(BRS_Point *position, BRS_Dimension *dimension, const BRS_Color *color, BRS_Font *font);
+BRS_GUI_Widget *BRS_GUI_createMenuBar(BRS_Point *position, BRS_Dimension *dimension, const BRS_Color *foreColor, BRS_Font *font);
 
 BRS_GUI_Widget *BRS_GUI_createLabel(BRS_Point *position, const BRS_Color *color, const char *text, BRS_Font *font);
-
-BRS_GUI_Widget *BRS_GUI_createMenu();
-
-BRS_GUI_Widget *BRS_GUI_createMenuItem();
 
 void BRS_GUI_setMenuBarClickHandler(BRS_GUI_Widget *widget, BRS_GUI_MenuBar_ClickHandler handler);
 

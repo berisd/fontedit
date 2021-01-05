@@ -5,6 +5,9 @@
 #ifndef BRS_LIST_H
 #define BRS_LIST_H
 
+#include <stddef.h>
+#include <stdlib.h>
+
 #define BRS_LIST_DECL(LIST_NAME, VALUE_TYPE) \
 typedef struct _##LIST_NAME##Entry LIST_NAME##Entry; \
 struct _##LIST_NAME##Entry { \

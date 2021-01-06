@@ -23,3 +23,7 @@ void BRS_GUI_MenuItem_render(BRS_VideoContext *context, BRS_GUI_MenuItem *menuIt
 
     BRS_drawString(context, menuItem->label, menuItem->font, &position, menuItem->foreColor);
 }
+
+void BRS_GUI_setMenuItemClickHandler(BRS_GUI_MenuItem *menuItem, BRS_GUI_MenuItem_ClickHandler handler) {
+    menuItem->clickHandler = handler;
+}

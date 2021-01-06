@@ -8,6 +8,7 @@
 #include "menu.h"
 
 typedef struct _BRS_GUI_MenuBar BRS_GUI_MenuBar;
+typedef void (*BRS_GUI_MenuBar_ClickHandler)(BRS_GUI_MenuBar *);
 
 struct _BRS_GUI_MenuBar {
     BRS_Font *font;
@@ -15,6 +16,7 @@ struct _BRS_GUI_MenuBar {
     BRS_Dimension *dimension;
     const BRS_Color *color;
     BRS_GUI_MenuList *menuList;
+    BRS_GUI_MenuBar_ClickHandler clickHandler;
 };
 
 BRS_GUI_MenuBar *BRS_GUI_MenuBar_create(BRS_Point *position, BRS_Dimension *dimension, const BRS_Color *color, BRS_Font *font);

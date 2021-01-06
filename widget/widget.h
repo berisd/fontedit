@@ -18,8 +18,6 @@ typedef union _BRS_GUI_Widget_Object BRS_GUI_Widget_Object;
 
 typedef struct _BRS_GUI_Widget BRS_GUI_Widget;
 
-typedef void (*BRS_GUI_MenuBar_ClickHandler)(BRS_GUI_MenuBar *);
-
 BRS_LIST_DECL(BRS_GUI_WidgetList, BRS_GUI_Widget)
 
 enum _BRS_GUI_WidgetType {
@@ -32,15 +30,9 @@ union _BRS_GUI_Widget_Object {
     BRS_GUI_Label *label;
 };
 
-typedef union _BRS_GUI_Widget_ClickHandler BRS_GUI_Widget_ClickHandler;
-union _BRS_GUI_Widget_ClickHandler {
-    BRS_GUI_MenuBar_ClickHandler menuBarClickHandler;
-};
-
 struct _BRS_GUI_Widget {
     BRS_GUI_WidgetType type;
     BRS_GUI_Widget_Object *object;
-    BRS_GUI_Widget_ClickHandler *onClickHandler;
 };
 
 void BRS_GUI_renderWidget(BRS_VideoContext *context, BRS_GUI_Widget *widget);
@@ -49,9 +41,9 @@ void BRS_GUI_destroyWidget(BRS_GUI_Widget *widget);
 
 void BRS_GUI_processEvent(BRS_GUI_Widget *widget, SDL_Event event);
 
-BRS_GUI_Widget *BRS_GUI_createMenuBar(BRS_Point *position, BRS_Dimension *dimension, const BRS_Color *foreColor, BRS_Font *font);
+BRS_GUI_Widget *BRS_GUI_Widget_createMenuBar(BRS_Point *position, BRS_Dimension *dimension, const BRS_Color *foreColor, BRS_Font *font);
 
-BRS_GUI_Widget *BRS_GUI_createLabel(BRS_Point *position, const BRS_Color *color, const char *text, BRS_Font *font);
+BRS_GUI_Widget *BRS_GUI_Widget_createLabel(BRS_Point *position, const BRS_Color *color, const char *text, BRS_Font *font);
 
 void BRS_GUI_setMenuBarClickHandler(BRS_GUI_Widget *widget, BRS_GUI_MenuBar_ClickHandler handler);
 

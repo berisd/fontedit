@@ -11,4 +11,6 @@ BRS_GUI_WidgetList *createWidgets(BRS_Font *font);
 
 void destroyWidgets(BRS_GUI_WidgetList *widgets);
 
+void quitApplication();
+
 #endif //FONTEDIT_GUI_H

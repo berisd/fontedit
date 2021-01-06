@@ -14,7 +14,10 @@ typedef struct ApplicationState {
     BRS_VideoContext *videoContext;
     BRS_Font *defaultFont;
     BRS_GUI_WidgetList *widgets;
+    bool quit;
 } ApplicationState;
+
+static ApplicationState *applicationState = NULL;
 
 static ApplicationConfig *createConfig() {
     ApplicationConfig *config = malloc(sizeof(ApplicationConfig));
@@ -47,6 +50,7 @@ static ApplicationState *initApplication(const ApplicationConfig *config) {
     applicationState->videoContext = videoContext;
     applicationState->defaultFont = createDefaultFont();
     applicationState->widgets = createWidgets(applicationState->defaultFont);
+    applicationState->quit = false;
     atexit(SDL_Quit);
     return applicationState;
 }
@@ -93,19 +97,22 @@ static void handleVideo(ApplicationState *applicationState) {
 
 static void runApplication(ApplicationState *applicationState) {
     SDL_Event event;
-    bool quit = false;
-    while (!quit) {
+    while (!applicationState->quit) {
         if (SDL_PollEvent(&event) != 0) {
-            quit = checkQuitApplication(event);
+            applicationState->quit = checkQuitApplication(event);
             processEvent(event, applicationState);
         }
         handleVideo(applicationState);
     }
 }
 
+void quitApplication() {
+    applicationState->quit = true;
+}
+
 int main() {
     ApplicationConfig *config = createConfig();
-    ApplicationState *applicationState = initApplication(config);
+    applicationState = initApplication(config);
     if (applicationState != NULL) {
         runApplication(applicationState);
     }

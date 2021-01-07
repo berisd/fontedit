@@ -70,4 +70,8 @@ void BRS_drawline(const BRS_VideoContext *context, const BRS_Line *line);
 void BRS_drawString(const BRS_VideoContext *context, const char *str, const BRS_Font *font, const BRS_Point *startPoint,
                     const BRS_Color *color);
 
+BRS_Point *BRS_copyPoint(BRS_Point *source);
+
+BRS_Dimension *BRS_copyDimension(BRS_Dimension *source);
+
 #endif //FONTEDIT_VIDEO_H

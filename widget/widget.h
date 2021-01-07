@@ -35,11 +35,11 @@ struct _BRS_GUI_Widget {
     BRS_GUI_Widget_Object *object;
 };
 
-void BRS_GUI_renderWidget(BRS_VideoContext *context, BRS_GUI_Widget *widget);
+void BRS_GUI_Widget_render(BRS_VideoContext *context, BRS_GUI_Widget *widget);
 
 void BRS_GUI_destroyWidget(BRS_GUI_Widget *widget);
 
-void BRS_GUI_processEvent(BRS_GUI_Widget *widget, SDL_Event event);
+void BRS_GUI_Widget_processEvent(BRS_GUI_Widget *widget, SDL_Event *event);
 
 BRS_GUI_Widget *BRS_GUI_Widget_createMenuBar(BRS_Point *position, BRS_Dimension *dimension, const BRS_Color *foreColor, BRS_Font *font);
 

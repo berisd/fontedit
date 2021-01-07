@@ -12,12 +12,14 @@ static void onClickMenuItemQuit(BRS_GUI_MenuItem *menuItem) {
     quitApplication();
 }
 
-static BRS_GUI_Menu *createFileMenu(BRS_Font *font) {
-    BRS_GUI_Menu *menu = BRS_GUI_Menu_create("File", &COLOR_WHITE, &COLOR_BLUE, &COLOR_YELLOW, font, false);
-    BRS_GUI_MenuItem *menuItemNew = BRS_GUI_MenuItem_create("New", &COLOR_WHITE, &COLOR_BLUE, font);
-    BRS_GUI_MenuItem *menuItemLoad = BRS_GUI_MenuItem_create("Load", &COLOR_WHITE, &COLOR_BLUE, font);
-    BRS_GUI_MenuItem *menuItemSave = BRS_GUI_MenuItem_create("Save", &COLOR_WHITE, &COLOR_BLUE, font);
-    BRS_GUI_MenuItem *menuItemQuit = BRS_GUI_MenuItem_create("Quit", &COLOR_WHITE, &COLOR_BLUE, font);
+static BRS_GUI_Menu *createFileMenu(BRS_GUI_MenuBar *menuBar, BRS_Font *font) {
+    BRS_Dimension dim = {.width = 50, .height = 20};
+    BRS_GUI_Menu *menu = BRS_GUI_Menu_create(menuBar, &dim, "File", &COLOR_WHITE, &COLOR_BLUE, &COLOR_YELLOW, font,
+                                             false);
+    BRS_GUI_MenuItem *menuItemNew = BRS_GUI_MenuItem_create(menu, "New", &COLOR_WHITE, &COLOR_BLUE, font);
+    BRS_GUI_MenuItem *menuItemLoad = BRS_GUI_MenuItem_create(menu, "Load", &COLOR_WHITE, &COLOR_BLUE, font);
+    BRS_GUI_MenuItem *menuItemSave = BRS_GUI_MenuItem_create(menu, "Save", &COLOR_WHITE, &COLOR_BLUE, font);
+    BRS_GUI_MenuItem *menuItemQuit = BRS_GUI_MenuItem_create(menu, "Quit", &COLOR_WHITE, &COLOR_BLUE, font);
 
     BRS_GUI_MenuItemList_push(menuItemNew, menu->itemList);
     BRS_GUI_MenuItemList_push(menuItemLoad, menu->itemList);
@@ -40,7 +42,7 @@ static BRS_GUI_Widget *createMenuBar(BRS_Font *font) {
 
     BRS_GUI_setMenuBarClickHandler(widget, &onClickMenuBar);
 
-    BRS_GUI_Menu *fileMenu = createFileMenu(font);
+    BRS_GUI_Menu *fileMenu = createFileMenu(widget->object->menuBar, font);
     BRS_GUI_MenuList_push(fileMenu, widget->object->menuBar->menuList);
 
     return widget;

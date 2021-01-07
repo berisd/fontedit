@@ -60,12 +60,12 @@ static void shutdownApplication(ApplicationState *applicationState) {
     freeApplicationState(applicationState);
 }
 
-static bool checkQuitApplication(SDL_Event event) {
-    switch (event.type) {
+static bool checkQuitApplication(SDL_Event *event) {
+    switch (event->type) {
         case SDL_QUIT:
             return true;
         case SDL_KEYDOWN:
-            switch (event.key.keysym.sym) {
+            switch (event->key.keysym.sym) {
                 case SDLK_ESCAPE:
                     return true;
             }
@@ -73,11 +73,11 @@ static bool checkQuitApplication(SDL_Event event) {
     return false;
 }
 
-static void processEvent(SDL_Event event, ApplicationState *applicationState) {
+static void processEvent(SDL_Event *event, ApplicationState *applicationState) {
     BRS_GUI_WidgetList *widgetList = applicationState->widgets;
     BRS_GUI_WidgetListEntry *entry = widgetList->firstEntry;
     while (entry != NULL) {
-        BRS_GUI_processEvent(entry->value, event);
+        BRS_GUI_Widget_processEvent(entry->value, event);
         entry = entry->next;
     }
 }
@@ -88,7 +88,7 @@ static void handleVideo(ApplicationState *applicationState) {
 
     BRS_GUI_WidgetListEntry *listEntry = applicationState->widgets->firstEntry;
     while (listEntry != NULL) {
-        BRS_GUI_renderWidget(applicationState->videoContext, listEntry->value);
+        BRS_GUI_Widget_render(applicationState->videoContext, listEntry->value);
         listEntry = listEntry->next;
     }
 
@@ -99,8 +99,8 @@ static void runApplication(ApplicationState *applicationState) {
     SDL_Event event;
     while (!applicationState->quit) {
         if (SDL_PollEvent(&event) != 0) {
-            applicationState->quit = checkQuitApplication(event);
-            processEvent(event, applicationState);
+            applicationState->quit = checkQuitApplication(&event);
+            processEvent(&event, applicationState);
         }
         handleVideo(applicationState);
     }

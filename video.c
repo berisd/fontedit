@@ -116,3 +116,15 @@ void BRS_drawString(const BRS_VideoContext *context, const char *str, const BRS_
         y -= font->height_bits;
     }
 }
+
+BRS_Point *BRS_copyPoint(BRS_Point *source) {
+    BRS_Point *copy = malloc(sizeof(source));
+    memcpy(copy, source, sizeof(source));
+    return copy;
+}
+
+BRS_Dimension *BRS_copyDimension(BRS_Dimension *source) {
+    struct BRS_Dimension *copy = malloc(sizeof(source));
+    memcpy(copy, source, sizeof(source));
+    return copy;
+}

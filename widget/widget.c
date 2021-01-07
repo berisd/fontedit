@@ -34,6 +34,34 @@ BRS_GUI_Widget_createMenuBar(BRS_Point *position, BRS_Dimension *dimension, cons
     return widget;
 }
 
+BRS_GUI_Widget *
+BRS_GUI_Widget_createCharTable(BRS_Point *position, const BRS_Color *foreColor,
+                               BRS_Font *font) {
+    BRS_GUI_CharTable *charTable = BRS_GUI_CharTable_create(position, foreColor, font);
+
+    BRS_GUI_Widget_Object *object = malloc(sizeof(BRS_GUI_Widget_Object));
+    object->charTable = charTable;
+
+    BRS_GUI_Widget *widget = malloc(sizeof(BRS_GUI_Widget));
+    widget->type = BRS_GUI_WIDGET_CHARTABLE;
+    widget->object = object;
+
+    return widget;
+}
+
+BRS_GUI_Widget *BRS_GUI_Widget_createCharEdit(BRS_Point *position, const BRS_Color *foreColor, BRS_Font *fontEdited) {
+    BRS_GUI_CharEdit *charEdit = BRS_GUI_CharEdit_create(position, foreColor, fontEdited);
+
+    BRS_GUI_Widget_Object *object = malloc(sizeof(BRS_GUI_Widget_Object));
+    object->charEdit = charEdit;
+
+    BRS_GUI_Widget *widget = malloc(sizeof(BRS_GUI_Widget));
+    widget->type = BRS_GUI_WIDGET_CHAREDIT;
+    widget->object = object;
+
+    return widget;
+}
+
 void BRS_GUI_Widget_render(BRS_VideoContext *context, BRS_GUI_Widget *widget) {
     switch (widget->type) {
         case BRS_GUI_WIDGET_LABEL:
@@ -41,6 +69,12 @@ void BRS_GUI_Widget_render(BRS_VideoContext *context, BRS_GUI_Widget *widget) {
             break;
         case BRS_GUI_WIDGET_MENUBAR:
             BRS_GUI_MenuBar_render(context, widget->object->menuBar);
+            break;
+        case BRS_GUI_WIDGET_CHARTABLE:
+            BRS_GUI_CharTable_render(context, widget->object->charTable);
+            break;
+        case BRS_GUI_WIDGET_CHAREDIT:
+            BRS_GUI_CharEdit_render(context, widget->object->charEdit);
             break;
     }
 }
@@ -58,10 +92,16 @@ void BRS_GUI_Widget_processEvent(BRS_GUI_Widget *widget, SDL_Event *event) {
 void BRS_GUI_destroyWidget(BRS_GUI_Widget *widget) {
     switch (widget->type) {
         case BRS_GUI_WIDGET_LABEL:
-            free(widget->object->label);
+            BRS_GUI_Label_destroy(widget->object->label);
             break;
         case BRS_GUI_WIDGET_MENUBAR:
             BRS_GUI_MenuBar_destroy(widget->object->menuBar);
+            break;
+        case BRS_GUI_WIDGET_CHARTABLE:
+            BRS_GUI_CharTable_destroy(widget->object->charTable);
+            break;
+        case BRS_GUI_WIDGET_CHAREDIT:
+            BRS_GUI_CharEdit_destroy(widget->object->charEdit);
             break;
     }
     free(widget->object);

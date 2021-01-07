@@ -1,4 +1,5 @@
 #include <malloc.h>
+#include <string.h>
 #include "font.h"
 
 BRS_LoadFontResult *BRS_loadFont(const char *filename) {
@@ -30,9 +31,24 @@ BRS_LoadFontResult *BRS_loadFont(const char *filename) {
     return result;
 }
 
-void BRS_freeFont(BRS_Font *font) {
+void BRS_destroyFont(BRS_Font *font) {
     if (font->data) {
         free(font->data);
     }
     free(font);
+}
+
+int32_t BRS_getFontSize(BRS_Font *font) {
+    return font->width_bits / 8 * font->height_bits * font->num_chars;
+}
+
+BRS_Font *BRS_copyFont(BRS_Font *font) {
+    BRS_Font *copy = malloc(sizeof(BRS_Font));
+    copy->width_bits = font->width_bits;
+    copy->height_bits = font->height_bits;
+    copy->num_chars = font->num_chars;
+    size_t fontSize = BRS_getFontSize(font);
+    copy->data = malloc(fontSize);
+    memcpy(copy->data, font->data, fontSize);
+    return font;
 }

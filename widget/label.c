@@ -7,10 +7,15 @@
 BRS_GUI_Label *BRS_GUI_Label_create(BRS_Point *position, const BRS_Color *color, const char *text, BRS_Font *font) {
     BRS_GUI_Label *label = malloc(sizeof(BRS_GUI_Label));
     label->text = text;
-    label->position = position;
+    label->position = BRS_copyPoint(position);
     label->font = font;
     label->color = color;
     return label;
+}
+
+void BRS_GUI_Label_destroy(BRS_GUI_Label * label) {
+    free(label->position);
+    free(label);
 }
 
 void *BRS_GUI_Label_render(BRS_VideoContext *context, BRS_GUI_Label *label) {

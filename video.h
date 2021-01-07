@@ -35,17 +35,18 @@ struct BRS_Line {
 };
 typedef struct BRS_Line BRS_Line;
 
+typedef struct _BRS_Rect {
+    int32_t x;
+    int32_t y;
+    int32_t width;
+    int32_t height;
+} BRS_Rect;
+
 struct BRS_Dimension {
     int32_t width;
     int32_t height;
 };
 typedef struct BRS_Dimension BRS_Dimension;
-
-struct BRS_Rect {
-    BRS_Point position;
-    BRS_Dimension dimension;
-};
-typedef struct BRS_Rect BRS_Rect;
 
 const BRS_Color COLOR_RED;
 const BRS_Color COLOR_BLUE;
@@ -66,6 +67,10 @@ void BRS_updateVideo(const BRS_VideoContext *context);
 void BRS_drawPoint(const BRS_VideoContext *context, const BRS_Point *point);
 
 void BRS_drawline(const BRS_VideoContext *context, const BRS_Line *line);
+
+void BRS_drawlRect(const BRS_VideoContext *context, const BRS_Rect *rect);
+
+void BRS_drawlFillRect(const BRS_VideoContext *context, const BRS_Rect *rect);
 
 void BRS_drawString(const BRS_VideoContext *context, const char *str, const BRS_Font *font, const BRS_Point *startPoint,
                     const BRS_Color *color);

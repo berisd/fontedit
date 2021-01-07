@@ -24,6 +24,8 @@ struct BRS_LoadFontResult {
 };
 
 BRS_LoadFontResult *BRS_loadFont(const char *filename);
-void BRS_freeFont(BRS_Font *font);
+void BRS_destroyFont(BRS_Font *font);
+int32_t BRS_getFontSize(BRS_Font *font);
+BRS_Font *BRS_copyFont(BRS_Font *font);
 
 #endif //SDLSCROLLTEXTMUS_FONT_H

@@ -1,4 +1,4 @@
-# Font Editor #
+# Font Edit #
 
 A simple font editor for bitmap and multicolor fonts.
 

@@ -48,14 +48,30 @@ static BRS_GUI_Widget *createMenuBar(BRS_Font *font) {
     return widget;
 }
 
-BRS_GUI_WidgetList *createWidgets(BRS_Font *font) {
+static BRS_GUI_Widget *createCharTable(BRS_Font *font) {
+    BRS_Point position = {.x = 10, .y = 50};
+    BRS_GUI_Widget *widget = BRS_GUI_Widget_createCharTable(&position, &COLOR_RED, font);
+    return widget;
+}
+
+static BRS_GUI_Widget *createCharEdit(BRS_Font *font) {
+    BRS_Point position = {.x = 500, .y = 50};
+    BRS_GUI_Widget *widget = BRS_GUI_Widget_createCharEdit(&position, &COLOR_RED, font);
+    return widget;
+}
+
+BRS_GUI_WidgetList *createWidgets(BRS_Font *font, uint32_t screenWidth, uint32_t screenHeight) {
     BRS_GUI_WidgetList *list = BRS_GUI_WidgetList_create();
 
     BRS_Point *labelPosition = malloc(sizeof(BRS_Point));
-    labelPosition->x = 100;
-    labelPosition->y = 150;
+    const char *labelText = "Hello World";
 
-    BRS_GUI_WidgetList_push(BRS_GUI_Widget_createLabel(labelPosition, &COLOR_RED, "Hello World", font), list);
+    labelPosition->x = (screenWidth - strlen(labelText) * font->width_bits) / 2;
+    labelPosition->y = screenHeight - font->height_bits -1;
+
+    BRS_GUI_WidgetList_push(createCharTable(font), list);
+    BRS_GUI_WidgetList_push(createCharEdit(font), list);
+    BRS_GUI_WidgetList_push(BRS_GUI_Widget_createLabel(labelPosition, &COLOR_RED, labelText, font), list);
     BRS_GUI_WidgetList_push(createMenuBar(font), list);
 
     return list;

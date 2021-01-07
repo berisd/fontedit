@@ -87,6 +87,16 @@ void BRS_drawline(const BRS_VideoContext *context, const BRS_Line *line) {
     SDL_RenderDrawLine(context->renderer, line->p1->x, line->p1->y, line->p2->x, line->p2->y);
 }
 
+void BRS_drawlRect(const BRS_VideoContext *context, const BRS_Rect *rect) {
+    SDL_Rect sdlRect = {.x = rect->x, .y = rect->y, .w = rect->width, .h = rect->height};
+    SDL_RenderDrawRect(context->renderer, &sdlRect);
+}
+
+void BRS_drawlFillRect(const BRS_VideoContext *context, const BRS_Rect *rect) {
+    SDL_Rect sdlRect = {.x = rect->x, .y = rect->y, .w = rect->width, .h = rect->height};
+    SDL_RenderFillRect(context->renderer, &sdlRect);
+}
+
 void BRS_drawString(const BRS_VideoContext *context, const char *str, const BRS_Font *font, const BRS_Point *startPoint,
                     const BRS_Color *color) {
     BRS_setColor(context, color);

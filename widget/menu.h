@@ -40,7 +40,7 @@ BRS_GUI_MenuBar_ClickHandler BRS_GUI_MenuBar_getClickHandler(BRS_GUI_MenuBar *me
 int32_t BRS_GUI_MenuBar_getMenuIndex(BRS_GUI_MenuBar *menuBar, BRS_GUI_Menu *menu);
 // External End
 
-void BRS_GUI_Menu_render(BRS_VideoContext *context, BRS_GUI_Menu *menu, BRS_Point position);
+void BRS_GUI_Menu_render(BRS_VideoContext *context, BRS_GUI_Menu *menu);
 
 BRS_GUI_Menu *
 BRS_GUI_Menu_create(BRS_GUI_MenuBar *menuBar, BRS_Dimension *dimension, const char *label, const BRS_Color *foreColor,

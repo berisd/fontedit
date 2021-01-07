@@ -33,11 +33,9 @@ void BRS_GUI_MenuBar_render(BRS_VideoContext *context, BRS_GUI_MenuBar *menubar)
     SDL_RenderFillRect(context->renderer, &r);
 
     BRS_GUI_MenuListEntry *entry = menubar->menuList->firstEntry;
-    BRS_Point menuPos = {.x = menubar->position->x + 1, .y = menubar->position->y + 1};
     while (entry != NULL) {
         BRS_GUI_Menu *menu = entry->value;
-        BRS_GUI_Menu_render(context, menu, menuPos);
-        menuPos.y += 20;
+        BRS_GUI_Menu_render(context, menu);
         entry = entry->next;
     }
 }

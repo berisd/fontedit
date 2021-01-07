@@ -19,6 +19,7 @@ typedef void (*BRS_GUI_MenuItem_ClickHandler)(BRS_GUI_MenuItem *);
 
 struct _BRS_GUI_MenuItem {
     BRS_GUI_Menu *menu;
+    BRS_Dimension *dimension;
     const char *label;
     const BRS_Color *foreColor;
     const BRS_Color *backColor;
@@ -37,12 +38,12 @@ int32_t BRS_GUI_Menu_getMenuItemIndex(BRS_GUI_Menu *menu, BRS_GUI_MenuItem *menu
 // External End
 
 BRS_GUI_MenuItem *
-BRS_GUI_MenuItem_create(BRS_GUI_Menu *menu, const char *label, const BRS_Color *foreColor, const BRS_Color *backColor,
+BRS_GUI_MenuItem_create(BRS_Dimension *dimension, BRS_GUI_Menu *menu, const char *label, const BRS_Color *foreColor, const BRS_Color *backColor,
                         BRS_Font *font);
 
 void BRS_GUI_MenuItem_destroy(BRS_GUI_MenuItem *menuItem);
 
-void BRS_GUI_MenuItem_render(BRS_VideoContext *context, BRS_GUI_MenuItem *menuItem, BRS_Point position);
+void BRS_GUI_MenuItem_render(BRS_VideoContext *context, BRS_GUI_MenuItem *menuItem);
 
 void BRS_GUI_setMenuItemClickHandler(BRS_GUI_MenuItem *menuItem, BRS_GUI_MenuItem_ClickHandler handler);
 

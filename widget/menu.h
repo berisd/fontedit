@@ -52,7 +52,7 @@ void BRS_GUI_Menu_processEvent(BRS_GUI_Menu *menu, SDL_Event *event);
 
 BRS_Dimension *BRS_GUI_Menu_getDimension(BRS_GUI_Menu *menu);
 
-BRS_Point *BRS_GUI_Menu_calcPosition(BRS_GUI_Menu *menu);
+void BRS_GUI_Menu_calcPosition(BRS_GUI_Menu *menu, BRS_Point *menuPosition);
 
 /**
  * Get Index for menuitem in menu

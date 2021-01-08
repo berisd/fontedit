@@ -33,7 +33,7 @@ struct _BRS_GUI_MenuItem {
 BRS_LIST_DECL(BRS_GUI_MenuItemList, BRS_GUI_MenuItem)
 
 // External
-BRS_Point *BRS_GUI_Menu_calcPosition(BRS_GUI_Menu *menu);
+void BRS_GUI_Menu_calcPosition(BRS_GUI_Menu *menu, BRS_Point *menuPosition);
 
 BRS_Dimension *BRS_GUI_Menu_getDimension(BRS_GUI_Menu *menu);
 

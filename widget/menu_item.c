@@ -6,16 +6,14 @@
 
 BRS_LIST_DEFN(BRS_GUI_MenuItemList, BRS_GUI_MenuItem)
 
-static BRS_Point *calculatePosition(BRS_GUI_MenuItem *menuItem) {
+static void calculatePosition(BRS_GUI_MenuItem *menuItem, BRS_Point *menuItemPosition) {
     int32_t menuItemIndex = BRS_GUI_Menu_getMenuItemIndex(menuItem->menu, menuItem);
-    BRS_Point *menuPosition = BRS_GUI_Menu_calcPosition(menuItem->menu);
+    BRS_Point menuPosition;
+    BRS_GUI_Menu_calcPosition(menuItem->menu, &menuPosition);
     BRS_Dimension *menuDimension = BRS_GUI_Menu_getDimension(menuItem->menu);
 
-    BRS_Point *menuItemPosition = malloc(sizeof(BRS_Point));
-    menuItemPosition->x = menuPosition->x;
-    menuItemPosition->y = menuPosition->y + menuDimension->height + menuItem->dimension->height * menuItemIndex;
-    free(menuPosition);
-    return menuItemPosition;
+    menuItemPosition->x = menuPosition.x;
+    menuItemPosition->y = menuPosition.y + menuDimension->height + menuItem->dimension->height * menuItemIndex;
 }
 
 BRS_GUI_MenuItem *
@@ -40,18 +38,18 @@ void BRS_GUI_MenuItem_destroy(BRS_GUI_MenuItem *menuItem) {
 }
 
 void BRS_GUI_MenuItem_render(BRS_VideoContext *context, BRS_GUI_MenuItem *menuItem) {
-    BRS_Point *position = calculatePosition(menuItem);
+    BRS_Point position;
+    calculatePosition(menuItem, &position);
 
     BRS_setColor(context, menuItem->backColor);
-    SDL_Rect r = {.x = position->x, .y = position->y, .w=menuItem->dimension->width, .h=menuItem->dimension->height};
+    SDL_Rect r = {.x = position.x, .y = position.y, .w=menuItem->dimension->width, .h=menuItem->dimension->height};
     SDL_RenderFillRect(context->renderer, &r);
 
-    position->x++;
-    position->y++;
+    position.x++;
+    position.y++;
 
-    BRS_drawString(context, menuItem->label, menuItem->font, position,
+    BRS_drawString(context, menuItem->label, menuItem->font, &position,
                    menuItem->highlighted ? menuItem->highlightedColor : menuItem->foreColor);
-    free(position);
 }
 
 void BRS_GUI_setMenuItemClickHandler(BRS_GUI_MenuItem *menuItem, BRS_GUI_MenuItem_ClickHandler handler) {
@@ -60,10 +58,12 @@ void BRS_GUI_setMenuItemClickHandler(BRS_GUI_MenuItem *menuItem, BRS_GUI_MenuIte
 
 static void processMouseButtonDown(BRS_GUI_MenuItem *menuItem, SDL_MouseButtonEvent *button) {
     if (button->button == SDL_BUTTON_LEFT) {
-        BRS_Point *menuPosition = BRS_GUI_Menu_calcPosition(menuItem->menu);
-        BRS_Point *menuItemPosition = calculatePosition(menuItem);
+        BRS_Point menuPosition;
+        BRS_GUI_Menu_calcPosition(menuItem->menu, &menuPosition);
+        BRS_Point menuItemPosition;
+        calculatePosition(menuItem, &menuItemPosition);
 
-        BRS_Rect menuItemRect = {.x = menuItemPosition->x, .y = menuItemPosition->y, .width = menuItem->dimension->width,
+        BRS_Rect menuItemRect = {.x = menuItemPosition.x, .y = menuItemPosition.y, .width = menuItem->dimension->width,
                 menuItem->dimension->height};
         BRS_Point mousePoint = {.x = button->x, .y = button->y};
         bool clickedInMenuItem = BRS_PointInRect(&mousePoint, &menuItemRect);
@@ -71,18 +71,15 @@ static void processMouseButtonDown(BRS_GUI_MenuItem *menuItem, SDL_MouseButtonEv
         if (clickedInMenuItem && menuItem->clickHandler) {
             menuItem->clickHandler(menuItem);
         }
-
-        free(menuPosition);
-        free(menuItemPosition);
     }
 }
 
 static void processMouseMove(BRS_GUI_MenuItem *menuItem, SDL_MouseMotionEvent *motion) {
     BRS_Point mousePoint = {.x = motion->x, .y = motion->y};
-    BRS_Point *position = calculatePosition(menuItem);
-    BRS_Rect widgetRect = {.x = position->x, .y = position->y, .width = menuItem->dimension->width, .height = menuItem->dimension->height};
+    BRS_Point position;
+    calculatePosition(menuItem, &position);
+    BRS_Rect widgetRect = {.x = position.x, .y = position.y, .width = menuItem->dimension->width, .height = menuItem->dimension->height};
     menuItem->highlighted = BRS_PointInRect(&mousePoint, &widgetRect);
-    free(position);
 }
 
 void BRS_GUI_MenuItem_processEvent(BRS_GUI_MenuItem *menuItem, SDL_Event *event) {

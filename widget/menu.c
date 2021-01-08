@@ -7,14 +7,15 @@
 BRS_LIST_DEFN(BRS_GUI_MenuList, BRS_GUI_Menu)
 
 void BRS_GUI_Menu_render(BRS_VideoContext *context, BRS_GUI_Menu *menu) {
-    BRS_Point *position = BRS_GUI_Menu_calcPosition(menu);
+    BRS_Point position;
+    BRS_GUI_Menu_calcPosition(menu, &position);
     BRS_setColor(context, menu->backColor);
-    SDL_Rect r = {.x = position->x, .y = position->y, .w=menu->dimension->width, .h=menu->dimension->height};
+    SDL_Rect r = {.x = position.x, .y = position.y, .w=menu->dimension->width, .h=menu->dimension->height};
     SDL_RenderFillRect(context->renderer, &r);
 
-    position->x++;
-    position->y++;
-    BRS_drawString(context, menu->label, menu->font, position,
+    position.x++;
+    position.y++;
+    BRS_drawString(context, menu->label, menu->font, &position,
                    menu->selected ? menu->selectedForeColor : menu->foreColor);
 
     if (menu->selected) {
@@ -24,7 +25,6 @@ void BRS_GUI_Menu_render(BRS_VideoContext *context, BRS_GUI_Menu *menu) {
             entry = entry->next;
         }
     }
-    free(position);
 }
 
 BRS_GUI_Menu *
@@ -69,13 +69,11 @@ BRS_Dimension *BRS_GUI_Menu_getDimension(BRS_GUI_Menu *menu) {
     return menu->dimension;
 }
 
-BRS_Point *BRS_GUI_Menu_calcPosition(BRS_GUI_Menu *menu) {
-    BRS_Point *pos = malloc(sizeof(BRS_Point));
+void BRS_GUI_Menu_calcPosition(BRS_GUI_Menu *menu, BRS_Point *menuPosition) {
     BRS_Point *menuBarPos = BRS_GUI_MenuBar_getPosition(menu->menuBar);
     int32_t menuIndex = BRS_GUI_MenuBar_getMenuIndex(menu->menuBar, menu);
-    pos->x = menuBarPos->x + menu->dimension->width * menuIndex;
-    pos->y = menuBarPos->y;
-    return pos;
+    menuPosition->x = menuBarPos->x + menu->dimension->width * menuIndex;
+    menuPosition->y = menuBarPos->y;
 }
 
 int32_t BRS_GUI_Menu_getMenuItemIndex(BRS_GUI_Menu *menu, BRS_GUI_MenuItem *menuItem) {

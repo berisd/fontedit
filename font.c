@@ -31,6 +31,15 @@ BRS_LoadFontResult *BRS_loadFont(const char *filename) {
     return result;
 }
 
+BRS_Font *BRS_createFont(uint16_t num_chars, uint8_t width_bits, uint8_t height_bits, uint8_t *data) {
+    BRS_Font *font = malloc(sizeof(BRS_Font));
+    font->width_bits = width_bits;
+    font->height_bits = height_bits;
+    font->num_chars = num_chars;
+    font->data = data;
+    return font;
+}
+
 void BRS_destroyFont(BRS_Font *font) {
     if (font->data) {
         free(font->data);

@@ -24,6 +24,7 @@ struct BRS_LoadFontResult {
 };
 
 BRS_LoadFontResult *BRS_loadFont(const char *filename);
+BRS_Font *BRS_createFont(uint16_t num_chars, uint8_t width_bits, uint8_t height_bits, uint8_t *data);
 void BRS_destroyFont(BRS_Font *font);
 int32_t BRS_getFontSize(BRS_Font *font);
 BRS_Font *BRS_copyFont(BRS_Font *font);

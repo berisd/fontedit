@@ -13,4 +13,6 @@ void destroyWidgets(BRS_GUI_WidgetList *widgets);
 
 void quitApplication();
 
+BRS_GUI_WidgetList *getWidgetList();
+
 #endif //FONTEDIT_GUI_H

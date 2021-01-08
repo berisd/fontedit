@@ -61,8 +61,10 @@ static void processMouseDown(BRS_GUI_MenuItem *menuItem, SDL_MouseButtonEvent *b
         BRS_Point *menuPosition = BRS_GUI_Menu_calcPosition(menuItem->menu);
         BRS_Point *menuItemPosition = calculatePosition(menuItem);
 
-        bool clickedInMenuItem = BRS_GUI_WIDGET_PointInRect(button->x, button->y, menuItemPosition,
-                                                            menuItem->dimension);
+        BRS_Rect menuItemRect = {.x = menuItemPosition->x, .y = menuItemPosition->y, .width = menuItem->dimension->width,
+                menuItem->dimension->height};
+        BRS_Point mousePoint = {.x = button->x, .y = button->y};
+        bool clickedInMenuItem = BRS_PointInRect(&mousePoint, &menuItemRect);
 
         if (clickedInMenuItem && menuItem->clickHandler) {
             menuItem->clickHandler(menuItem);
@@ -75,7 +77,7 @@ static void processMouseDown(BRS_GUI_MenuItem *menuItem, SDL_MouseButtonEvent *b
 
 void BRS_GUI_MenuItem_processEvent(BRS_GUI_MenuItem *menuItem, SDL_Event *event) {
     switch (event->type) {
-        case SDL_MOUSEBUTTONDOWN:
+        case SDL_MOUSEBUTTONUP:
             processMouseDown(menuItem, &event->button);
             break;
     }

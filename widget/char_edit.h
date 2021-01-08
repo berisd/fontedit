@@ -13,7 +13,7 @@ typedef struct _BRS_GUI_CharEdit BRS_GUI_CharEdit;
 struct _BRS_GUI_CharEdit {
     BRS_Font *fontEdited;
     BRS_Point *position;
-    char selectedChar;
+    int32_t selectedChar;
     const BRS_Color *foreColor;
 };
 

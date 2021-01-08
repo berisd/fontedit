@@ -47,13 +47,17 @@ void BRS_GUI_destroyWidget(BRS_GUI_Widget *widget);
 
 void BRS_GUI_Widget_processEvent(BRS_GUI_Widget *widget, SDL_Event *event);
 
-BRS_GUI_Widget *BRS_GUI_Widget_createMenuBar(BRS_Point *position, BRS_Dimension *dimension, const BRS_Color *foreColor, BRS_Font *font);
+BRS_GUI_Widget *
+BRS_GUI_Widget_createMenuBar(BRS_Point *position, BRS_Dimension *dimension, const BRS_Color *foreColor, BRS_Font *font);
 
-BRS_GUI_Widget *BRS_GUI_Widget_createLabel(BRS_Point *position, const BRS_Color *color, const char *text, BRS_Font *font);
+BRS_GUI_Widget *
+BRS_GUI_Widget_createLabel(BRS_Point *position, const BRS_Color *color, const char *text, BRS_Font *font);
 
 BRS_GUI_Widget *BRS_GUI_Widget_createCharEdit(BRS_Point *position, const BRS_Color *foreColor, BRS_Font *fontEdited);
 
-BRS_GUI_Widget *BRS_GUI_Widget_createCharTable(BRS_Point *position, const BRS_Color *foreColor, BRS_Font *font);
+BRS_GUI_Widget *
+BRS_GUI_Widget_createCharTable(BRS_Point *position, const BRS_Color *borderColor, const BRS_Color *charColor,
+                               const BRS_Color *highlightedColor, const BRS_Color *selectedColor, BRS_Font *font);
 
 void BRS_GUI_setMenuBarClickHandler(BRS_GUI_Widget *widget, BRS_GUI_MenuBar_ClickHandler handler);
 

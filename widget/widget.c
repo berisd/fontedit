@@ -35,9 +35,11 @@ BRS_GUI_Widget_createMenuBar(BRS_Point *position, BRS_Dimension *dimension, cons
 }
 
 BRS_GUI_Widget *
-BRS_GUI_Widget_createCharTable(BRS_Point *position, const BRS_Color *foreColor,
+BRS_GUI_Widget_createCharTable(BRS_Point *position, const BRS_Color *borderColor, const BRS_Color *charColor,
+                               const BRS_Color *highlightedColor, const BRS_Color *selectedColor,
                                BRS_Font *font) {
-    BRS_GUI_CharTable *charTable = BRS_GUI_CharTable_create(position, foreColor, font);
+    BRS_GUI_CharTable *charTable = BRS_GUI_CharTable_create(position, borderColor, charColor, highlightedColor,
+                                                            selectedColor, font);
 
     BRS_GUI_Widget_Object *object = malloc(sizeof(BRS_GUI_Widget_Object));
     object->charTable = charTable;
@@ -81,11 +83,11 @@ void BRS_GUI_Widget_render(BRS_VideoContext *context, BRS_GUI_Widget *widget) {
 
 void BRS_GUI_Widget_processEvent(BRS_GUI_Widget *widget, SDL_Event *event) {
     switch (widget->type) {
-        case BRS_GUI_WIDGET_MENUBAR: {
-            BRS_GUI_MenuBar *menuBar = widget->object->menuBar;
-            BRS_GUI_MenuBar_processEvent(menuBar, event);
-        }
+        case BRS_GUI_WIDGET_MENUBAR:
+            BRS_GUI_MenuBar_processEvent(widget->object->menuBar, event);
             break;
+        case BRS_GUI_WIDGET_CHARTABLE:
+            BRS_GUI_CharTable_processEvent(widget->object->charTable, event);
     }
 }
 

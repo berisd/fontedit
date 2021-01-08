@@ -5,6 +5,7 @@
 #ifndef FONTEDIT_VIDEO_H
 #define FONTEDIT_VIDEO_H
 
+#include <stdbool.h>
 #include <SDL2/SDL.h>
 #include "font.h"
 
@@ -23,11 +24,11 @@ struct BRS_Color {
 };
 typedef struct BRS_Color BRS_Color;
 
-typedef struct BRS_Point {
+typedef struct _BRS_Point {
     int x;
     int y;
 } BRS_Point;
-typedef struct BRS_Point BRS_Point;
+typedef struct _BRS_Point BRS_Point;
 
 struct BRS_Line {
     BRS_Point *p1;
@@ -53,6 +54,8 @@ const BRS_Color COLOR_BLUE;
 const BRS_Color COLOR_YELLOW;
 const BRS_Color COLOR_WHITE;
 const BRS_Color COLOR_BLACK;
+const BRS_Color COLOR_DARK_GRAY;
+const BRS_Color COLOR_LIGHT_GRAY;
 
 BRS_VideoContext *BRS_initVideo(uint32_t screenWidth, uint32_t screenHeight);
 
@@ -74,6 +77,8 @@ void BRS_drawlFillRect(const BRS_VideoContext *context, const BRS_Rect *rect);
 
 void BRS_drawString(const BRS_VideoContext *context, const char *str, const BRS_Font *font, const BRS_Point *startPoint,
                     const BRS_Color *color);
+
+bool BRS_PointInRect(BRS_Point *point, BRS_Rect *rect);
 
 BRS_Point *BRS_copyPoint(BRS_Point *source);
 

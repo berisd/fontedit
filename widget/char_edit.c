@@ -7,6 +7,7 @@
 static const int32_t PIXELS_PER_DOT = 16;
 static const int32_t PIXELS_PADDING = 1;
 static const int32_t PIXELS_BORDER = 1;
+static const int32_t NO_CHAR = -1;
 
 BRS_GUI_CharEdit *
 BRS_GUI_CharEdit_create(BRS_Point *position, const BRS_Color *foreColor, BRS_Font *font) {
@@ -14,7 +15,7 @@ BRS_GUI_CharEdit_create(BRS_Point *position, const BRS_Color *foreColor, BRS_Fon
     charEdit->position = BRS_copyPoint(position);
     charEdit->foreColor = foreColor;
     charEdit->fontEdited = font;
-    charEdit->selectedChar = 'A';
+    charEdit->selectedChar = NO_CHAR;
     return charEdit;
 }
 
@@ -88,9 +89,23 @@ static void drawDotsForChar(const BRS_VideoContext *context, const BRS_GUI_CharE
     }
 }
 
+static void clearTable(BRS_VideoContext *context, BRS_GUI_CharEdit *charEdit) {
+    BRS_setColor(context, &COLOR_BLACK);
+    BRS_Rect rect = {
+            .x = charEdit->position->x,
+            .y = charEdit->position->y,
+            .width = charEdit->fontEdited->width_bits * (PIXELS_PER_DOT + PIXELS_PADDING * 2 + PIXELS_BORDER * 2),
+            .height = charEdit->fontEdited->height_bits * (PIXELS_PER_DOT + PIXELS_PADDING * 2 + PIXELS_BORDER * 2)
+    };
+    BRS_drawlFillRect(context, &rect);
+}
+
 void BRS_GUI_CharEdit_render(BRS_VideoContext *context, BRS_GUI_CharEdit *charEdit) {
+    clearTable(context, charEdit);
     drawTableBorder(context, charEdit);
     drawVerticalLines(context, charEdit);
     drawHorizontalLines(context, charEdit);
-    drawDotsForChar(context, charEdit);
+    if (charEdit->selectedChar != NO_CHAR) {
+        drawDotsForChar(context, charEdit);
+    }
 }

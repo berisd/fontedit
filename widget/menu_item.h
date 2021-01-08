@@ -7,15 +7,16 @@
 
 #include "../list.h"
 #include "../video.h"
-#include "util.h"
 
 // External
 typedef struct _BRS_GUI_Menu BRS_GUI_Menu;
-typedef struct _BRS_GUI_MenuItem BRS_GUI_MenuItem;
+
 typedef struct _BRS_GUI_MenuBar BRS_GUI_MenuBar;
+// External End
+
+typedef struct _BRS_GUI_MenuItem BRS_GUI_MenuItem;
 
 typedef void (*BRS_GUI_MenuItem_ClickHandler)(BRS_GUI_MenuItem *);
-// External End
 
 struct _BRS_GUI_MenuItem {
     BRS_GUI_Menu *menu;
@@ -38,7 +39,8 @@ int32_t BRS_GUI_Menu_getMenuItemIndex(BRS_GUI_Menu *menu, BRS_GUI_MenuItem *menu
 // External End
 
 BRS_GUI_MenuItem *
-BRS_GUI_MenuItem_create(BRS_Dimension *dimension, BRS_GUI_Menu *menu, const char *label, const BRS_Color *foreColor, const BRS_Color *backColor,
+BRS_GUI_MenuItem_create(BRS_Dimension *dimension, BRS_GUI_Menu *menu, const char *label, const BRS_Color *foreColor,
+                        const BRS_Color *backColor,
                         BRS_Font *font);
 
 void BRS_GUI_MenuItem_destroy(BRS_GUI_MenuItem *menuItem);

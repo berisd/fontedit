@@ -112,6 +112,10 @@ void quitApplication() {
     applicationState->quit = true;
 }
 
+BRS_GUI_WidgetList *getWidgetList() {
+    return applicationState->widgets;
+}
+
 int main() {
     ApplicationConfig *config = createConfig();
     applicationState = initApplication(config);

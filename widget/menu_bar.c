@@ -40,7 +40,7 @@ void BRS_GUI_MenuBar_render(BRS_VideoContext *context, BRS_GUI_MenuBar *menubar)
     }
 }
 
-static void processMouseDown(BRS_GUI_MenuBar *menuBar, SDL_MouseButtonEvent *button) {
+static void processMouseButtonDown(BRS_GUI_MenuBar *menuBar, SDL_MouseButtonEvent *button) {
     if (button->button == SDL_BUTTON_LEFT) {
         BRS_Point *position = menuBar->position;
         BRS_Dimension *dimension = menuBar->dimension;
@@ -54,8 +54,8 @@ static void processMouseDown(BRS_GUI_MenuBar *menuBar, SDL_MouseButtonEvent *but
 
 void BRS_GUI_MenuBar_processEvent(BRS_GUI_MenuBar *menuBar, SDL_Event *event) {
     switch (event->type) {
-        case SDL_MOUSEBUTTONDOWN:
-            processMouseDown(menuBar, &event->button);
+        case SDL_MOUSEBUTTONUP:
+            processMouseButtonDown(menuBar, &event->button);
             break;
     }
 

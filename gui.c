@@ -22,7 +22,7 @@ static void onClickMenuBar(BRS_GUI_MenuBar *menuBar) {
 }
 
 static void onClickCharTable(BRS_GUI_CharTable *charTable) {
-    BRS_GUI_Widget * charEditWidget = getCharEditWidget();
+    BRS_GUI_Widget *charEditWidget = getCharEditWidget();
     charEditWidget->object->charEdit->selectedChar = charTable->selectedChar;
 }
 
@@ -34,10 +34,14 @@ static BRS_GUI_Menu *createFileMenu(BRS_GUI_MenuBar *menuBar, BRS_Font *font) {
     BRS_Dimension dim = {.width = 50, .height = 20};
     BRS_GUI_Menu *menu = BRS_GUI_Menu_create(menuBar, &dim, "File", &COLOR_WHITE, &COLOR_BLUE, &COLOR_DARK_GRAY, font,
                                              false);
-    BRS_GUI_MenuItem *menuItemNew = BRS_GUI_MenuItem_create(&dim, menu, "New", &COLOR_WHITE, &COLOR_BLUE, font);
-    BRS_GUI_MenuItem *menuItemLoad = BRS_GUI_MenuItem_create(&dim, menu, "Load", &COLOR_WHITE, &COLOR_BLUE, font);
-    BRS_GUI_MenuItem *menuItemSave = BRS_GUI_MenuItem_create(&dim, menu, "Save", &COLOR_WHITE, &COLOR_BLUE, font);
-    BRS_GUI_MenuItem *menuItemQuit = BRS_GUI_MenuItem_create(&dim, menu, "Quit", &COLOR_WHITE, &COLOR_BLUE, font);
+    BRS_GUI_MenuItem *menuItemNew = BRS_GUI_MenuItem_create(&dim, menu, "New", &COLOR_WHITE, &COLOR_BLUE,
+                                                            &COLOR_LIGHT_GRAY, font);
+    BRS_GUI_MenuItem *menuItemLoad = BRS_GUI_MenuItem_create(&dim, menu, "Load", &COLOR_WHITE, &COLOR_BLUE,
+                                                             &COLOR_LIGHT_GRAY, font);
+    BRS_GUI_MenuItem *menuItemSave = BRS_GUI_MenuItem_create(&dim, menu, "Save", &COLOR_WHITE, &COLOR_BLUE,
+                                                             &COLOR_LIGHT_GRAY, font);
+    BRS_GUI_MenuItem *menuItemQuit = BRS_GUI_MenuItem_create(&dim, menu, "Quit", &COLOR_WHITE, &COLOR_BLUE,
+                                                             &COLOR_LIGHT_GRAY, font);
 
     BRS_GUI_MenuItemList_push(menuItemNew, menu->itemList);
     BRS_GUI_MenuItemList_push(menuItemLoad, menu->itemList);

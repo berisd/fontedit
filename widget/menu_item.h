@@ -24,8 +24,10 @@ struct _BRS_GUI_MenuItem {
     const char *label;
     const BRS_Color *foreColor;
     const BRS_Color *backColor;
+    const BRS_Color *highlightedColor;
     BRS_Font *font;
     BRS_GUI_MenuItem_ClickHandler clickHandler;
+    bool highlighted;
 };
 
 BRS_LIST_DECL(BRS_GUI_MenuItemList, BRS_GUI_MenuItem)
@@ -40,8 +42,7 @@ int32_t BRS_GUI_Menu_getMenuItemIndex(BRS_GUI_Menu *menu, BRS_GUI_MenuItem *menu
 
 BRS_GUI_MenuItem *
 BRS_GUI_MenuItem_create(BRS_Dimension *dimension, BRS_GUI_Menu *menu, const char *label, const BRS_Color *foreColor,
-                        const BRS_Color *backColor,
-                        BRS_Font *font);
+                        const BRS_Color *backColor, const BRS_Color *highlightedColor, BRS_Font *font);
 
 void BRS_GUI_MenuItem_destroy(BRS_GUI_MenuItem *menuItem);
 

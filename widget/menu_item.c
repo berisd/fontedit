@@ -20,16 +20,17 @@ static BRS_Point *calculatePosition(BRS_GUI_MenuItem *menuItem) {
 
 BRS_GUI_MenuItem *
 BRS_GUI_MenuItem_create(BRS_Dimension *dimension, BRS_GUI_Menu *menu, const char *label, const BRS_Color *foreColor,
-                        const BRS_Color *backColor,
-                        BRS_Font *font) {
+                        const BRS_Color *backColor, const BRS_Color *highlightedColor, BRS_Font *font) {
     BRS_GUI_MenuItem *menuItem = malloc(sizeof(BRS_GUI_MenuItem));
     menuItem->dimension = BRS_copyDimension(dimension);
     menuItem->menu = menu;
     menuItem->label = label;
     menuItem->foreColor = foreColor;
     menuItem->backColor = backColor;
+    menuItem->highlightedColor = highlightedColor;
     menuItem->font = font;
     menuItem->clickHandler = NULL;
+    menuItem->highlighted = false;
     return menuItem;
 }
 
@@ -48,7 +49,8 @@ void BRS_GUI_MenuItem_render(BRS_VideoContext *context, BRS_GUI_MenuItem *menuIt
     position->x++;
     position->y++;
 
-    BRS_drawString(context, menuItem->label, menuItem->font, position, menuItem->foreColor);
+    BRS_drawString(context, menuItem->label, menuItem->font, position,
+                   menuItem->highlighted ? menuItem->highlightedColor : menuItem->foreColor);
     free(position);
 }
 
@@ -56,7 +58,7 @@ void BRS_GUI_setMenuItemClickHandler(BRS_GUI_MenuItem *menuItem, BRS_GUI_MenuIte
     menuItem->clickHandler = handler;
 }
 
-static void processMouseDown(BRS_GUI_MenuItem *menuItem, SDL_MouseButtonEvent *button) {
+static void processMouseButtonDown(BRS_GUI_MenuItem *menuItem, SDL_MouseButtonEvent *button) {
     if (button->button == SDL_BUTTON_LEFT) {
         BRS_Point *menuPosition = BRS_GUI_Menu_calcPosition(menuItem->menu);
         BRS_Point *menuItemPosition = calculatePosition(menuItem);
@@ -75,10 +77,21 @@ static void processMouseDown(BRS_GUI_MenuItem *menuItem, SDL_MouseButtonEvent *b
     }
 }
 
+static void processMouseMove(BRS_GUI_MenuItem *menuItem, SDL_MouseMotionEvent *motion) {
+    BRS_Point mousePoint = {.x = motion->x, .y = motion->y};
+    BRS_Point *position = calculatePosition(menuItem);
+    BRS_Rect widgetRect = {.x = position->x, .y = position->y, .width = menuItem->dimension->width, .height = menuItem->dimension->height};
+    menuItem->highlighted = BRS_PointInRect(&mousePoint, &widgetRect);
+    free(position);
+}
+
 void BRS_GUI_MenuItem_processEvent(BRS_GUI_MenuItem *menuItem, SDL_Event *event) {
     switch (event->type) {
+        case SDL_MOUSEMOTION:
+            processMouseMove(menuItem, &event->motion);
+            break;
         case SDL_MOUSEBUTTONUP:
-            processMouseDown(menuItem, &event->button);
+            processMouseButtonDown(menuItem, &event->button);
             break;
     }
 }

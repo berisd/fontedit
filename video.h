@@ -49,14 +49,6 @@ struct BRS_Dimension {
 };
 typedef struct BRS_Dimension BRS_Dimension;
 
-const BRS_Color COLOR_RED;
-const BRS_Color COLOR_BLUE;
-const BRS_Color COLOR_YELLOW;
-const BRS_Color COLOR_WHITE;
-const BRS_Color COLOR_BLACK;
-const BRS_Color COLOR_DARK_GRAY;
-const BRS_Color COLOR_LIGHT_GRAY;
-
 BRS_VideoContext *BRS_initVideo(uint32_t screenWidth, uint32_t screenHeight);
 
 void BRS_shutdownVideo(const BRS_VideoContext *context);

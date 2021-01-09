@@ -53,7 +53,9 @@ BRS_GUI_Widget_createMenuBar(BRS_Point *position, BRS_Dimension *dimension, cons
 BRS_GUI_Widget *
 BRS_GUI_Widget_createLabel(BRS_Point *position, const BRS_Color *color, const char *text, BRS_Font *font);
 
-BRS_GUI_Widget *BRS_GUI_Widget_createCharEdit(BRS_Point *position, const BRS_Color *foreColor, BRS_Font *fontEdited);
+BRS_GUI_Widget *
+BRS_GUI_Widget_createCharEdit(BRS_Point *position, const BRS_Color *foreColor, const BRS_Color *dotColor,
+                              const BRS_Color *clearColor, BRS_Font *fontEdited);
 
 BRS_GUI_Widget *
 BRS_GUI_Widget_createCharTable(BRS_Point *position, const BRS_Color *borderColor, const BRS_Color *charColor,

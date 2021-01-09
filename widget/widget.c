@@ -51,8 +51,9 @@ BRS_GUI_Widget_createCharTable(BRS_Point *position, const BRS_Color *borderColor
     return widget;
 }
 
-BRS_GUI_Widget *BRS_GUI_Widget_createCharEdit(BRS_Point *position, const BRS_Color *foreColor, BRS_Font *fontEdited) {
-    BRS_GUI_CharEdit *charEdit = BRS_GUI_CharEdit_create(position, foreColor, fontEdited);
+BRS_GUI_Widget *BRS_GUI_Widget_createCharEdit(BRS_Point *position, const BRS_Color *foreColor, const BRS_Color *dotColor,
+                                              const BRS_Color *clearColor, BRS_Font *fontEdited) {
+    BRS_GUI_CharEdit *charEdit = BRS_GUI_CharEdit_create(position, foreColor, dotColor, clearColor, fontEdited);
 
     BRS_GUI_Widget_Object *object = malloc(sizeof(BRS_GUI_Widget_Object));
     object->charEdit = charEdit;

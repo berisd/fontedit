@@ -80,7 +80,7 @@ static BRS_GUI_Widget *createCharTable(BRS_Font *font) {
 
 static BRS_GUI_Widget *createCharEdit(BRS_Font *font) {
     BRS_Point position = {.x = 500, .y = 50};
-    BRS_GUI_Widget *widget = BRS_GUI_Widget_createCharEdit(&position, &COLOR_RED, font);
+    BRS_GUI_Widget *widget = BRS_GUI_Widget_createCharEdit(&position, &COLOR_RED, &COLOR_YELLOW, &COLOR_BLACK, font);
     return widget;
 }
 

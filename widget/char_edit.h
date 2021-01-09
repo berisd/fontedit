@@ -15,10 +15,13 @@ struct _BRS_GUI_CharEdit {
     BRS_Point *position;
     int32_t selectedChar;
     const BRS_Color *foreColor;
+    const BRS_Color *dotColor;
+    const BRS_Color *clearColor;
 };
 
 BRS_GUI_CharEdit *
-BRS_GUI_CharEdit_create(BRS_Point *position, const BRS_Color *foreColor, BRS_Font *font);
+BRS_GUI_CharEdit_create(BRS_Point *position, const BRS_Color *foreColor, const BRS_Color *dotColor,
+                        const BRS_Color *clearColor, BRS_Font *font);
 
 void BRS_GUI_CharEdit_render(BRS_VideoContext *context, BRS_GUI_CharEdit *charEdit);
 

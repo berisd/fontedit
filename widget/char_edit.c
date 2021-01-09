@@ -10,10 +10,13 @@ static const int32_t PIXELS_BORDER = 1;
 static const int32_t NO_CHAR = -1;
 
 BRS_GUI_CharEdit *
-BRS_GUI_CharEdit_create(BRS_Point *position, const BRS_Color *foreColor, BRS_Font *font) {
+BRS_GUI_CharEdit_create(BRS_Point *position, const BRS_Color *foreColor, const BRS_Color *dotColor,
+                        const BRS_Color *clearColor, BRS_Font *font) {
     BRS_GUI_CharEdit *charEdit = malloc(sizeof(BRS_GUI_CharEdit));
     charEdit->position = BRS_copyPoint(position);
     charEdit->foreColor = foreColor;
+    charEdit->dotColor = dotColor;
+    charEdit->clearColor = clearColor;
     charEdit->fontEdited = font;
     charEdit->selectedChar = NO_CHAR;
     return charEdit;
@@ -72,7 +75,7 @@ static void drawDotsForChar(const BRS_VideoContext *context, const BRS_GUI_CharE
     int32_t ch = charEdit->selectedChar;
     int16_t fontCharPos = ch * font->height_bits;
     BRS_Rect rect = {.x= charEdit->position->x, .y=charEdit->position->y, .width=PIXELS_PER_DOT, .height=PIXELS_PER_DOT};
-    BRS_setColor(context, &COLOR_YELLOW);
+    BRS_setColor(context, charEdit->dotColor);
     for (int fontCharByteCounter = 0; fontCharByteCounter < font->height_bits; fontCharByteCounter++) {
         uint8_t fontCharByte = font->data[fontCharPos + fontCharByteCounter];
         for (int fontCharBitCounter = 0; fontCharBitCounter < font->width_bits; fontCharBitCounter++) {
@@ -90,7 +93,7 @@ static void drawDotsForChar(const BRS_VideoContext *context, const BRS_GUI_CharE
 }
 
 static void clearTable(BRS_VideoContext *context, BRS_GUI_CharEdit *charEdit) {
-    BRS_setColor(context, &COLOR_BLACK);
+    BRS_setColor(context, charEdit->clearColor);
     BRS_Rect rect = {
             .x = charEdit->position->x,
             .y = charEdit->position->y,

@@ -6,6 +6,7 @@
 #define FONTEDIT_GUI_H
 
 #include "widget/widget.h"
+#include "theme.h"
 
 BRS_GUI_WidgetList *createWidgets(BRS_Font *font, uint32_t screenWidth, uint32_t screenHeight);
 

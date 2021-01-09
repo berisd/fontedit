@@ -61,6 +61,6 @@ BRS_GUI_Widget *
 BRS_GUI_Widget_createCharTable(BRS_Point *position, const BRS_Color *borderColor, const BRS_Color *charColor,
                                const BRS_Color *highlightedColor, const BRS_Color *selectedColor, BRS_Font *font);
 
-void BRS_GUI_setMenuBarClickHandler(BRS_GUI_Widget *widget, BRS_GUI_MenuBar_ClickHandler handler);
+void BRS_GUI_setClickHandler(BRS_GUI_Widget *widget, void *handler);
 
 #endif //BRS_GUI_WIDGET_H

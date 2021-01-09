@@ -62,7 +62,7 @@ static BRS_GUI_Widget *createMenuBar(BRS_Font *font) {
     menuBarDimension->height = 20;
     BRS_GUI_Widget *widget = BRS_GUI_Widget_createMenuBar(menuBarPosition, menuBarDimension, &COLOR_BLUE, font);
 
-    BRS_GUI_setMenuBarClickHandler(widget, &onClickMenuBar);
+    BRS_GUI_setClickHandler(widget, &onClickMenuBar);
 
     BRS_GUI_Menu *fileMenu = createFileMenu(widget->object->menuBar, font);
     BRS_GUI_MenuList_push(fileMenu, widget->object->menuBar->menuList);

@@ -19,7 +19,8 @@ struct _##LIST_NAME { \
     LIST_NAME##Entry *firstEntry; \
     LIST_NAME##Entry *lastEntry; \
 };                                           \
-LIST_NAME *LIST_NAME##_create();              \
+LIST_NAME *LIST_NAME##_create();             \
+void LIST_NAME##_destroy(LIST_NAME *list); \
 LIST_NAME##Entry *LIST_NAME##Entry_create(VALUE_TYPE *value); \
 LIST_NAME *LIST_NAME##_push(VALUE_TYPE *val, LIST_NAME *list); \
 
@@ -30,6 +31,17 @@ LIST_NAME *LIST_NAME##_create() { \
     list->lastEntry = NULL;\
     return list;\
 }                                            \
+                                             \
+void LIST_NAME##_destroy(LIST_NAME *list) { \
+    LIST_NAME##Entry *entry = list->firstEntry; \
+    while (entry != NULL) { \
+        LIST_NAME##Entry *tmp = entry; \
+        entry = entry->next; \
+        free(tmp); \
+    } \
+    free(list);                                            \
+}                                            \
+                                             \
 LIST_NAME##Entry *LIST_NAME##Entry_create(VALUE_TYPE *value) { \
     LIST_NAME##Entry *entry = malloc(sizeof(LIST_NAME##Entry)); \
     entry->value = value; \

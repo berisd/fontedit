@@ -10,7 +10,7 @@
 
 BRS_GUI_WidgetList *createWidgets(BRS_Font *font, uint32_t screenWidth, uint32_t screenHeight);
 
-void destroyWidgets(BRS_GUI_WidgetList *widgets);
+void destroyWidgets(BRS_GUI_WidgetList *widgetList);
 
 void quitApplication();
 

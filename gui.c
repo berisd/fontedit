@@ -101,13 +101,11 @@ BRS_GUI_WidgetList *createWidgets(BRS_Font *font, uint32_t screenWidth, uint32_t
     return list;
 }
 
-void destroyWidgets(BRS_GUI_WidgetList *widgets) {
-    BRS_GUI_WidgetListEntry *entry = widgets->firstEntry;
+void destroyWidgets(BRS_GUI_WidgetList *widgetList) {
+    BRS_GUI_WidgetListEntry *entry = widgetList->firstEntry;
     while (entry != NULL) {
         BRS_GUI_destroyWidget(entry->value);
-        BRS_GUI_WidgetListEntry *tmp = entry;
         entry = entry->next;
-        free(tmp);
     }
-    free(widgets);
+    BRS_GUI_WidgetList_destroy(widgetList);
 }

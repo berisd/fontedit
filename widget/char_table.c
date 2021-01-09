@@ -142,7 +142,6 @@ static void drawHorizontalLines(const BRS_VideoContext *context, const BRS_GUI_C
     }
 }
 
-
 static void drawChars(const BRS_VideoContext *context, const BRS_GUI_CharTable *charTable) {
     BRS_Point pos = {.x = charTable->position->x + PIXELS_BORDER + PIXELS_PADDING, .y = charTable->position->y +
                                                                                         PIXELS_BORDER + PIXELS_PADDING};
@@ -161,8 +160,10 @@ static void drawChars(const BRS_VideoContext *context, const BRS_GUI_CharTable *
     for (rowIndex = 0; rowIndex < CHAR_LINES; rowIndex++) {
         pos.x = charTable->position->x + PIXELS_BORDER + PIXELS_PADDING;
         for (colIndex = 0; colIndex < CHARS_PER_ROW; colIndex++) {
-            if (charTable->highlightedChar == ch) {
-                BRS_setColor(context, charTable->highlightedColor);
+            if (charTable->highlightedChar == ch || charTable->selectedChar == ch) {
+                bool isSelected = charTable->selectedChar == ch;
+                const BRS_Color *charColor = isSelected ? charTable->selectedColor : charTable->highlightedColor;
+                BRS_setColor(context, charColor);
                 charRect.x = pos.x - PIXELS_PADDING;
                 charRect.y = pos.y - PIXELS_PADDING;
                 BRS_drawlFillRect(context, &charRect);

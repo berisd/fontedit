@@ -69,7 +69,7 @@ static void drawHorizontalLines(const BRS_VideoContext *context, const BRS_GUI_C
 
 static void drawDotsForChar(const BRS_VideoContext *context, const BRS_GUI_CharEdit *charEdit) {
     BRS_Font *font = charEdit->fontEdited;
-    char ch = charEdit->selectedChar;
+    int32_t ch = charEdit->selectedChar;
     int16_t fontCharPos = ch * font->height_bits;
     BRS_Rect rect = {.x= charEdit->position->x, .y=charEdit->position->y, .width=PIXELS_PER_DOT, .height=PIXELS_PER_DOT};
     BRS_setColor(context, &COLOR_YELLOW);

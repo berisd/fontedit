@@ -107,7 +107,7 @@ void BRS_drawString(const BRS_VideoContext *context, const char *str, const BRS_
     size_t len = strlen(str);
     BRS_Point point;
     for (int i = 0; i < len; i++) {
-        char strChar = str[i];
+        uint8_t strChar = str[i];
         int16_t fontCharPos = strChar * font->height_bits;
         for (int fontCharByteCounter = 0; fontCharByteCounter < font->height_bits; fontCharByteCounter++) {
             uint8_t fontCharByte = font->data[fontCharPos + fontCharByteCounter];

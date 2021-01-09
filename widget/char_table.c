@@ -157,7 +157,7 @@ static void drawChars(const BRS_VideoContext *context, const BRS_GUI_CharTable *
     uint16_t colIndex;
 
     int32_t ch = 0;
-    char str[2];
+    uint8_t str[2];
     for (rowIndex = 0; rowIndex < CHAR_LINES; rowIndex++) {
         pos.x = charTable->position->x + PIXELS_BORDER + PIXELS_PADDING;
         for (colIndex = 0; colIndex < CHARS_PER_ROW; colIndex++) {

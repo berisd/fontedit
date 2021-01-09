@@ -32,12 +32,9 @@ struct _BRS_GUI_Menu {
 BRS_LIST_DECL(BRS_GUI_MenuList, BRS_GUI_Menu)
 
 // External
-BRS_Point *BRS_GUI_MenuBar_getPosition(BRS_GUI_MenuBar *menuBar);
+extern BRS_Point *BRS_GUI_MenuBar_getPosition(BRS_GUI_MenuBar *menuBar);
 
-BRS_Dimension *BRS_GUI_MenuBar_getDimension(BRS_GUI_MenuBar *menuBar);
-
-BRS_GUI_MenuBar_ClickHandler BRS_GUI_MenuBar_getClickHandler(BRS_GUI_MenuBar *menuBar);
-int32_t BRS_GUI_MenuBar_getMenuIndex(BRS_GUI_MenuBar *menuBar, BRS_GUI_Menu *menu);
+extern int32_t BRS_GUI_MenuBar_getMenuIndex(BRS_GUI_MenuBar *menuBar, BRS_GUI_Menu *menu);
 // External End
 
 void BRS_GUI_Menu_render(BRS_VideoContext *context, BRS_GUI_Menu *menu);

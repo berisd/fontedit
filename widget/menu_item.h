@@ -33,11 +33,11 @@ struct _BRS_GUI_MenuItem {
 BRS_LIST_DECL(BRS_GUI_MenuItemList, BRS_GUI_MenuItem)
 
 // External
-void BRS_GUI_Menu_calcPosition(BRS_GUI_Menu *menu, BRS_Point *menuPosition);
+extern void BRS_GUI_Menu_calcPosition(BRS_GUI_Menu *menu, BRS_Point *menuPosition);
 
-BRS_Dimension *BRS_GUI_Menu_getDimension(BRS_GUI_Menu *menu);
+extern BRS_Dimension *BRS_GUI_Menu_getDimension(BRS_GUI_Menu *menu);
 
-int32_t BRS_GUI_Menu_getMenuItemIndex(BRS_GUI_Menu *menu, BRS_GUI_MenuItem *menuItem);
+extern int32_t BRS_GUI_Menu_getMenuItemIndex(BRS_GUI_Menu *menu, BRS_GUI_MenuItem *menuItem);
 // External End
 
 BRS_GUI_MenuItem *

@@ -29,8 +29,8 @@ void BRS_GUI_MenuBar_destroy(BRS_GUI_MenuBar *menuBar) {
 
 void BRS_GUI_MenuBar_render(BRS_VideoContext *context, BRS_GUI_MenuBar *menubar) {
     BRS_setColor(context, menubar->color);
-    SDL_Rect r = {.x = menubar->position->x, .y = menubar->position->y, .w=menubar->dimension->width, .h=menubar->dimension->height};
-    SDL_RenderFillRect(context->renderer, &r);
+    BRS_Rect r = {.x = menubar->position->x, .y = menubar->position->y, .width=menubar->dimension->width, .height=menubar->dimension->height};
+    BRS_drawlFillRect(context, &r);
 
     BRS_GUI_MenuListEntry *entry = menubar->menuList->firstEntry;
     while (entry != NULL) {
@@ -42,11 +42,10 @@ void BRS_GUI_MenuBar_render(BRS_VideoContext *context, BRS_GUI_MenuBar *menubar)
 
 static void processMouseButtonDown(BRS_GUI_MenuBar *menuBar, SDL_MouseButtonEvent *button) {
     if (button->button == SDL_BUTTON_LEFT) {
-        BRS_Point *position = menuBar->position;
-        BRS_Dimension *dimension = menuBar->dimension;
-        bool intersect = (button->x >= position->x && button->x <= position->x + dimension->width &&
-                          button->y >= position->y && button->y <= position->x + dimension->height);
-        if (intersect) {
+        BRS_Point mousePoint = {.x = button->x, .y = button->y};
+        BRS_Rect menuBarRect = {.x = menuBar->position->x, .y = menuBar->position->y, .width = menuBar->dimension->width, .height = menuBar->dimension->height};
+
+        if (BRS_PointInRect(&mousePoint, &menuBarRect)) {
             menuBar->clickHandler(menuBar);
         }
     }
@@ -69,14 +68,6 @@ void BRS_GUI_MenuBar_processEvent(BRS_GUI_MenuBar *menuBar, SDL_Event *event) {
 
 BRS_Point *BRS_GUI_MenuBar_getPosition(BRS_GUI_MenuBar *menuBar) {
     return menuBar->position;
-}
-
-BRS_Dimension *BRS_GUI_MenuBar_getDimension(BRS_GUI_MenuBar *menuBar) {
-    return menuBar->dimension;
-}
-
-BRS_GUI_MenuBar_ClickHandler BRS_GUI_MenuBar_getClickHandler(BRS_GUI_MenuBar *menuBar) {
-    return menuBar->clickHandler;
 }
 
 int32_t BRS_GUI_MenuBar_getMenuIndex(BRS_GUI_MenuBar *menuBar, BRS_GUI_Menu *menu) {

@@ -18,32 +18,23 @@ static int32_t calcTableHeight(BRS_GUI_CharTable *charTable) {
     return CHAR_LINES * (charTable->font->height_bits + PIXELS_BORDER * 2 + PIXELS_PADDING * 2);
 }
 
-static int32_t calcCellWith(BRS_GUI_CharTable *charTable) {
+static int32_t calcCellWidth(const BRS_GUI_CharTable *charTable) {
     return charTable->font->width_bits + PIXELS_BORDER * 2 + PIXELS_PADDING * 2;
 }
 
-static int32_t calcCellHeight(BRS_GUI_CharTable *charTable) {
+static int32_t calcCellHeight(const BRS_GUI_CharTable *charTable) {
     return charTable->font->height_bits + PIXELS_BORDER * 2 + PIXELS_PADDING * 2;
 }
 
-static bool calcGridPosition(GridPosition *gridPosition, BRS_GUI_CharTable *charTable, int32_t x, int32_t y) {
-    int32_t cellWidth = calcCellWith(charTable);
+static void calcGridPosition(GridPosition *gridPosition, BRS_GUI_CharTable *charTable, BRS_Point *mousePoint) {
+    int32_t cellWidth = calcCellWidth(charTable);
     int32_t cellHeight = calcCellHeight(charTable);
 
-    BRS_Point point = {.x = x, .y = y};
-    BRS_Rect cellRect = {.x = 0, .y = 0, .width = cellWidth, .height = cellHeight};
-    for (uint16_t rowIndex = 0; rowIndex < CHAR_LINES; rowIndex++) {
-        for (uint16_t colIndex = 0; colIndex < CHARS_PER_ROW; colIndex++) {
-            cellRect.x = charTable->position->x + cellWidth * colIndex;
-            cellRect.y = charTable->position->y + cellHeight * rowIndex;
-            if (BRS_PointInRect(&point, &cellRect)) {
-                gridPosition->columnIndex = colIndex;
-                gridPosition->rowIndex = rowIndex;
-                return true;
-            }
-        }
-    }
-    return false;
+    int32_t relX = mousePoint->x - charTable->position->x;
+    int32_t relY = mousePoint->y - charTable->position->y;
+
+    gridPosition->columnIndex = relX / cellWidth;
+    gridPosition->rowIndex = relY / cellHeight;
 }
 
 static uint8_t getCharByGridPosition(GridPosition *gridPosition) {
@@ -51,25 +42,18 @@ static uint8_t getCharByGridPosition(GridPosition *gridPosition) {
     return ch;
 }
 
-static void processMouseMove(BRS_GUI_CharTable *charTable, SDL_MouseMotionEvent *motion) {
+static void processMouseMove(BRS_GUI_CharTable *charTable, BRS_Point *mousePoint) {
     GridPosition gridPosition;
-    if (calcGridPosition(&gridPosition, charTable, motion->x, motion->y)) {
-        uint8_t ch = getCharByGridPosition(&gridPosition);
-        charTable->highlightedChar = ch;
-    } else {
-        charTable->highlightedChar = NO_CHAR;
-    }
-
+    calcGridPosition(&gridPosition, charTable, mousePoint);
+    uint8_t ch = getCharByGridPosition(&gridPosition);
+    charTable->highlightedChar = ch;
 }
 
-static void processMouseButtonDown(BRS_GUI_CharTable *charTable, SDL_MouseButtonEvent *event) {
+static void processMouseButtonDown(BRS_GUI_CharTable *charTable, BRS_Point *mousePoint) {
     GridPosition gridPosition;
-    if (calcGridPosition(&gridPosition, charTable, event->x, event->y)) {
-        uint8_t ch = getCharByGridPosition(&gridPosition);
-        charTable->selectedChar = ch;
-    } else {
-        charTable->selectedChar = NO_CHAR;
-    }
+    calcGridPosition(&gridPosition, charTable, mousePoint);
+    uint8_t ch = getCharByGridPosition(&gridPosition);
+    charTable->selectedChar = ch;
 
     if (charTable->clickHandler) {
         charTable->clickHandler(charTable);
@@ -131,10 +115,9 @@ static void drawHorizontalLines(const BRS_VideoContext *context, const BRS_GUI_C
     uint32_t i;
     BRS_Point p1 = {.x = charTable->position->x, .y = charTable->position->y};
     BRS_Point p2 = {.x = charTable->position->x +
-                         CHARS_PER_ROW * (charTable->font->width_bits + PIXELS_BORDER * 2 +
-                                          PIXELS_PADDING * 2), .y = charTable->position->y};
+                         CHARS_PER_ROW * calcCellWidth(charTable), .y = charTable->position->y};
     BRS_Line line = {.p1 = &p1, .p2 = &p2};
-    int32_t y_diff = charTable->font->height_bits + PIXELS_BORDER * 2 + PIXELS_PADDING * 2;
+    int32_t y_diff = calcCellHeight(charTable);
     for (i = 0; i < CHAR_LINES; i++) {
         BRS_drawline(context, &line);
         line.p1->y += y_diff;
@@ -149,8 +132,8 @@ static void drawChars(const BRS_VideoContext *context, const BRS_GUI_CharTable *
             .width = charTable->font->width_bits + 2 * PIXELS_PADDING,
             .height = charTable->font->height_bits + 2 * PIXELS_PADDING
     };
-    int32_t x_diff = charTable->font->width_bits + PIXELS_BORDER * 2 + PIXELS_PADDING * 2;
-    int32_t y_diff = charTable->font->height_bits + PIXELS_BORDER * 2 + PIXELS_PADDING * 2;
+    int32_t x_diff = calcCellWidth(charTable);
+    int32_t y_diff = calcCellHeight(charTable);
 
     uint16_t rowIndex;
     uint16_t colIndex;
@@ -186,13 +169,14 @@ void BRS_GUI_CharTable_render(BRS_VideoContext *context, BRS_GUI_CharTable *char
 }
 
 void BRS_GUI_CharTable_processEvent(BRS_GUI_CharTable *charTable, SDL_Event *event) {
+    BRS_Rect widgetRect = {.x = charTable->position->x, .y = charTable->position->y, .width = calcTableWith(
+            charTable), .height = calcTableHeight(charTable)};
+
     switch (event->type) {
         case SDL_MOUSEMOTION: {
             BRS_Point mousePoint = {.x = event->motion.x, .y = event->motion.y};
-            BRS_Rect widgetRect = {.x = charTable->position->x, .y = charTable->position->y, .width = calcTableWith(
-                    charTable), .height = calcTableHeight(charTable)};
             if (BRS_PointInRect(&mousePoint, &widgetRect)) {
-                processMouseMove(charTable, &event->motion);
+                processMouseMove(charTable, &mousePoint);
             } else {
                 charTable->highlightedChar = NO_CHAR;
             }
@@ -200,11 +184,9 @@ void BRS_GUI_CharTable_processEvent(BRS_GUI_CharTable *charTable, SDL_Event *eve
         }
             break;
         case SDL_MOUSEBUTTONUP: {
-            BRS_Point mousePoint = {.x = event->motion.x, .y = event->motion.y};
-            BRS_Rect widgetRect = {.x = charTable->position->x, .y = charTable->position->y, .width = calcTableWith(
-                    charTable), .height = calcTableHeight(charTable)};
+            BRS_Point mousePoint = {.x = event->button.x, .y = event->button.y};
             if (BRS_PointInRect(&mousePoint, &widgetRect)) {
-                processMouseButtonDown(charTable, &event->button);
+                processMouseButtonDown(charTable, &mousePoint);
             } else {
                 charTable->selectedChar = NO_CHAR;
             }

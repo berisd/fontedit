@@ -42,11 +42,8 @@ void BRS_GUI_MenuItem_render(BRS_VideoContext *context, BRS_GUI_MenuItem *menuIt
     calculatePosition(menuItem, &position);
 
     BRS_setColor(context, menuItem->backColor);
-    SDL_Rect r = {.x = position.x, .y = position.y, .w=menuItem->dimension->width, .h=menuItem->dimension->height};
-    SDL_RenderFillRect(context->renderer, &r);
-
-    position.x++;
-    position.y++;
+    BRS_Rect menuItemRect = {.x = position.x, .y = position.y, .width=menuItem->dimension->width, .height=menuItem->dimension->height};
+    BRS_drawlFillRect(context, &menuItemRect);
 
     BRS_drawString(context, menuItem->label, menuItem->font, &position,
                    menuItem->highlighted ? menuItem->highlightedColor : menuItem->foreColor);

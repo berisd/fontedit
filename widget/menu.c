@@ -10,11 +10,9 @@ void BRS_GUI_Menu_render(BRS_VideoContext *context, BRS_GUI_Menu *menu) {
     BRS_Point position;
     BRS_GUI_Menu_calcPosition(menu, &position);
     BRS_setColor(context, menu->backColor);
-    SDL_Rect r = {.x = position.x, .y = position.y, .w=menu->dimension->width, .h=menu->dimension->height};
-    SDL_RenderFillRect(context->renderer, &r);
+    BRS_Rect menuRect = {.x = position.x, .y = position.y, .width = menu->dimension->width, .height = menu->dimension->height};
+    BRS_drawlFillRect(context, &menuRect);
 
-    position.x++;
-    position.y++;
     BRS_drawString(context, menu->label, menu->font, &position,
                    menu->selected ? menu->selectedForeColor : menu->foreColor);
 
@@ -57,6 +55,10 @@ void BRS_GUI_Menu_destroy(BRS_GUI_Menu *menu) {
 }
 
 void BRS_GUI_Menu_processEvent(BRS_GUI_Menu *menu, SDL_Event *event) {
+    if (!menu->selected) {
+        return;
+    }
+
     BRS_GUI_MenuItemListEntry *menuItemEntry = menu->itemList->firstEntry;
     while (menuItemEntry != NULL) {
         BRS_GUI_MenuItem *menu = menuItemEntry->value;

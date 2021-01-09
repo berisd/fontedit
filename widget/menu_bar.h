@@ -31,8 +31,6 @@ void BRS_GUI_MenuBar_processEvent(BRS_GUI_MenuBar *menuBar, SDL_Event *event);
 
 BRS_Point *BRS_GUI_MenuBar_getPosition(BRS_GUI_MenuBar *menuBar);
 
-BRS_Dimension *BRS_GUI_MenuBar_getDimension(BRS_GUI_MenuBar *menuBar);
-
 /**
  * Get Index for menu in menubar
  * @param menuBar

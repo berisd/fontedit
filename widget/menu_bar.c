@@ -5,13 +5,12 @@
 #include "menu_bar.h"
 
 BRS_GUI_MenuBar *
-BRS_GUI_MenuBar_create(BRS_Point *position, BRS_Dimension *dimension, const BRS_Color *color, BRS_Font *font) {
+BRS_GUI_MenuBar_create(BRS_Point *position, BRS_Dimension *dimension, const BRS_GUI_Theme *theme) {
     BRS_GUI_MenuBar *menubar = malloc(sizeof(BRS_GUI_MenuBar));
-    menubar->color = color;
+    menubar->theme = (BRS_GUI_Theme *)theme;
     menubar->dimension = BRS_copyDimension(dimension);
     menubar->menuList = BRS_GUI_MenuList_create();
     menubar->position = BRS_copyPoint(position);
-    menubar->font = font;
     return menubar;
 }
 
@@ -28,7 +27,7 @@ void BRS_GUI_MenuBar_destroy(BRS_GUI_MenuBar *menuBar) {
 }
 
 void BRS_GUI_MenuBar_render(BRS_VideoContext *context, BRS_GUI_MenuBar *menubar) {
-    BRS_setColor(context, menubar->color);
+    BRS_setColor(context, menubar->theme->menuBarColor);
     BRS_Rect r = {.x = menubar->position->x, .y = menubar->position->y, .width=menubar->dimension->width, .height=menubar->dimension->height};
     BRS_drawlFillRect(context, &r);
 

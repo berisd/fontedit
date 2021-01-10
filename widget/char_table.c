@@ -61,14 +61,10 @@ static void processMouseButtonDown(BRS_GUI_CharTable *charTable, BRS_Point *mous
 }
 
 BRS_GUI_CharTable *
-BRS_GUI_CharTable_create(BRS_Point *position, const BRS_Color *borderColor, const BRS_Color *charColor,
-                         const BRS_Color *highlightedColor, const BRS_Color *selectedColor, BRS_Font *fontEdited) {
+BRS_GUI_CharTable_create(BRS_Point *position, const BRS_GUI_Theme *theme, BRS_Font *fontEdited) {
     BRS_GUI_CharTable *charTable = malloc(sizeof(BRS_GUI_CharTable));
     charTable->position = BRS_copyPoint(position);
-    charTable->borderColor = borderColor;
-    charTable->charColor = charColor;
-    charTable->highlightedColor = highlightedColor;
-    charTable->selectedColor = selectedColor;
+    charTable->theme = (BRS_GUI_Theme *)theme;
     charTable->fontEdited = fontEdited;
     charTable->highlightedCharIndex = NO_CHAR;
     charTable->selectedCharIndex = NO_CHAR;
@@ -83,7 +79,7 @@ void BRS_GUI_CharTable_destroy(BRS_GUI_CharTable *charTable) {
 }
 
 static void drawTableBorder(BRS_VideoContext *context, BRS_GUI_CharTable *charTable) {
-    BRS_setColor(context, charTable->borderColor);
+    BRS_setColor(context, charTable->theme->charTableBorderColor);
     BRS_Rect rect = {
             .x = charTable->position->x,
             .y = charTable->position->y,
@@ -94,7 +90,7 @@ static void drawTableBorder(BRS_VideoContext *context, BRS_GUI_CharTable *charTa
 }
 
 static void drawVerticalLines(const BRS_VideoContext *context, const BRS_GUI_CharTable *charTable) {
-    BRS_setColor(context, charTable->borderColor);
+    BRS_setColor(context, charTable->theme->charTableBorderColor);
 
     uint32_t i;
     BRS_Point p1 = {.x = charTable->position->x, .y = charTable->position->y};
@@ -112,7 +108,7 @@ static void drawVerticalLines(const BRS_VideoContext *context, const BRS_GUI_Cha
 }
 
 static void drawHorizontalLines(const BRS_VideoContext *context, const BRS_GUI_CharTable *charTable) {
-    BRS_setColor(context, charTable->borderColor);
+    BRS_setColor(context, charTable->theme->charTableBorderColor);
 
     uint32_t i;
     BRS_Point p1 = {.x = charTable->position->x, .y = charTable->position->y};
@@ -146,7 +142,8 @@ static void drawChars(const BRS_VideoContext *context, const BRS_GUI_CharTable *
         for (colIndex = 0; colIndex < CHARS_PER_ROW; colIndex++) {
             if (charTable->highlightedCharIndex == charIndex || charTable->selectedCharIndex == charIndex) {
                 bool isSelected = charTable->selectedCharIndex == charIndex;
-                const BRS_Color *charColor = isSelected ? charTable->selectedColor : charTable->highlightedColor;
+                const BRS_Color *charColor = isSelected ? charTable->theme->charTableSelectedColor
+                                                        : charTable->theme->charTableHighlightedColor;
                 BRS_setColor(context, charColor);
                 charRect.x = pos.x - PIXELS_PADDING;
                 charRect.y = pos.y - PIXELS_PADDING;
@@ -154,7 +151,7 @@ static void drawChars(const BRS_VideoContext *context, const BRS_GUI_CharTable *
             }
 
             uint8_t ch = charIndex;
-            BRS_drawString(context, &ch, 1, charTable->fontEdited, &pos, charTable->charColor);
+            BRS_drawString(context, &ch, 1, charTable->fontEdited, &pos, charTable->theme->charTableCharColor);
             pos.x += x_diff;
             charIndex++;
         }

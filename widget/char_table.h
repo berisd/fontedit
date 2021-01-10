@@ -7,6 +7,7 @@
 
 #include "../font.h"
 #include "../video.h"
+#include "../theme.h"
 #include "grid.h"
 
 typedef struct _BRS_GUI_CharTable BRS_GUI_CharTable;
@@ -18,10 +19,7 @@ typedef void (*BRS_GUI_CharTable_ChangedSelectedCharIndex)(BRS_GUI_CharTable *);
 struct _BRS_GUI_CharTable {
     BRS_Font *fontEdited;
     BRS_Point *position;
-    const BRS_Color *borderColor;
-    const BRS_Color *charColor;
-    const BRS_Color *highlightedColor;
-    const BRS_Color *selectedColor;
+    BRS_GUI_Theme *theme;
     int32_t highlightedCharIndex;
     int32_t selectedCharIndex;
     BRS_GUI_CharTable_ClickHandler clickHandler;
@@ -31,8 +29,7 @@ struct _BRS_GUI_CharTable {
 void BRS_GUI_CharTable_setSelectedCharIndex(BRS_GUI_CharTable *charTable, int32_t selectedCharIndex);
 
 BRS_GUI_CharTable *
-BRS_GUI_CharTable_create(BRS_Point *position, const BRS_Color *borderColor, const BRS_Color *charColor,
-                         const BRS_Color *highlightedColor, const BRS_Color *selectedColor, BRS_Font *fontEdited);
+BRS_GUI_CharTable_create(BRS_Point *position, const BRS_GUI_Theme *theme, BRS_Font *fontEdited);
 
 void BRS_GUI_CharTable_destroy(BRS_GUI_CharTable *charTable);
 

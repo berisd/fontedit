@@ -6,17 +6,17 @@
 #define BRS_GUI_LABEL_H
 
 #include "../video.h"
+#include "../theme.h"
 
 typedef struct _BRS_GUI_Label BRS_GUI_Label;
 
 struct _BRS_GUI_Label {
     BRS_Point *position;
+    BRS_GUI_Theme *theme;
     const char *text;
-    BRS_Font *font;
-    const BRS_Color *color;
 };
 
-BRS_GUI_Label *BRS_GUI_Label_create(BRS_Point *position, const BRS_Color *color, const char *text, BRS_Font *font);
+BRS_GUI_Label *BRS_GUI_Label_create(BRS_Point *position, const BRS_GUI_Theme *theme, const char *text);
 
 void BRS_GUI_Label_destroy(BRS_GUI_Label *label);
 

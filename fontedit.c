@@ -12,7 +12,7 @@ typedef struct ApplicationConfig {
 
 typedef struct ApplicationState {
     BRS_VideoContext *videoContext;
-    BRS_Font *defaultFont;
+    BRS_GUI_Theme *theme;
     BRS_GUI_WidgetList *widgets;
     BRS_Font *fontEdited;
     bool quit;
@@ -37,7 +37,7 @@ static ApplicationState *createApplicationState() {
 }
 
 static void freeApplicationState(ApplicationState *applicationState) {
-    BRS_destroyFont(applicationState->defaultFont);
+    BRS_GUI_Theme_destroy(applicationState->theme);
     destroyWidgets(applicationState->widgets);
     free(applicationState);
 }
@@ -49,9 +49,9 @@ static ApplicationState *initApplication(const ApplicationConfig *config) {
         return NULL;
     }
     applicationState->videoContext = videoContext;
-    applicationState->defaultFont = createDefaultFont();
-    applicationState->fontEdited = BRS_copyFont(applicationState->defaultFont);
-    applicationState->widgets = createWidgets(applicationState->defaultFont, applicationState->fontEdited,
+    applicationState->theme = BRS_GUI_Theme_create();
+    applicationState->fontEdited = BRS_copyFont(applicationState->theme->font);
+    applicationState->widgets = createWidgets(applicationState->theme, applicationState->fontEdited,
                                               config->screenWidth, config->screenHeight);
     applicationState->quit = false;
     atexit(SDL_Quit);

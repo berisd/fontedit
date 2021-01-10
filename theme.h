@@ -6,6 +6,7 @@
 #define FONTEDIT_THEME_H
 
 #include "video.h"
+#include "util.h"
 
 const BRS_Color COLOR_RED;
 const BRS_Color COLOR_BLUE;
@@ -14,5 +15,27 @@ const BRS_Color COLOR_WHITE;
 const BRS_Color COLOR_BLACK;
 const BRS_Color COLOR_DARK_GRAY;
 const BRS_Color COLOR_LIGHT_GRAY;
+
+typedef struct _BRS_GUI_Theme {
+    BRS_Font *font;
+    const BRS_Color *screenColor;
+    const BRS_Color *menuBarColor;
+    const BRS_Color *menuForeColor;
+    const BRS_Color *menuBackColor;
+    const BRS_Color *menuSelectedForeColor;
+    const BRS_Color *menuItemForeColor;
+    const BRS_Color *menuItemBackColor;
+    const BRS_Color *menuItemHighlightedColor;
+    const BRS_Color *labelForeColor;
+    const BRS_Color *charTableBorderColor;
+    const BRS_Color *charTableCharColor;
+    const BRS_Color *charTableHighlightedColor;
+    const BRS_Color *charTableSelectedColor;
+    const BRS_Color *charEditForeColor;
+    const BRS_Color *charEditDotColor;
+} BRS_GUI_Theme;
+
+BRS_GUI_Theme *BRS_GUI_Theme_create();
+void BRS_GUI_Theme_destroy(BRS_GUI_Theme *theme);
 
 #endif //FONTEDIT_THEME_H

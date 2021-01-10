@@ -19,12 +19,12 @@ static uint16_t _countMenuItems(BRS_GUI_Menu *menu) {
 void BRS_GUI_Menu_render(BRS_VideoContext *context, BRS_GUI_Menu *menu) {
     BRS_Point position;
     BRS_GUI_Menu_calcPosition(menu, &position);
-    BRS_setColor(context, menu->backColor);
+    BRS_setColor(context, menu->theme->menuBackColor);
     BRS_Rect menuRect = {.x = position.x, .y = position.y, .width = menu->dimension->width, .height = menu->dimension->height};
     BRS_drawlFillRect(context, &menuRect);
 
-    BRS_drawString(context, menu->label, strlen(menu->label), menu->font, &position,
-                   menu->selected ? menu->selectedForeColor : menu->foreColor);
+    BRS_drawString(context, menu->label, strlen(menu->label), menu->theme->font, &position,
+                   menu->selected ? menu->theme->menuSelectedForeColor : menu->theme->menuForeColor);
 
     if (menu->selected) {
         BRS_GUI_MenuItemListEntry *entry = menu->itemList->firstEntry;
@@ -36,18 +36,14 @@ void BRS_GUI_Menu_render(BRS_VideoContext *context, BRS_GUI_Menu *menu) {
 }
 
 BRS_GUI_Menu *
-BRS_GUI_Menu_create(BRS_GUI_MenuBar *menuBar, BRS_Dimension *dimension, const char *label, const BRS_Color *foreColor,
-                    const BRS_Color *backColor,
-                    const BRS_Color *selectedForeColor, BRS_Font *font, bool selected) {
+BRS_GUI_Menu_create(BRS_GUI_MenuBar *menuBar, BRS_Dimension *dimension, const char *label, const BRS_GUI_Theme *theme,
+                    bool selected) {
     BRS_GUI_Menu *menu = malloc(sizeof(BRS_GUI_Menu));
     menu->menuBar = menuBar;
     menu->dimension = BRS_copyDimension(dimension);
     menu->label = label;
-    menu->font = font;
+    menu->theme = (BRS_GUI_Theme *)theme;
     menu->itemList = BRS_GUI_MenuItemList_create();
-    menu->foreColor = foreColor;
-    menu->backColor = backColor;
-    menu->selectedForeColor = selectedForeColor;
     menu->selected = selected;
     menu->itemList = BRS_GUI_MenuItemList_create();
     return menu;

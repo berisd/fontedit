@@ -38,13 +38,10 @@ static void calcGridPosition(GridPosition *gridPosition, BRS_GUI_CharEdit *charE
 }
 
 BRS_GUI_CharEdit *
-BRS_GUI_CharEdit_create(BRS_Point *position, const BRS_Color *foreColor, const BRS_Color *dotColor,
-                        const BRS_Color *clearColor, BRS_Font *fontEdited) {
+BRS_GUI_CharEdit_create(BRS_Point *position, const BRS_GUI_Theme *theme, BRS_Font *fontEdited) {
     BRS_GUI_CharEdit *charEdit = malloc(sizeof(BRS_GUI_CharEdit));
     charEdit->position = BRS_copyPoint(position);
-    charEdit->foreColor = foreColor;
-    charEdit->dotColor = dotColor;
-    charEdit->clearColor = clearColor;
+    charEdit->theme = (BRS_GUI_Theme *)theme;
     charEdit->fontEdited = fontEdited;
     charEdit->selectedChar = NO_CHAR;
     charEdit->_buttonPressed = NO_BUTTON;
@@ -57,7 +54,7 @@ void BRS_GUI_CharEdit_destroy(BRS_GUI_CharEdit *charEdit) {
 }
 
 static void drawTableBorder(BRS_VideoContext *context, BRS_GUI_CharEdit *charEdit) {
-    BRS_setColor(context, charEdit->foreColor);
+    BRS_setColor(context, charEdit->theme->charEditForeColor);
     BRS_Rect rect = {
             .x = charEdit->position->x,
             .y = charEdit->position->y,
@@ -75,7 +72,7 @@ static void drawVerticalLines(const BRS_VideoContext *context, const BRS_GUI_Cha
                                                      (PIXELS_PER_DOT + PIXELS_PADDING * 2 + PIXELS_BORDER * 2)};
     BRS_Line line = {.p1 = &p1, .p2 = &p2};
     int32_t x_diff = PIXELS_PER_DOT + PIXELS_PADDING * 2 + PIXELS_BORDER * 2;
-    BRS_setColor(context, charEdit->foreColor);
+    BRS_setColor(context, charEdit->theme->charEditForeColor);
     for (i = 0; i < charEdit->fontEdited->width_bits; i++) {
         BRS_drawline(context, &line);
         line.p1->x += x_diff;
@@ -91,7 +88,7 @@ static void drawHorizontalLines(const BRS_VideoContext *context, const BRS_GUI_C
                          (PIXELS_PER_DOT + PIXELS_PADDING * 2 + PIXELS_BORDER * 2), .y = charEdit->position->y};
     BRS_Line line = {.p1 = &p1, .p2 = &p2};
     int32_t y_diff = PIXELS_PER_DOT + PIXELS_PADDING * 2 + PIXELS_BORDER * 2;
-    BRS_setColor(context, charEdit->foreColor);
+    BRS_setColor(context, charEdit->theme->charEditForeColor);
     for (i = 0; i < charEdit->fontEdited->height_bits; i++) {
         BRS_drawline(context, &line);
         line.p1->y += y_diff;
@@ -104,7 +101,7 @@ static void drawDotsForChar(const BRS_VideoContext *context, const BRS_GUI_CharE
     int32_t ch = charEdit->selectedChar;
     int16_t fontCharPos = ch * font->height_bits;
     BRS_Rect rect = {.x= charEdit->position->x, .y=charEdit->position->y, .width=PIXELS_PER_DOT, .height=PIXELS_PER_DOT};
-    BRS_setColor(context, charEdit->dotColor);
+    BRS_setColor(context, charEdit->theme->charEditDotColor);
     for (int fontCharByteCounter = 0; fontCharByteCounter < font->height_bits; fontCharByteCounter++) {
         uint8_t fontCharByte = font->data[fontCharPos + fontCharByteCounter];
         for (int fontCharBitCounter = 0; fontCharBitCounter < font->width_bits; fontCharBitCounter++) {
@@ -122,7 +119,7 @@ static void drawDotsForChar(const BRS_VideoContext *context, const BRS_GUI_CharE
 }
 
 static void clearTable(BRS_VideoContext *context, BRS_GUI_CharEdit *charEdit) {
-    BRS_setColor(context, charEdit->clearColor);
+    BRS_setColor(context, charEdit->theme->screenColor);
     BRS_Rect rect = {
             .x = charEdit->position->x,
             .y = charEdit->position->y,

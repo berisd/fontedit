@@ -12,7 +12,7 @@
 extern BRS_GUI_WidgetList *getWidgetList();
 // External End
 
-BRS_GUI_WidgetList *createWidgets(BRS_Font *font, BRS_Font *fontEdited, uint32_t screenWidth, uint32_t screenHeight);
+BRS_GUI_WidgetList *createWidgets(BRS_GUI_Theme *theme, BRS_Font *fontEdited, uint32_t screenWidth, uint32_t screenHeight);
 
 void destroyWidgets(BRS_GUI_WidgetList *widgetList);
 

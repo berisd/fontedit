@@ -17,16 +17,12 @@ static void calculatePosition(BRS_GUI_MenuItem *menuItem, BRS_Point *menuItemPos
 }
 
 BRS_GUI_MenuItem *
-BRS_GUI_MenuItem_create(BRS_Dimension *dimension, BRS_GUI_Menu *menu, const char *label, const BRS_Color *foreColor,
-                        const BRS_Color *backColor, const BRS_Color *highlightedColor, BRS_Font *font) {
+BRS_GUI_MenuItem_create(BRS_Dimension *dimension, BRS_GUI_Menu *menu, const char *label, const BRS_GUI_Theme *theme) {
     BRS_GUI_MenuItem *menuItem = malloc(sizeof(BRS_GUI_MenuItem));
     menuItem->dimension = BRS_copyDimension(dimension);
     menuItem->menu = menu;
     menuItem->label = label;
-    menuItem->foreColor = foreColor;
-    menuItem->backColor = backColor;
-    menuItem->highlightedColor = highlightedColor;
-    menuItem->font = font;
+    menuItem->theme = (BRS_GUI_Theme *)theme;
     menuItem->clickHandler = NULL;
     menuItem->highlighted = false;
     return menuItem;
@@ -41,12 +37,13 @@ void BRS_GUI_MenuItem_render(BRS_VideoContext *context, BRS_GUI_MenuItem *menuIt
     BRS_Point position;
     calculatePosition(menuItem, &position);
 
-    BRS_setColor(context, menuItem->backColor);
+    BRS_setColor(context, menuItem->theme->menuItemBackColor);
     BRS_Rect menuItemRect = {.x = position.x, .y = position.y, .width=menuItem->dimension->width, .height=menuItem->dimension->height};
     BRS_drawlFillRect(context, &menuItemRect);
 
-    BRS_drawString(context, menuItem->label, strlen(menuItem->label), menuItem->font, &position,
-                   menuItem->highlighted ? menuItem->highlightedColor : menuItem->foreColor);
+    BRS_drawString(context, menuItem->label, strlen(menuItem->label), menuItem->theme->font, &position,
+                   menuItem->highlighted ? menuItem->theme->menuItemHighlightedColor
+                                         : menuItem->theme->menuItemForeColor);
 }
 
 void BRS_GUI_setMenuItemClickHandler(BRS_GUI_MenuItem *menuItem, BRS_GUI_MenuItem_ClickHandler handler) {

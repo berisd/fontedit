@@ -30,31 +30,26 @@ static BRS_GUI_Widget *createWidget(BRS_GUI_WidgetType type, void *object) {
 }
 
 BRS_GUI_Widget *
-BRS_GUI_Widget_createLabel(BRS_Point *position, const BRS_Color *color, const char *text, BRS_Font *font) {
-    BRS_GUI_Label *label = BRS_GUI_Label_create(position, color, text, font);
+BRS_GUI_Widget_createLabel(BRS_Point *position, const BRS_GUI_Theme *theme, const char *text) {
+    BRS_GUI_Label *label = BRS_GUI_Label_create(position, theme, text);
     return createWidget(BRS_GUI_WIDGET_LABEL, label);
 }
 
 BRS_GUI_Widget *
-BRS_GUI_Widget_createMenuBar(BRS_Point *position, BRS_Dimension *dimension, const BRS_Color *foreColor,
-                             BRS_Font *font) {
-    BRS_GUI_MenuBar *menubar = BRS_GUI_MenuBar_create(position, dimension, foreColor, font);
+BRS_GUI_Widget_createMenuBar(BRS_Point *position, BRS_Dimension *dimension, const BRS_GUI_Theme *theme) {
+    BRS_GUI_MenuBar *menubar = BRS_GUI_MenuBar_create(position, dimension, theme);
     return createWidget(BRS_GUI_WIDGET_MENUBAR, menubar);
 }
 
 BRS_GUI_Widget *
-BRS_GUI_Widget_createCharTable(BRS_Point *position, const BRS_Color *borderColor, const BRS_Color *charColor,
-                               const BRS_Color *highlightedColor, const BRS_Color *selectedColor,
-                               BRS_Font *fontEdited) {
-    BRS_GUI_CharTable *charTable = BRS_GUI_CharTable_create(position, borderColor, charColor, highlightedColor,
-                                                            selectedColor, fontEdited);
+BRS_GUI_Widget_createCharTable(BRS_Point *position, const BRS_GUI_Theme *theme, BRS_Font *fontEdited) {
+    BRS_GUI_CharTable *charTable = BRS_GUI_CharTable_create(position, theme, fontEdited);
     return createWidget(BRS_GUI_WIDGET_CHARTABLE, charTable);
 }
 
 BRS_GUI_Widget *
-BRS_GUI_Widget_createCharEdit(BRS_Point *position, const BRS_Color *foreColor, const BRS_Color *dotColor,
-                              const BRS_Color *clearColor, BRS_Font *fontEdited) {
-    BRS_GUI_CharEdit *charEdit = BRS_GUI_CharEdit_create(position, foreColor, dotColor, clearColor, fontEdited);
+BRS_GUI_Widget_createCharEdit(BRS_Point *position, const BRS_GUI_Theme *theme, BRS_Font *fontEdited) {
+    BRS_GUI_CharEdit *charEdit = BRS_GUI_CharEdit_create(position, theme, fontEdited);
     return createWidget(BRS_GUI_WIDGET_CHAREDIT, charEdit);
 }
 
@@ -108,7 +103,7 @@ void BRS_GUI_Widget_destroy(BRS_GUI_Widget *widget) {
     free(widget);
 }
 
-void BRS_GUI_Widget_setClickHandler(BRS_GUI_Widget *widget, void* handler) {
+void BRS_GUI_Widget_setClickHandler(BRS_GUI_Widget *widget, void *handler) {
     switch (widget->type) {
         case BRS_GUI_WIDGET_MENUBAR:
             widget->object->menuBar->clickHandler = handler;

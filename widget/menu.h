@@ -7,6 +7,7 @@
 
 #include <stdbool.h>
 #include "../video.h"
+#include "../theme.h"
 #include "menu_item.h"
 
 // External
@@ -21,10 +22,7 @@ struct _BRS_GUI_Menu {
     BRS_GUI_MenuBar *menuBar;
     BRS_Dimension *dimension;
     const char *label;
-    const BRS_Color *foreColor;
-    const BRS_Color *backColor;
-    const BRS_Color *selectedForeColor;
-    BRS_Font *font;
+    BRS_GUI_Theme *theme;
     bool selected;
     BRS_GUI_MenuItemList *itemList;
 };
@@ -40,8 +38,7 @@ extern int32_t BRS_GUI_MenuBar_getMenuIndex(BRS_GUI_MenuBar *menuBar, BRS_GUI_Me
 void BRS_GUI_Menu_render(BRS_VideoContext *context, BRS_GUI_Menu *menu);
 
 BRS_GUI_Menu *
-BRS_GUI_Menu_create(BRS_GUI_MenuBar *menuBar, BRS_Dimension *dimension, const char *label, const BRS_Color *foreColor,
-                    const BRS_Color *backColor, const BRS_Color *selectedForeColor, BRS_Font *font, bool selected);
+BRS_GUI_Menu_create(BRS_GUI_MenuBar *menuBar, BRS_Dimension *dimension, const char *label, const BRS_GUI_Theme *theme, bool selected);
 
 void BRS_GUI_Menu_destroy(BRS_GUI_Menu *menu);
 

@@ -35,18 +35,13 @@ static void onClickMenuItemQuit(BRS_GUI_MenuItem *menuItem) {
     quitApplication();
 }
 
-static BRS_GUI_Menu *createFileMenu(BRS_GUI_MenuBar *menuBar, BRS_Font *font) {
+static BRS_GUI_Menu *createFileMenu(BRS_GUI_MenuBar *menuBar, BRS_GUI_Theme *theme) {
     BRS_Dimension dim = {.width = 50, .height = 20};
-    BRS_GUI_Menu *menu = BRS_GUI_Menu_create(menuBar, &dim, "File", &COLOR_WHITE, &COLOR_BLUE, &COLOR_DARK_GRAY, font,
-                                             false);
-    BRS_GUI_MenuItem *menuItemNew = BRS_GUI_MenuItem_create(&dim, menu, "New", &COLOR_WHITE, &COLOR_BLUE,
-                                                            &COLOR_LIGHT_GRAY, font);
-    BRS_GUI_MenuItem *menuItemLoad = BRS_GUI_MenuItem_create(&dim, menu, "Load", &COLOR_WHITE, &COLOR_BLUE,
-                                                             &COLOR_LIGHT_GRAY, font);
-    BRS_GUI_MenuItem *menuItemSave = BRS_GUI_MenuItem_create(&dim, menu, "Save", &COLOR_WHITE, &COLOR_BLUE,
-                                                             &COLOR_LIGHT_GRAY, font);
-    BRS_GUI_MenuItem *menuItemQuit = BRS_GUI_MenuItem_create(&dim, menu, "Quit", &COLOR_WHITE, &COLOR_BLUE,
-                                                             &COLOR_LIGHT_GRAY, font);
+    BRS_GUI_Menu *menu = BRS_GUI_Menu_create(menuBar, &dim, "File", theme, false);
+    BRS_GUI_MenuItem *menuItemNew = BRS_GUI_MenuItem_create(&dim, menu, "New", theme);
+    BRS_GUI_MenuItem *menuItemLoad = BRS_GUI_MenuItem_create(&dim, menu, "Load", theme);
+    BRS_GUI_MenuItem *menuItemSave = BRS_GUI_MenuItem_create(&dim, menu, "Save", theme);
+    BRS_GUI_MenuItem *menuItemQuit = BRS_GUI_MenuItem_create(&dim, menu, "Quit", theme);
 
     BRS_GUI_MenuItemList_push(menuItemNew, menu->itemList);
     BRS_GUI_MenuItemList_push(menuItemLoad, menu->itemList);
@@ -58,51 +53,51 @@ static BRS_GUI_Menu *createFileMenu(BRS_GUI_MenuBar *menuBar, BRS_Font *font) {
     return menu;
 }
 
-static BRS_GUI_Widget *createMenuBar(BRS_Font *font) {
+static BRS_GUI_Widget *createMenuBar(BRS_GUI_Theme *theme) {
     BRS_Point *menuBarPosition = malloc(sizeof(BRS_Point));
     menuBarPosition->x = 0;
     menuBarPosition->y = 0;
     BRS_Dimension *menuBarDimension = malloc(sizeof(struct BRS_Dimension));
     menuBarDimension->width = 800;
     menuBarDimension->height = 20;
-    BRS_GUI_Widget *widget = BRS_GUI_Widget_createMenuBar(menuBarPosition, menuBarDimension, &COLOR_BLUE, font);
+    BRS_GUI_Widget *widget = BRS_GUI_Widget_createMenuBar(menuBarPosition, menuBarDimension, theme);
 
     BRS_GUI_Widget_setClickHandler(widget, &onClickMenuBar);
 
-    BRS_GUI_Menu *fileMenu = createFileMenu(widget->object->menuBar, font);
+    BRS_GUI_Menu *fileMenu = createFileMenu(widget->object->menuBar, theme);
     BRS_GUI_MenuList_push(fileMenu, widget->object->menuBar->menuList);
 
     return widget;
 }
 
-static BRS_GUI_Widget *createCharTable(BRS_Font *fontEdited) {
+static BRS_GUI_Widget *createCharTable(BRS_Font *fontEdited, BRS_GUI_Theme *theme) {
     BRS_Point position = {.x = 10, .y = 50};
-    BRS_GUI_Widget *widget = BRS_GUI_Widget_createCharTable(&position, &COLOR_RED, &COLOR_YELLOW, &COLOR_LIGHT_GRAY,
-                                                            &COLOR_DARK_GRAY, fontEdited);
+    BRS_GUI_Widget *widget = BRS_GUI_Widget_createCharTable(&position, theme, fontEdited);
     BRS_GUI_CharTable_setClickHandler(widget->object->charTable, onClickCharTable);
     BRS_GUI_CharTable_setChangedSelectedCharIndexHandler(widget->object->charTable, onChangeCharTableSelectedCharIndex);
     return widget;
 }
 
-static BRS_GUI_Widget *createCharEdit(BRS_Font *fontEdited) {
+static BRS_GUI_Widget *createCharEdit(BRS_Font *fontEdited, BRS_GUI_Theme *theme) {
     BRS_Point position = {.x = 500, .y = 50};
-    BRS_GUI_Widget *widget = BRS_GUI_Widget_createCharEdit(&position, &COLOR_RED, &COLOR_YELLOW, &COLOR_BLACK, fontEdited);
+    BRS_GUI_Widget *widget = BRS_GUI_Widget_createCharEdit(&position, theme, fontEdited);
     return widget;
 }
 
-BRS_GUI_WidgetList *createWidgets(BRS_Font *font, BRS_Font *fontEdited, uint32_t screenWidth, uint32_t screenHeight) {
+BRS_GUI_WidgetList *
+createWidgets(BRS_GUI_Theme *theme, BRS_Font *fontEdited, uint32_t screenWidth, uint32_t screenHeight) {
     BRS_GUI_WidgetList *list = BRS_GUI_WidgetList_create();
 
     BRS_Point *labelPosition = malloc(sizeof(BRS_Point));
     const char *labelText = "Ready.";
 
-    labelPosition->x = (screenWidth - strlen(labelText) * font->width_bits) / 2;
-    labelPosition->y = screenHeight - font->height_bits - 1;
+    labelPosition->x = (screenWidth - strlen(labelText) * theme->font->width_bits) / 2;
+    labelPosition->y = screenHeight - theme->font->height_bits - 1;
 
-    BRS_GUI_WidgetList_push(createCharTable(fontEdited), list);
-    BRS_GUI_WidgetList_push(createCharEdit(fontEdited), list);
-    BRS_GUI_WidgetList_push(BRS_GUI_Widget_createLabel(labelPosition, &COLOR_LIGHT_GRAY, labelText, font), list);
-    BRS_GUI_WidgetList_push(createMenuBar(font), list);
+    BRS_GUI_WidgetList_push(createCharTable(fontEdited, theme), list);
+    BRS_GUI_WidgetList_push(createCharEdit(fontEdited, theme), list);
+    BRS_GUI_WidgetList_push(BRS_GUI_Widget_createLabel(labelPosition, theme, labelText), list);
+    BRS_GUI_WidgetList_push(createMenuBar(theme), list);
 
     return list;
 }

@@ -82,6 +82,10 @@ void BRS_GUI_Widget_processEvent(BRS_GUI_Widget *widget, SDL_Event *event) {
             break;
         case BRS_GUI_WIDGET_CHARTABLE:
             BRS_GUI_CharTable_processEvent(widget->object->charTable, event);
+            break;
+        case BRS_GUI_WIDGET_CHAREDIT:
+            BRS_GUI_CharEdit_processEvent(widget->object->charEdit, event);
+            break;
     }
 }
 

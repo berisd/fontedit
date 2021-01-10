@@ -23,8 +23,8 @@ void BRS_GUI_Menu_render(BRS_VideoContext *context, BRS_GUI_Menu *menu) {
     BRS_Rect menuRect = {.x = position.x, .y = position.y, .width = menu->dimension->width, .height = menu->dimension->height};
     BRS_drawlFillRect(context, &menuRect);
 
-    BRS_drawString(context, menu->label, strlen(menu->label), menu->theme->font, &position,
-                   menu->selected ? menu->theme->menuSelectedForeColor : menu->theme->menuForeColor);
+    BRS_setColor(context, menu->selected ? menu->theme->menuSelectedForeColor : menu->theme->menuForeColor);
+    BRS_drawString(context, menu->label, strlen(menu->label), menu->theme->font, &position);
 
     if (menu->selected) {
         BRS_GUI_MenuItemListEntry *entry = menu->itemList->firstEntry;
@@ -42,7 +42,7 @@ BRS_GUI_Menu_create(BRS_GUI_MenuBar *menuBar, BRS_Dimension *dimension, const ch
     menu->menuBar = menuBar;
     menu->dimension = BRS_copyDimension(dimension);
     menu->label = label;
-    menu->theme = (BRS_GUI_Theme *)theme;
+    menu->theme = (BRS_GUI_Theme *) theme;
     menu->itemList = BRS_GUI_MenuItemList_create();
     menu->selected = selected;
     menu->itemList = BRS_GUI_MenuItemList_create();

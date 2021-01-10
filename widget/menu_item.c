@@ -22,7 +22,7 @@ BRS_GUI_MenuItem_create(BRS_Dimension *dimension, BRS_GUI_Menu *menu, const char
     menuItem->dimension = BRS_copyDimension(dimension);
     menuItem->menu = menu;
     menuItem->label = label;
-    menuItem->theme = (BRS_GUI_Theme *)theme;
+    menuItem->theme = (BRS_GUI_Theme *) theme;
     menuItem->clickHandler = NULL;
     menuItem->highlighted = false;
     return menuItem;
@@ -41,9 +41,9 @@ void BRS_GUI_MenuItem_render(BRS_VideoContext *context, BRS_GUI_MenuItem *menuIt
     BRS_Rect menuItemRect = {.x = position.x, .y = position.y, .width=menuItem->dimension->width, .height=menuItem->dimension->height};
     BRS_drawlFillRect(context, &menuItemRect);
 
-    BRS_drawString(context, menuItem->label, strlen(menuItem->label), menuItem->theme->font, &position,
-                   menuItem->highlighted ? menuItem->theme->menuItemHighlightedColor
-                                         : menuItem->theme->menuItemForeColor);
+    BRS_setColor(context, menuItem->highlighted ? menuItem->theme->menuItemHighlightedColor
+                                                : menuItem->theme->menuItemForeColor);
+    BRS_drawString(context, menuItem->label, strlen(menuItem->label), menuItem->theme->font, &position);
 }
 
 void BRS_GUI_setMenuItemClickHandler(BRS_GUI_MenuItem *menuItem, BRS_GUI_MenuItem_ClickHandler handler) {

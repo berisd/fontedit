@@ -64,7 +64,7 @@ BRS_GUI_CharTable *
 BRS_GUI_CharTable_create(BRS_Point *position, const BRS_GUI_Theme *theme, BRS_Font *fontEdited) {
     BRS_GUI_CharTable *charTable = malloc(sizeof(BRS_GUI_CharTable));
     charTable->position = BRS_copyPoint(position);
-    charTable->theme = (BRS_GUI_Theme *)theme;
+    charTable->theme = (BRS_GUI_Theme *) theme;
     charTable->fontEdited = fontEdited;
     charTable->highlightedCharIndex = NO_CHAR;
     charTable->selectedCharIndex = NO_CHAR;
@@ -151,7 +151,8 @@ static void drawChars(const BRS_VideoContext *context, const BRS_GUI_CharTable *
             }
 
             uint8_t ch = charIndex;
-            BRS_drawString(context, &ch, 1, charTable->fontEdited, &pos, charTable->theme->charTableCharColor);
+            BRS_setColor(context, charTable->theme->charTableCharColor);
+            BRS_drawString(context, &ch, 1, charTable->fontEdited, &pos);
             pos.x += x_diff;
             charIndex++;
         }

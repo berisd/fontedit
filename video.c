@@ -91,9 +91,8 @@ void BRS_drawlFillRect(const BRS_VideoContext *context, const BRS_Rect *rect) {
     SDL_RenderFillRect(context->renderer, &sdlRect);
 }
 
-void BRS_drawString(const BRS_VideoContext *context, const uint8_t *str, uint16_t strlen, const BRS_Font *font, const BRS_Point *startPoint,
-                    const BRS_Color *color) {
-    BRS_setColor(context, color);
+void BRS_drawString(const BRS_VideoContext *context, const uint8_t *str, uint16_t strlen, const BRS_Font *font,
+                    const BRS_Point *startPoint) {
     int32_t x = startPoint->x;
     int32_t y = startPoint->y;
     BRS_Point point;

@@ -67,8 +67,8 @@ void BRS_drawlRect(const BRS_VideoContext *context, const BRS_Rect *rect);
 
 void BRS_drawlFillRect(const BRS_VideoContext *context, const BRS_Rect *rect);
 
-void BRS_drawString(const BRS_VideoContext *context, const uint8_t *str, uint16_t strlen, const BRS_Font *font, const BRS_Point *startPoint,
-                    const BRS_Color *color);
+void BRS_drawString(const BRS_VideoContext *context, const uint8_t *str, uint16_t strlen, const BRS_Font *font,
+                    const BRS_Point *startPoint);
 
 bool BRS_PointInRect(BRS_Point *point, BRS_Rect *rect);
 

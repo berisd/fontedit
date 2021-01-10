@@ -10,12 +10,13 @@
 
 // External
 extern BRS_GUI_WidgetList *getWidgetList();
+extern void BRS_FontEdit_quitApplication();
 // External End
 
 BRS_GUI_WidgetList *createWidgets(BRS_GUI_Theme *theme, BRS_Font *fontEdited, uint32_t screenWidth, uint32_t screenHeight);
 
 void destroyWidgets(BRS_GUI_WidgetList *widgetList);
 
-void quitApplication();
+
 
 #endif //FONTEDIT_GUI_H

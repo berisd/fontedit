@@ -20,6 +20,6 @@ BRS_GUI_Label *BRS_GUI_Label_create(BRS_Point *position, const BRS_GUI_Theme *th
 
 void BRS_GUI_Label_destroy(BRS_GUI_Label *label);
 
-void *BRS_GUI_Label_render(BRS_VideoContext *context, BRS_GUI_Label *label);
+void BRS_GUI_Label_render(BRS_VideoContext *context, BRS_GUI_Label *label);
 
 #endif //BRS_GUI_LABEL_H

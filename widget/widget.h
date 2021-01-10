@@ -14,6 +14,8 @@
 #include "menu_bar.h"
 #include "char_edit.h"
 #include "char_table.h"
+#include "messagebox.h"
+#include "inputbox.h"
 
 typedef enum _BRS_GUI_WidgetType BRS_GUI_WidgetType;
 
@@ -28,6 +30,8 @@ enum _BRS_GUI_WidgetType {
     BRS_GUI_WIDGET_MENUBAR,
     BRS_GUI_WIDGET_CHAREDIT,
     BRS_GUI_WIDGET_CHARTABLE,
+    BRS_GUI_WIDGET_MESSAGEBOX,
+    BRS_GUI_WIDGET_INPUTBOX
 };
 
 union _BRS_GUI_Widget_Object {
@@ -35,6 +39,8 @@ union _BRS_GUI_Widget_Object {
     BRS_GUI_Label *label;
     BRS_GUI_CharEdit *charEdit;
     BRS_GUI_CharTable *charTable;
+    BRS_GUI_MessageBox *messageBox;
+    BRS_GUI_InputBox *inputBox;
 };
 
 struct _BRS_GUI_Widget {
@@ -55,6 +61,12 @@ BRS_GUI_Widget_createMenuBar(BRS_Point *position, BRS_Dimension *dimension, cons
 
 BRS_GUI_Widget *
 BRS_GUI_Widget_createLabel(BRS_Point *position, const BRS_GUI_Theme *theme, const char *text);
+
+BRS_GUI_Widget *
+BRS_GUI_Widget_createMessageBox(BRS_Point *position, struct BRS_Dimension *dimension, const BRS_GUI_Theme *theme, const char *title, const char *text);
+
+BRS_GUI_Widget *
+BRS_GUI_Widget_createInputBox(BRS_Point *position, struct BRS_Dimension *dimension, const BRS_GUI_Theme *theme, const char *title, const char *textLabel);
 
 BRS_GUI_Widget *
 BRS_GUI_Widget_createCharEdit(BRS_Point *position, const BRS_GUI_Theme *theme, BRS_Font *fontEdited);

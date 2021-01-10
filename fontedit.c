@@ -109,7 +109,7 @@ static void runApplication(ApplicationState *applicationState) {
     }
 }
 
-void quitApplication() {
+void BRS_FontEdit_quitApplication() {
     applicationState->quit = true;
 }
 

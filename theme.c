@@ -24,12 +24,15 @@ BRS_GUI_Theme *BRS_GUI_Theme_create() {
     theme->menuItemForeColor = &COLOR_WHITE;
     theme->menuItemHighlightedColor = &COLOR_LIGHT_GRAY;
     theme->labelForeColor = &COLOR_LIGHT_GRAY;
-    theme->charTableBorderColor = &COLOR_RED;
+    theme->borderColor = &COLOR_RED;
     theme->charTableCharColor = &COLOR_YELLOW;
     theme->charTableHighlightedColor = &COLOR_LIGHT_GRAY;
     theme->charTableSelectedColor = &COLOR_DARK_GRAY;
     theme->charEditForeColor = &COLOR_RED;
     theme->charEditDotColor = &COLOR_YELLOW;
+    theme->inputBoxBackColor = &COLOR_BLACK;
+    theme->inputBoxTextForeColor = &COLOR_YELLOW;
+    theme->inputBoxTitleForeColor = &COLOR_WHITE;
     return theme;
 }
 

@@ -31,8 +31,17 @@ static void onChangeCharTableSelectedCharIndex(BRS_GUI_CharTable *charTable) {
     charEditWidget->object->charEdit->selectedChar = charTable->selectedCharIndex;
 }
 
+static void onClickMenuItemLoad(BRS_GUI_MenuItem *load) {
+    BRS_GUI_Widget *inputBoxWidget = BRS_GUI_Widget_getByType(BRS_GUI_WIDGET_INPUTBOX);
+    BRS_GUI_InputBox *inputBox = inputBoxWidget->object->inputBox;
+    inputBox->title = "Load file";
+    inputBox->textLabel = "Name?";
+    BRS_GUI_InputBox_clearText(inputBox);
+    inputBox->visible = true;
+}
+
 static void onClickMenuItemQuit(BRS_GUI_MenuItem *menuItem) {
-    quitApplication();
+    BRS_FontEdit_quitApplication();
 }
 
 static BRS_GUI_Menu *createFileMenu(BRS_GUI_MenuBar *menuBar, BRS_GUI_Theme *theme) {
@@ -48,6 +57,7 @@ static BRS_GUI_Menu *createFileMenu(BRS_GUI_MenuBar *menuBar, BRS_GUI_Theme *the
     BRS_GUI_MenuItemList_push(menuItemSave, menu->itemList);
     BRS_GUI_MenuItemList_push(menuItemQuit, menu->itemList);
 
+    BRS_GUI_setMenuItemClickHandler(menuItemLoad, onClickMenuItemLoad);
     BRS_GUI_setMenuItemClickHandler(menuItemQuit, onClickMenuItemQuit);
 
     return menu;
@@ -84,6 +94,14 @@ static BRS_GUI_Widget *createCharEdit(BRS_Font *fontEdited, BRS_GUI_Theme *theme
     return widget;
 }
 
+static BRS_GUI_Widget *createInputBox(BRS_GUI_Theme *theme, uint32_t screenWidth, uint32_t screenHeight) {
+    BRS_Dimension dimension = {.width = 200, .height = 100};
+    BRS_Point position = {.x = (screenWidth - dimension.width) / 2, .y = (screenHeight - dimension.height) / 2 -
+                                                                         dimension.height};
+    BRS_GUI_Widget *widget = BRS_GUI_Widget_createInputBox(&position, &dimension, theme, "Input", "?");
+    return widget;
+}
+
 BRS_GUI_WidgetList *
 createWidgets(BRS_GUI_Theme *theme, BRS_Font *fontEdited, uint32_t screenWidth, uint32_t screenHeight) {
     BRS_GUI_WidgetList *list = BRS_GUI_WidgetList_create();
@@ -98,6 +116,7 @@ createWidgets(BRS_GUI_Theme *theme, BRS_Font *fontEdited, uint32_t screenWidth, 
     BRS_GUI_WidgetList_push(createCharEdit(fontEdited, theme), list);
     BRS_GUI_WidgetList_push(BRS_GUI_Widget_createLabel(labelPosition, theme, labelText), list);
     BRS_GUI_WidgetList_push(createMenuBar(theme), list);
+    BRS_GUI_WidgetList_push(createInputBox(theme, screenWidth, screenHeight), list);
 
     return list;
 }

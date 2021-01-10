@@ -17,7 +17,7 @@ void BRS_GUI_Label_destroy(BRS_GUI_Label *label) {
     free(label);
 }
 
-void *BRS_GUI_Label_render(BRS_VideoContext *context, BRS_GUI_Label *label) {
+void BRS_GUI_Label_render(BRS_VideoContext *context, BRS_GUI_Label *label) {
     BRS_setColor(context, label->theme->labelForeColor);
     BRS_drawString(context, label->text, strlen(label->text), label->theme->font, label->position);
 }

@@ -79,7 +79,7 @@ void BRS_GUI_CharTable_destroy(BRS_GUI_CharTable *charTable) {
 }
 
 static void drawTableBorder(BRS_VideoContext *context, BRS_GUI_CharTable *charTable) {
-    BRS_setColor(context, charTable->theme->charTableBorderColor);
+    BRS_setColor(context, charTable->theme->borderColor);
     BRS_Rect rect = {
             .x = charTable->position->x,
             .y = charTable->position->y,
@@ -90,7 +90,7 @@ static void drawTableBorder(BRS_VideoContext *context, BRS_GUI_CharTable *charTa
 }
 
 static void drawVerticalLines(const BRS_VideoContext *context, const BRS_GUI_CharTable *charTable) {
-    BRS_setColor(context, charTable->theme->charTableBorderColor);
+    BRS_setColor(context, charTable->theme->borderColor);
 
     uint32_t i;
     BRS_Point p1 = {.x = charTable->position->x, .y = charTable->position->y};
@@ -108,7 +108,7 @@ static void drawVerticalLines(const BRS_VideoContext *context, const BRS_GUI_Cha
 }
 
 static void drawHorizontalLines(const BRS_VideoContext *context, const BRS_GUI_CharTable *charTable) {
-    BRS_setColor(context, charTable->theme->charTableBorderColor);
+    BRS_setColor(context, charTable->theme->borderColor);
 
     uint32_t i;
     BRS_Point p1 = {.x = charTable->position->x, .y = charTable->position->y};

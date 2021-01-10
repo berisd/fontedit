@@ -11,19 +11,19 @@ static const int32_t PIXELS_BORDER = 1;
 static const int32_t NO_CHAR = -1;
 
 static int32_t calcTableWith(BRS_GUI_CharTable *charTable) {
-    return CHARS_PER_ROW * (charTable->font->width_bits + PIXELS_BORDER * 2 + PIXELS_PADDING * 2);
+    return CHARS_PER_ROW * (charTable->fontEdited->width_bits + PIXELS_BORDER * 2 + PIXELS_PADDING * 2);
 }
 
 static int32_t calcTableHeight(BRS_GUI_CharTable *charTable) {
-    return CHAR_LINES * (charTable->font->height_bits + PIXELS_BORDER * 2 + PIXELS_PADDING * 2);
+    return CHAR_LINES * (charTable->fontEdited->height_bits + PIXELS_BORDER * 2 + PIXELS_PADDING * 2);
 }
 
 static int32_t calcCellWidth(const BRS_GUI_CharTable *charTable) {
-    return charTable->font->width_bits + PIXELS_BORDER * 2 + PIXELS_PADDING * 2;
+    return charTable->fontEdited->width_bits + PIXELS_BORDER * 2 + PIXELS_PADDING * 2;
 }
 
 static int32_t calcCellHeight(const BRS_GUI_CharTable *charTable) {
-    return charTable->font->height_bits + PIXELS_BORDER * 2 + PIXELS_PADDING * 2;
+    return charTable->fontEdited->height_bits + PIXELS_BORDER * 2 + PIXELS_PADDING * 2;
 }
 
 static void calcGridPosition(GridPosition *gridPosition, BRS_GUI_CharTable *charTable, BRS_Point *mousePoint) {
@@ -46,14 +46,14 @@ static void processMouseMove(BRS_GUI_CharTable *charTable, BRS_Point *mousePoint
     GridPosition gridPosition;
     calcGridPosition(&gridPosition, charTable, mousePoint);
     uint8_t ch = getCharByGridPosition(&gridPosition);
-    charTable->highlightedChar = ch;
+    charTable->highlightedCharIndex = ch;
 }
 
 static void processMouseButtonDown(BRS_GUI_CharTable *charTable, BRS_Point *mousePoint) {
     GridPosition gridPosition;
     calcGridPosition(&gridPosition, charTable, mousePoint);
     uint8_t ch = getCharByGridPosition(&gridPosition);
-    charTable->selectedChar = ch;
+    BRS_GUI_CharTable_setSelectedCharIndex(charTable, ch);
 
     if (charTable->clickHandler) {
         charTable->clickHandler(charTable);
@@ -62,17 +62,18 @@ static void processMouseButtonDown(BRS_GUI_CharTable *charTable, BRS_Point *mous
 
 BRS_GUI_CharTable *
 BRS_GUI_CharTable_create(BRS_Point *position, const BRS_Color *borderColor, const BRS_Color *charColor,
-                         const BRS_Color *highlightedColor, const BRS_Color *selectedColor, BRS_Font *font) {
+                         const BRS_Color *highlightedColor, const BRS_Color *selectedColor, BRS_Font *fontEdited) {
     BRS_GUI_CharTable *charTable = malloc(sizeof(BRS_GUI_CharTable));
     charTable->position = BRS_copyPoint(position);
     charTable->borderColor = borderColor;
     charTable->charColor = charColor;
     charTable->highlightedColor = highlightedColor;
     charTable->selectedColor = selectedColor;
-    charTable->font = font;
-    charTable->highlightedChar = NO_CHAR;
-    charTable->selectedChar = NO_CHAR;
+    charTable->fontEdited = fontEdited;
+    charTable->highlightedCharIndex = NO_CHAR;
+    charTable->selectedCharIndex = NO_CHAR;
     charTable->clickHandler = NULL;
+    charTable->changedSelectedCharIndexHandler = NULL;
     return charTable;
 }
 
@@ -98,10 +99,11 @@ static void drawVerticalLines(const BRS_VideoContext *context, const BRS_GUI_Cha
     uint32_t i;
     BRS_Point p1 = {.x = charTable->position->x, .y = charTable->position->y};
     BRS_Point p2 = {.x = charTable->position->x, .y = charTable->position->y +
-                                                      CHAR_LINES * (charTable->font->height_bits + PIXELS_BORDER * 2 +
-                                                                    PIXELS_PADDING * 2)};
+                                                      CHAR_LINES *
+                                                      (charTable->fontEdited->height_bits + PIXELS_BORDER * 2 +
+                                                       PIXELS_PADDING * 2)};
     BRS_Line line = {.p1 = &p1, .p2 = &p2};
-    int32_t x_diff = charTable->font->width_bits + +PIXELS_BORDER * 2 + PIXELS_PADDING * 2;
+    int32_t x_diff = charTable->fontEdited->width_bits + +PIXELS_BORDER * 2 + PIXELS_PADDING * 2;
     for (i = 0; i < CHARS_PER_ROW; i++) {
         BRS_drawline(context, &line);
         line.p1->x += x_diff;
@@ -129,8 +131,8 @@ static void drawChars(const BRS_VideoContext *context, const BRS_GUI_CharTable *
     BRS_Point pos = {.x = charTable->position->x + PIXELS_BORDER + PIXELS_PADDING, .y = charTable->position->y +
                                                                                         PIXELS_BORDER + PIXELS_PADDING};
     BRS_Rect charRect = {.x = 0, .y = 0,
-            .width = charTable->font->width_bits + 2 * PIXELS_PADDING,
-            .height = charTable->font->height_bits + 2 * PIXELS_PADDING
+            .width = charTable->fontEdited->width_bits + 2 * PIXELS_PADDING,
+            .height = charTable->fontEdited->height_bits + 2 * PIXELS_PADDING
     };
     int32_t x_diff = calcCellWidth(charTable);
     int32_t y_diff = calcCellHeight(charTable);
@@ -138,13 +140,12 @@ static void drawChars(const BRS_VideoContext *context, const BRS_GUI_CharTable *
     uint16_t rowIndex;
     uint16_t colIndex;
 
-    int32_t ch = 0;
-    uint8_t str[2];
+    int32_t charIndex = 0;
     for (rowIndex = 0; rowIndex < CHAR_LINES; rowIndex++) {
         pos.x = charTable->position->x + PIXELS_BORDER + PIXELS_PADDING;
         for (colIndex = 0; colIndex < CHARS_PER_ROW; colIndex++) {
-            if (charTable->highlightedChar == ch || charTable->selectedChar == ch) {
-                bool isSelected = charTable->selectedChar == ch;
+            if (charTable->highlightedCharIndex == charIndex || charTable->selectedCharIndex == charIndex) {
+                bool isSelected = charTable->selectedCharIndex == charIndex;
                 const BRS_Color *charColor = isSelected ? charTable->selectedColor : charTable->highlightedColor;
                 BRS_setColor(context, charColor);
                 charRect.x = pos.x - PIXELS_PADDING;
@@ -152,10 +153,10 @@ static void drawChars(const BRS_VideoContext *context, const BRS_GUI_CharTable *
                 BRS_drawlFillRect(context, &charRect);
             }
 
-            str[0] = ch;
-            BRS_drawString(context, str, charTable->font, &pos, charTable->charColor);
+            uint8_t ch = charIndex;
+            BRS_drawString(context, &ch, 1, charTable->fontEdited, &pos, charTable->charColor);
             pos.x += x_diff;
-            ch++;
+            charIndex++;
         }
         pos.y += y_diff;
     }
@@ -178,17 +179,14 @@ void BRS_GUI_CharTable_processEvent(BRS_GUI_CharTable *charTable, SDL_Event *eve
             if (BRS_PointInRect(&mousePoint, &widgetRect)) {
                 processMouseMove(charTable, &mousePoint);
             } else {
-                charTable->highlightedChar = NO_CHAR;
+                charTable->highlightedCharIndex = NO_CHAR;
             }
-
         }
             break;
         case SDL_MOUSEBUTTONUP: {
             BRS_Point mousePoint = {.x = event->button.x, .y = event->button.y};
             if (BRS_PointInRect(&mousePoint, &widgetRect)) {
                 processMouseButtonDown(charTable, &mousePoint);
-            } else {
-                charTable->selectedChar = NO_CHAR;
             }
         }
             break;
@@ -197,4 +195,21 @@ void BRS_GUI_CharTable_processEvent(BRS_GUI_CharTable *charTable, SDL_Event *eve
 
 void BRS_GUI_CharTable_setClickHandler(BRS_GUI_CharTable *charTable, BRS_GUI_CharTable_ClickHandler handler) {
     charTable->clickHandler = handler;
+}
+
+void
+BRS_GUI_CharTable_setChangedSelectedCharIndexHandler(BRS_GUI_CharTable *charTable,
+                                                     BRS_GUI_CharTable_ChangedSelectedCharIndex handler) {
+    charTable->changedSelectedCharIndexHandler = handler;
+}
+
+void BRS_GUI_CharTable_setSelectedCharIndex(BRS_GUI_CharTable *charTable, int32_t selectedCharIndex) {
+    if (charTable->selectedCharIndex == selectedCharIndex) {
+        return;
+    }
+
+    charTable->selectedCharIndex = selectedCharIndex;
+    if (charTable->changedSelectedCharIndexHandler != NULL) {
+        charTable->changedSelectedCharIndexHandler(charTable);
+    }
 }

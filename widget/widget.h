@@ -43,9 +43,11 @@ struct _BRS_GUI_Widget {
 
 void BRS_GUI_Widget_render(BRS_VideoContext *context, BRS_GUI_Widget *widget);
 
-void BRS_GUI_destroyWidget(BRS_GUI_Widget *widget);
+void BRS_GUI_Widget_destroy(BRS_GUI_Widget *widget);
 
 void BRS_GUI_Widget_processEvent(BRS_GUI_Widget *widget, SDL_Event *event);
+
+BRS_GUI_Widget *BRS_GUI_Widget_getByType(BRS_GUI_WidgetType type);
 
 BRS_GUI_Widget *
 BRS_GUI_Widget_createMenuBar(BRS_Point *position, BRS_Dimension *dimension, const BRS_Color *foreColor, BRS_Font *font);
@@ -59,8 +61,8 @@ BRS_GUI_Widget_createCharEdit(BRS_Point *position, const BRS_Color *foreColor, c
 
 BRS_GUI_Widget *
 BRS_GUI_Widget_createCharTable(BRS_Point *position, const BRS_Color *borderColor, const BRS_Color *charColor,
-                               const BRS_Color *highlightedColor, const BRS_Color *selectedColor, BRS_Font *font);
+                               const BRS_Color *highlightedColor, const BRS_Color *selectedColor, BRS_Font *fontEdited);
 
-void BRS_GUI_setClickHandler(BRS_GUI_Widget *widget, void *handler);
+void BRS_GUI_Widget_setClickHandler(BRS_GUI_Widget *widget, void *handler);
 
 #endif //BRS_GUI_WIDGET_H

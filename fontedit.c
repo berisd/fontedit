@@ -51,7 +51,8 @@ static ApplicationState *initApplication(const ApplicationConfig *config) {
     applicationState->videoContext = videoContext;
     applicationState->defaultFont = createDefaultFont();
     applicationState->fontEdited = BRS_copyFont(applicationState->defaultFont);
-    applicationState->widgets = createWidgets(applicationState->defaultFont, config->screenWidth, config->screenHeight);
+    applicationState->widgets = createWidgets(applicationState->defaultFont, applicationState->fontEdited,
+                                              config->screenWidth, config->screenHeight);
     applicationState->quit = false;
     atexit(SDL_Quit);
     return applicationState;
@@ -119,6 +120,7 @@ BRS_GUI_WidgetList *getWidgetList() {
 int main() {
     ApplicationConfig *config = createConfig();
     applicationState = initApplication(config);
+    BRS_GUI_CharTable_setSelectedCharIndex(BRS_GUI_Widget_getByType(BRS_GUI_WIDGET_CHARTABLE)->object->charTable, 0);
     if (applicationState != NULL) {
         runApplication(applicationState);
     }

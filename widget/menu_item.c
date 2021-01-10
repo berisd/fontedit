@@ -45,7 +45,7 @@ void BRS_GUI_MenuItem_render(BRS_VideoContext *context, BRS_GUI_MenuItem *menuIt
     BRS_Rect menuItemRect = {.x = position.x, .y = position.y, .width=menuItem->dimension->width, .height=menuItem->dimension->height};
     BRS_drawlFillRect(context, &menuItemRect);
 
-    BRS_drawString(context, menuItem->label, menuItem->font, &position,
+    BRS_drawString(context, menuItem->label, strlen(menuItem->label), menuItem->font, &position,
                    menuItem->highlighted ? menuItem->highlightedColor : menuItem->foreColor);
 }
 

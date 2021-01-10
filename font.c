@@ -59,5 +59,5 @@ BRS_Font *BRS_copyFont(BRS_Font *font) {
     size_t fontSize = BRS_getFontSize(font);
     copy->data = malloc(fontSize);
     memcpy(copy->data, font->data, fontSize);
-    return font;
+    return copy;
 }

@@ -6,6 +6,16 @@
 
 BRS_LIST_DEFN(BRS_GUI_MenuList, BRS_GUI_Menu)
 
+static uint16_t _countMenuItems(BRS_GUI_Menu *menu) {
+    uint16_t count = 0;
+    BRS_GUI_MenuItemListEntry *entry = menu->itemList->firstEntry;
+    while (entry != NULL) {
+        count++;
+        entry = entry->next;
+    }
+    return count;
+}
+
 void BRS_GUI_Menu_render(BRS_VideoContext *context, BRS_GUI_Menu *menu) {
     BRS_Point position;
     BRS_GUI_Menu_calcPosition(menu, &position);
@@ -13,7 +23,7 @@ void BRS_GUI_Menu_render(BRS_VideoContext *context, BRS_GUI_Menu *menu) {
     BRS_Rect menuRect = {.x = position.x, .y = position.y, .width = menu->dimension->width, .height = menu->dimension->height};
     BRS_drawlFillRect(context, &menuRect);
 
-    BRS_drawString(context, menu->label, menu->font, &position,
+    BRS_drawString(context, menu->label, strlen(menu->label), menu->font, &position,
                    menu->selected ? menu->selectedForeColor : menu->foreColor);
 
     if (menu->selected) {
@@ -55,6 +65,21 @@ void BRS_GUI_Menu_destroy(BRS_GUI_Menu *menu) {
 }
 
 void BRS_GUI_Menu_processEvent(BRS_GUI_Menu *menu, SDL_Event *event) {
+    if (event->type == SDL_MOUSEMOTION && menu->selected) {
+        BRS_Point position;
+        BRS_GUI_Menu_calcPosition(menu, &position);
+
+        BRS_Dimension *menuItemDimension = menu->itemList->firstEntry->value->dimension;
+        int16_t menuItemsHeight = _countMenuItems(menu) * menuItemDimension->height;
+
+        BRS_Rect menuRect = {.x = position.x, .y = position.y, .width = menu->dimension->width, .height =
+        menu->dimension->height + menuItemsHeight};
+
+        BRS_Point mousePoint = {.x = event->motion.x, .y = event->motion.y};
+        if (!BRS_PointInRect(&mousePoint, &menuRect)) {
+            menu->selected = false;
+        }
+    }
     if (!menu->selected) {
         return;
     }

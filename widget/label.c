@@ -13,13 +13,13 @@ BRS_GUI_Label *BRS_GUI_Label_create(BRS_Point *position, const BRS_Color *color,
     return label;
 }
 
-void BRS_GUI_Label_destroy(BRS_GUI_Label * label) {
+void BRS_GUI_Label_destroy(BRS_GUI_Label *label) {
     free(label->position);
     free(label);
 }
 
 void *BRS_GUI_Label_render(BRS_VideoContext *context, BRS_GUI_Label *label) {
     BRS_setColor(context, label->color);
-    BRS_drawString(context, label->text, label->font, label->position, label->color);
+    BRS_drawString(context, label->text, strlen(label->text), label->font, label->position, label->color);
 }
 

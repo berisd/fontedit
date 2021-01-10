@@ -8,12 +8,14 @@
 #include "widget/widget.h"
 #include "theme.h"
 
-BRS_GUI_WidgetList *createWidgets(BRS_Font *font, uint32_t screenWidth, uint32_t screenHeight);
+// External
+extern BRS_GUI_WidgetList *getWidgetList();
+// External End
+
+BRS_GUI_WidgetList *createWidgets(BRS_Font *font, BRS_Font *fontEdited, uint32_t screenWidth, uint32_t screenHeight);
 
 void destroyWidgets(BRS_GUI_WidgetList *widgetList);
 
 void quitApplication();
-
-BRS_GUI_WidgetList *getWidgetList();
 
 #endif //FONTEDIT_GUI_H

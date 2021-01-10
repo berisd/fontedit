@@ -3,12 +3,12 @@
 //
 #include "gui.h"
 
-static BRS_GUI_Widget *getCharEditWidget() {
+BRS_GUI_Widget *BRS_GUI_Widget_getByType(BRS_GUI_WidgetType type) {
     BRS_GUI_WidgetList *widgetList = getWidgetList();
     BRS_GUI_WidgetListEntry *entry = widgetList->firstEntry;
     while (entry != NULL) {
         BRS_GUI_Widget *widget = entry->value;
-        if (widget->type == BRS_GUI_WIDGET_CHAREDIT) {
+        if (widget->type == type) {
             return widget;
         }
         entry = entry->next;
@@ -22,8 +22,13 @@ static void onClickMenuBar(BRS_GUI_MenuBar *menuBar) {
 }
 
 static void onClickCharTable(BRS_GUI_CharTable *charTable) {
-    BRS_GUI_Widget *charEditWidget = getCharEditWidget();
-    charEditWidget->object->charEdit->selectedChar = charTable->selectedChar;
+    BRS_GUI_Widget *charEditWidget = BRS_GUI_Widget_getByType(BRS_GUI_WIDGET_CHAREDIT);
+    charEditWidget->object->charEdit->selectedChar = charTable->selectedCharIndex;
+}
+
+static void onChangeCharTableSelectedCharIndex(BRS_GUI_CharTable *charTable) {
+    BRS_GUI_Widget *charEditWidget = BRS_GUI_Widget_getByType(BRS_GUI_WIDGET_CHAREDIT);
+    charEditWidget->object->charEdit->selectedChar = charTable->selectedCharIndex;
 }
 
 static void onClickMenuItemQuit(BRS_GUI_MenuItem *menuItem) {
@@ -62,7 +67,7 @@ static BRS_GUI_Widget *createMenuBar(BRS_Font *font) {
     menuBarDimension->height = 20;
     BRS_GUI_Widget *widget = BRS_GUI_Widget_createMenuBar(menuBarPosition, menuBarDimension, &COLOR_BLUE, font);
 
-    BRS_GUI_setClickHandler(widget, &onClickMenuBar);
+    BRS_GUI_Widget_setClickHandler(widget, &onClickMenuBar);
 
     BRS_GUI_Menu *fileMenu = createFileMenu(widget->object->menuBar, font);
     BRS_GUI_MenuList_push(fileMenu, widget->object->menuBar->menuList);
@@ -70,21 +75,22 @@ static BRS_GUI_Widget *createMenuBar(BRS_Font *font) {
     return widget;
 }
 
-static BRS_GUI_Widget *createCharTable(BRS_Font *font) {
+static BRS_GUI_Widget *createCharTable(BRS_Font *fontEdited) {
     BRS_Point position = {.x = 10, .y = 50};
     BRS_GUI_Widget *widget = BRS_GUI_Widget_createCharTable(&position, &COLOR_RED, &COLOR_YELLOW, &COLOR_LIGHT_GRAY,
-                                                            &COLOR_DARK_GRAY, font);
+                                                            &COLOR_DARK_GRAY, fontEdited);
     BRS_GUI_CharTable_setClickHandler(widget->object->charTable, onClickCharTable);
+    BRS_GUI_CharTable_setChangedSelectedCharIndexHandler(widget->object->charTable, onChangeCharTableSelectedCharIndex);
     return widget;
 }
 
-static BRS_GUI_Widget *createCharEdit(BRS_Font *font) {
+static BRS_GUI_Widget *createCharEdit(BRS_Font *fontEdited) {
     BRS_Point position = {.x = 500, .y = 50};
-    BRS_GUI_Widget *widget = BRS_GUI_Widget_createCharEdit(&position, &COLOR_RED, &COLOR_YELLOW, &COLOR_BLACK, font);
+    BRS_GUI_Widget *widget = BRS_GUI_Widget_createCharEdit(&position, &COLOR_RED, &COLOR_YELLOW, &COLOR_BLACK, fontEdited);
     return widget;
 }
 
-BRS_GUI_WidgetList *createWidgets(BRS_Font *font, uint32_t screenWidth, uint32_t screenHeight) {
+BRS_GUI_WidgetList *createWidgets(BRS_Font *font, BRS_Font *fontEdited, uint32_t screenWidth, uint32_t screenHeight) {
     BRS_GUI_WidgetList *list = BRS_GUI_WidgetList_create();
 
     BRS_Point *labelPosition = malloc(sizeof(BRS_Point));
@@ -93,8 +99,8 @@ BRS_GUI_WidgetList *createWidgets(BRS_Font *font, uint32_t screenWidth, uint32_t
     labelPosition->x = (screenWidth - strlen(labelText) * font->width_bits) / 2;
     labelPosition->y = screenHeight - font->height_bits - 1;
 
-    BRS_GUI_WidgetList_push(createCharTable(font), list);
-    BRS_GUI_WidgetList_push(createCharEdit(font), list);
+    BRS_GUI_WidgetList_push(createCharTable(fontEdited), list);
+    BRS_GUI_WidgetList_push(createCharEdit(fontEdited), list);
     BRS_GUI_WidgetList_push(BRS_GUI_Widget_createLabel(labelPosition, &COLOR_LIGHT_GRAY, labelText, font), list);
     BRS_GUI_WidgetList_push(createMenuBar(font), list);
 
@@ -104,7 +110,7 @@ BRS_GUI_WidgetList *createWidgets(BRS_Font *font, uint32_t screenWidth, uint32_t
 void destroyWidgets(BRS_GUI_WidgetList *widgetList) {
     BRS_GUI_WidgetListEntry *entry = widgetList->firstEntry;
     while (entry != NULL) {
-        BRS_GUI_destroyWidget(entry->value);
+        BRS_GUI_Widget_destroy(entry->value);
         entry = entry->next;
     }
     BRS_GUI_WidgetList_destroy(widgetList);

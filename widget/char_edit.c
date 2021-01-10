@@ -39,13 +39,13 @@ static void calcGridPosition(GridPosition *gridPosition, BRS_GUI_CharEdit *charE
 
 BRS_GUI_CharEdit *
 BRS_GUI_CharEdit_create(BRS_Point *position, const BRS_Color *foreColor, const BRS_Color *dotColor,
-                        const BRS_Color *clearColor, BRS_Font *font) {
+                        const BRS_Color *clearColor, BRS_Font *fontEdited) {
     BRS_GUI_CharEdit *charEdit = malloc(sizeof(BRS_GUI_CharEdit));
     charEdit->position = BRS_copyPoint(position);
     charEdit->foreColor = foreColor;
     charEdit->dotColor = dotColor;
     charEdit->clearColor = clearColor;
-    charEdit->fontEdited = font;
+    charEdit->fontEdited = fontEdited;
     charEdit->selectedChar = NO_CHAR;
     charEdit->_buttonPressed = NO_BUTTON;
     return charEdit;
@@ -161,7 +161,7 @@ static void setCharDot(BRS_GUI_CharEdit *charEdit, GridPosition *gridPosition) {
     font->data[charRowBytePos] = charRowByte;
 }
 
-static void processMouseMove(BRS_GUI_CharEdit *charEdit, BRS_Point *mousePoint) {
+static void setCharDotAtPoint(BRS_GUI_CharEdit *charEdit, BRS_Point *mousePoint) {
     GridPosition gridPosition;
     calcGridPosition(&gridPosition, charEdit, mousePoint);
     setCharDot(charEdit, &gridPosition);
@@ -175,7 +175,7 @@ void BRS_GUI_CharEdit_processEvent(BRS_GUI_CharEdit *charEdit, SDL_Event *event)
         case SDL_MOUSEMOTION: {
             BRS_Point mousePoint = {.x = event->motion.x, .y = event->motion.y};
             if (BRS_PointInRect(&mousePoint, &widgetRect)) {
-                processMouseMove(charEdit, &mousePoint);
+                setCharDotAtPoint(charEdit, &mousePoint);
             }
         }
             break;
@@ -183,6 +183,7 @@ void BRS_GUI_CharEdit_processEvent(BRS_GUI_CharEdit *charEdit, SDL_Event *event)
             BRS_Point mousePoint = {.x = event->button.x, .y = event->button.y};
             if (BRS_PointInRect(&mousePoint, &widgetRect)) {
                 charEdit->_buttonPressed = event->button.button;
+                setCharDotAtPoint(charEdit, &mousePoint);
             } else {
                 charEdit->_buttonPressed = NO_BUTTON;
             }

@@ -14,7 +14,7 @@ const BRS_Color COLOR_LIGHT_GRAY = {.r = 180, .g = 179, .b = 177, .a = 255};
 
 BRS_GUI_Theme *BRS_GUI_Theme_create() {
     BRS_GUI_Theme *theme = malloc(sizeof(BRS_GUI_Theme));
-    theme->font = createDefaultFont();
+    theme->font = BRS_createDefaultFont();
     theme->screenColor = &COLOR_BLACK;
     theme->menuBarColor = &COLOR_BLUE;
     theme->menuBackColor = &COLOR_BLUE;

@@ -7,6 +7,6 @@
 
 #include "font.h"
 
-BRS_Font *createDefaultFont();
+BRS_Font *BRS_createDefaultFont();
 
 #endif //FONTEDIT_UTIL_H

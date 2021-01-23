@@ -5,12 +5,12 @@
 #include "messagebox.h"
 
 BRS_GUI_MessageBox *
-BRS_GUI_MessageBox_create(BRS_Point *position, BRS_Dimension *dimension, const BRS_GUI_Theme *theme, const char *title,
+BRS_GUI_MessageBox_create(BRS_Point *position, BRS_Size *size, const BRS_GUI_Theme *theme, const char *title,
                           const char *text) {
     BRS_GUI_MessageBox *messageBox = malloc(sizeof(BRS_GUI_MessageBox));
     messageBox->theme = (BRS_GUI_Theme *) theme;
     messageBox->position = BRS_copyPoint(position);
-    messageBox->dimension = BRS_copyDimension(dimension);
+    messageBox->size = BRS_copySize(size);
     messageBox->title = title;
     messageBox->text = text;
     return messageBox;
@@ -18,7 +18,7 @@ BRS_GUI_MessageBox_create(BRS_Point *position, BRS_Dimension *dimension, const B
 
 void BRS_GUI_MessageBox_destroy(BRS_GUI_MessageBox *messageBox) {
     free(messageBox->position);
-    free(messageBox->dimension);
+    free(messageBox->size);
     free(messageBox);
 }
 

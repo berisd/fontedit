@@ -6,7 +6,7 @@
 #define FONTEDIT_CHAR_TABLE_H
 
 #include "../font.h"
-#include "../video.h"
+#include "../render.h"
 #include "../theme.h"
 #include "grid.h"
 

@@ -6,7 +6,7 @@
 #define BRS_GUI_MENU_ITEM_H
 
 #include "../list.h"
-#include "../video.h"
+#include "../render.h"
 #include "../theme.h"
 
 // External
@@ -21,7 +21,7 @@ typedef void (*BRS_GUI_MenuItem_ClickHandler)(BRS_GUI_MenuItem *);
 
 struct _BRS_GUI_MenuItem {
     BRS_GUI_Menu *menu;
-    BRS_Dimension *dimension;
+    BRS_Size *size;
     const char *label;
     BRS_GUI_Theme *theme;
     BRS_GUI_MenuItem_ClickHandler clickHandler;
@@ -33,13 +33,13 @@ BRS_LIST_DECL(BRS_GUI_MenuItemList, BRS_GUI_MenuItem)
 // External
 extern void BRS_GUI_Menu_calcPosition(BRS_GUI_Menu *menu, BRS_Point *menuPosition);
 
-extern BRS_Dimension *BRS_GUI_Menu_getDimension(BRS_GUI_Menu *menu);
+extern BRS_Size *BRS_GUI_Menu_getSize(BRS_GUI_Menu *menu);
 
 extern int32_t BRS_GUI_Menu_getMenuItemIndex(BRS_GUI_Menu *menu, BRS_GUI_MenuItem *menuItem);
 // External End
 
 BRS_GUI_MenuItem *
-BRS_GUI_MenuItem_create(BRS_Dimension *dimension, BRS_GUI_Menu *menu, const char *label, const BRS_GUI_Theme *theme);
+BRS_GUI_MenuItem_create(BRS_Size *size, BRS_GUI_Menu *menu, const char *label, const BRS_GUI_Theme *theme);
 
 void BRS_GUI_MenuItem_destroy(BRS_GUI_MenuItem *menuItem);
 

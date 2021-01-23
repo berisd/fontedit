@@ -11,7 +11,7 @@
 typedef BRS_GUI_WidgetList BRS_GUI;
 
 // External
-extern BRS_GUI_WidgetList *getWidgetList();
+extern BRS_GUI_WidgetList *BRS_FontEdit_getWidgetList();
 
 extern void BRS_FontEdit_quitApplication();
 // External End

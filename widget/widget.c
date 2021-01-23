@@ -52,22 +52,22 @@ BRS_GUI_Widget_createLabel(BRS_Point *position, const BRS_GUI_Theme *theme, cons
 }
 
 BRS_GUI_Widget *
-BRS_GUI_Widget_createMessageBox(BRS_Point *position, struct BRS_Dimension *dimension, const BRS_GUI_Theme *theme,
+BRS_GUI_Widget_createMessageBox(BRS_Point *position, BRS_Size *size, const BRS_GUI_Theme *theme,
                                 const char *title, const char *text) {
-    BRS_GUI_MessageBox *messageBox = BRS_GUI_MessageBox_create(position, dimension, theme, title, text);
+    BRS_GUI_MessageBox *messageBox = BRS_GUI_MessageBox_create(position, size, theme, title, text);
     return createWidget(BRS_GUI_WIDGET_MESSAGEBOX, messageBox);
 }
 
 BRS_GUI_Widget *
-BRS_GUI_Widget_createInputBox(BRS_Point *position, struct BRS_Dimension *dimension, const BRS_GUI_Theme *theme,
+BRS_GUI_Widget_createInputBox(BRS_Point *position, BRS_Size *size, const BRS_GUI_Theme *theme,
                               const char *title, const char *textLabel) {
-    BRS_GUI_InputBox *inputBox = BRS_GUI_InputBox_create(position, dimension, theme, title, textLabel);
+    BRS_GUI_InputBox *inputBox = BRS_GUI_InputBox_create(position, size, theme, title, textLabel);
     return createWidget(BRS_GUI_WIDGET_INPUTBOX, inputBox);
 }
 
 BRS_GUI_Widget *
-BRS_GUI_Widget_createMenuBar(BRS_Point *position, BRS_Dimension *dimension, const BRS_GUI_Theme *theme) {
-    BRS_GUI_MenuBar *menubar = BRS_GUI_MenuBar_create(position, dimension, theme);
+BRS_GUI_Widget_createMenuBar(BRS_Point *position, BRS_Size *size, const BRS_GUI_Theme *theme) {
+    BRS_GUI_MenuBar *menubar = BRS_GUI_MenuBar_create(position, size, theme);
     return createWidget(BRS_GUI_WIDGET_MENUBAR, menubar);
 }
 

@@ -13,14 +13,14 @@ typedef void (*BRS_GUI_MenuBar_ClickHandler)(BRS_GUI_MenuBar *);
 
 struct _BRS_GUI_MenuBar {
     BRS_Point *position;
-    BRS_Dimension *dimension;
+    BRS_Size *size;
     BRS_GUI_Theme *theme;
     BRS_GUI_MenuList *menuList;
     BRS_GUI_MenuBar_ClickHandler clickHandler;
 };
 
 BRS_GUI_MenuBar *
-BRS_GUI_MenuBar_create(BRS_Point *position, BRS_Dimension *dimension, const BRS_GUI_Theme *theme);
+BRS_GUI_MenuBar_create(BRS_Point *position, BRS_Size *size, const BRS_GUI_Theme *theme);
 
 void BRS_GUI_MenuBar_destroy(BRS_GUI_MenuBar *menuBar);
 

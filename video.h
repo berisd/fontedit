@@ -16,64 +16,12 @@ typedef struct BRS_VideoContext {
     SDL_Renderer *renderer;
 } BRS_VideoContext;
 
-struct BRS_Color {
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
-    uint8_t a;
-};
-typedef struct BRS_Color BRS_Color;
-
-typedef struct _BRS_Point {
-    int x;
-    int y;
-} BRS_Point;
-typedef struct _BRS_Point BRS_Point;
-
-struct BRS_Line {
-    BRS_Point *p1;
-    BRS_Point *p2;
-};
-typedef struct BRS_Line BRS_Line;
-
-typedef struct _BRS_Rect {
-    int32_t x;
-    int32_t y;
-    int32_t width;
-    int32_t height;
-} BRS_Rect;
-
-struct BRS_Dimension {
-    int32_t width;
-    int32_t height;
-};
-typedef struct BRS_Dimension BRS_Dimension;
-
 BRS_VideoContext *BRS_initVideo(uint32_t screenWidth, uint32_t screenHeight);
 
 void BRS_shutdownVideo(const BRS_VideoContext *context);
 
 void BRS_clearVideo(const BRS_VideoContext *context);
 
-void BRS_setColor(const BRS_VideoContext *context, const BRS_Color *color);
-
 void BRS_updateVideo(const BRS_VideoContext *context);
-
-void BRS_drawPoint(const BRS_VideoContext *context, const BRS_Point *point);
-
-void BRS_drawline(const BRS_VideoContext *context, const BRS_Line *line);
-
-void BRS_drawlRect(const BRS_VideoContext *context, const BRS_Rect *rect);
-
-void BRS_drawlFillRect(const BRS_VideoContext *context, const BRS_Rect *rect);
-
-void BRS_drawString(const BRS_VideoContext *context, const uint8_t *str, uint16_t strlen, const BRS_Font *font,
-                    const BRS_Point *startPoint);
-
-bool BRS_PointInRect(BRS_Point *point, BRS_Rect *rect);
-
-BRS_Point *BRS_copyPoint(BRS_Point *source);
-
-BRS_Dimension *BRS_copyDimension(BRS_Dimension *source);
 
 #endif //FONTEDIT_VIDEO_H

@@ -7,12 +7,12 @@
 static const uint8_t MAX_TEXT_LEN = 100;
 
 BRS_GUI_InputBox *
-BRS_GUI_InputBox_create(BRS_Point *position, BRS_Dimension *dimension, const BRS_GUI_Theme *theme, const char *title,
+BRS_GUI_InputBox_create(BRS_Point *position, BRS_Size *size, const BRS_GUI_Theme *theme, const char *title,
                         const char *textLabel) {
     BRS_GUI_InputBox *inputBox = malloc(sizeof(BRS_GUI_InputBox));
     inputBox->theme = (BRS_GUI_Theme *) theme;
     inputBox->position = BRS_copyPoint(position);
-    inputBox->dimension = BRS_copyDimension(dimension);
+    inputBox->size = BRS_copySize(size);
     inputBox->title = title;
     inputBox->textLabel = textLabel;
     inputBox->text = malloc(MAX_TEXT_LEN);
@@ -22,14 +22,14 @@ BRS_GUI_InputBox_create(BRS_Point *position, BRS_Dimension *dimension, const BRS
 
 void BRS_GUI_InputBox_destroy(BRS_GUI_InputBox *inputBox) {
     free(inputBox->position);
-    free(inputBox->dimension);
+    free(inputBox->size);
     free(inputBox->text);
     free(inputBox);
 }
 
 void BRS_GUI_InputBox_render(BRS_VideoContext *context, BRS_GUI_InputBox *inputBox) {
     if (inputBox->visible) {
-        BRS_Rect rect = {.x = inputBox->position->x, .y = inputBox->position->y, .width = inputBox->dimension->width, .height = inputBox->dimension->height};
+        BRS_Rect rect = {.x = inputBox->position->x, .y = inputBox->position->y, .width = inputBox->size->width, .height = inputBox->size->height};
         BRS_setColor(context, inputBox->theme->inputBoxBackColor);
         BRS_drawlFillRect(context, &rect);
         BRS_setColor(context, inputBox->theme->borderColor);
@@ -40,8 +40,8 @@ void BRS_GUI_InputBox_render(BRS_VideoContext *context, BRS_GUI_InputBox *inputB
         BRS_drawString(context, inputBox->title, strlen(inputBox->title), inputBox->theme->font, &titlePoint);
 
         BRS_Point titleLineP1 = {.x = inputBox->position->x + 1, .y = inputBox->position->y + 1 + 20};
-        BRS_Point titleLineP2 = {.x = inputBox->position->x + inputBox->dimension->width, .y = inputBox->position->y +
-                                                                                               1 + 20};
+        BRS_Point titleLineP2 = {.x = inputBox->position->x + inputBox->size->width, .y = inputBox->position->y +
+                                                                                          1 + 20};
         BRS_Line titleLine = {.p1 = &titleLineP1, .p2 = &titleLineP2};
         BRS_setColor(context, inputBox->theme->borderColor);
         BRS_drawline(context, &titleLine);

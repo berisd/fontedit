@@ -5,14 +5,14 @@
 #ifndef FONTEDIT_INPUTBOX_H
 #define FONTEDIT_INPUTBOX_H
 
-#include "../video.h"
+#include "../render.h"
 #include "../theme.h"
 
 typedef struct _BRS_GUI_InputBox BRS_GUI_InputBox;
 
 struct _BRS_GUI_InputBox {
     BRS_Point *position;
-    BRS_Dimension *dimension;
+    BRS_Size *size;
     BRS_GUI_Theme *theme;
     const char *title;
     const char *textLabel;
@@ -21,7 +21,7 @@ struct _BRS_GUI_InputBox {
 };
 
 BRS_GUI_InputBox *
-BRS_GUI_InputBox_create(BRS_Point *position, BRS_Dimension *dimension, const BRS_GUI_Theme *theme, const char *title,
+BRS_GUI_InputBox_create(BRS_Point *position, BRS_Size *size, const BRS_GUI_Theme *theme, const char *title,
                         const char *textLabel);
 
 void BRS_GUI_InputBox_destroy(BRS_GUI_InputBox *inputBox);

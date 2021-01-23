@@ -5,7 +5,7 @@
 #ifndef BRS_GUI_LABEL_H
 #define BRS_GUI_LABEL_H
 
-#include "../video.h"
+#include "../render.h"
 #include "../theme.h"
 
 typedef struct _BRS_GUI_Label BRS_GUI_Label;

@@ -61,16 +61,16 @@ void BRS_GUI_Widget_processEvent(BRS_GUI_Widget *widget, SDL_Event *event);
 BRS_GUI_Widget *BRS_GUI_Widget_getByType(BRS_GUI_WidgetType type);
 
 BRS_GUI_Widget *
-BRS_GUI_Widget_createMenuBar(BRS_Point *position, BRS_Dimension *dimension, const BRS_GUI_Theme *theme);
+BRS_GUI_Widget_createMenuBar(BRS_Point *position, BRS_Size *size, const BRS_GUI_Theme *theme);
 
 BRS_GUI_Widget *
 BRS_GUI_Widget_createLabel(BRS_Point *position, const BRS_GUI_Theme *theme, const char *text);
 
 BRS_GUI_Widget *
-BRS_GUI_Widget_createMessageBox(BRS_Point *position, struct BRS_Dimension *dimension, const BRS_GUI_Theme *theme, const char *title, const char *text);
+BRS_GUI_Widget_createMessageBox(BRS_Point *position, BRS_Size *size, const BRS_GUI_Theme *theme, const char *title, const char *text);
 
 BRS_GUI_Widget *
-BRS_GUI_Widget_createInputBox(BRS_Point *position, struct BRS_Dimension *dimension, const BRS_GUI_Theme *theme, const char *title, const char *textLabel);
+BRS_GUI_Widget_createInputBox(BRS_Point *position, BRS_Size *size, const BRS_GUI_Theme *theme, const char *title, const char *textLabel);
 
 BRS_GUI_Widget *
 BRS_GUI_Widget_createCharEdit(BRS_Point *position, const BRS_GUI_Theme *theme, BRS_Font *fontEdited);

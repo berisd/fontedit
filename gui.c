@@ -20,7 +20,7 @@ static BRS_GUI_Widget *BRS_GUI_Widget_getByTypeFromList(BRS_GUI_WidgetList *widg
 }
 
 BRS_GUI_Widget *BRS_GUI_Widget_getByType(BRS_GUI_WidgetType type) {
-    return BRS_GUI_Widget_getByTypeFromList(getWidgetList(), type);
+    return BRS_GUI_Widget_getByTypeFromList(BRS_FontEdit_getWidgetList(), type);
 }
 
 static void onClickMenuBar(BRS_GUI_MenuBar *menuBar) {
@@ -52,7 +52,7 @@ static void onClickMenuItemQuit(BRS_GUI_MenuItem *menuItem) {
 }
 
 static BRS_GUI_Menu *createFileMenu(BRS_GUI_MenuBar *menuBar, BRS_GUI_Theme *theme) {
-    BRS_Dimension dim = {.width = 50, .height = 20};
+    BRS_Size dim = {.width = 50, .height = 20};
     BRS_GUI_Menu *menu = BRS_GUI_Menu_create(menuBar, &dim, "File", theme, false);
     BRS_GUI_MenuItem *menuItemNew = BRS_GUI_MenuItem_create(&dim, menu, "New", theme);
     BRS_GUI_MenuItem *menuItemLoad = BRS_GUI_MenuItem_create(&dim, menu, "Load", theme);
@@ -74,10 +74,10 @@ static BRS_GUI_Widget *createMenuBar(BRS_GUI_Theme *theme) {
     BRS_Point *menuBarPosition = malloc(sizeof(BRS_Point));
     menuBarPosition->x = 0;
     menuBarPosition->y = 0;
-    BRS_Dimension *menuBarDimension = malloc(sizeof(struct BRS_Dimension));
-    menuBarDimension->width = 800;
-    menuBarDimension->height = 20;
-    BRS_GUI_Widget *widget = BRS_GUI_Widget_createMenuBar(menuBarPosition, menuBarDimension, theme);
+    BRS_Size *menuBarSize = malloc(sizeof(BRS_Size));
+    menuBarSize->width = 800;
+    menuBarSize->height = 20;
+    BRS_GUI_Widget *widget = BRS_GUI_Widget_createMenuBar(menuBarPosition, menuBarSize, theme);
 
     BRS_GUI_Widget_setClickHandler(widget, &onClickMenuBar);
 
@@ -102,10 +102,10 @@ static BRS_GUI_Widget *createCharEdit(BRS_Font *fontEdited, BRS_GUI_Theme *theme
 }
 
 static BRS_GUI_Widget *createInputBox(BRS_GUI_Theme *theme, uint32_t screenWidth, uint32_t screenHeight) {
-    BRS_Dimension dimension = {.width = 200, .height = 100};
-    BRS_Point position = {.x = (screenWidth - dimension.width) / 2, .y = (screenHeight - dimension.height) / 2 -
-                                                                         dimension.height};
-    BRS_GUI_Widget *widget = BRS_GUI_Widget_createInputBox(&position, &dimension, theme, "Input", "?");
+    BRS_Size size = {.width = 200, .height = 100};
+    BRS_Point position = {.x = (screenWidth - size.width) / 2, .y = (screenHeight - size.height) / 2 -
+                                                                    size.height};
+    BRS_GUI_Widget *widget = BRS_GUI_Widget_createInputBox(&position, &size, theme, "Input", "?");
     return widget;
 }
 

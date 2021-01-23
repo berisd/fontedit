@@ -10,16 +10,16 @@ static void calculatePosition(BRS_GUI_MenuItem *menuItem, BRS_Point *menuItemPos
     int32_t menuItemIndex = BRS_GUI_Menu_getMenuItemIndex(menuItem->menu, menuItem);
     BRS_Point menuPosition;
     BRS_GUI_Menu_calcPosition(menuItem->menu, &menuPosition);
-    BRS_Dimension *menuDimension = BRS_GUI_Menu_getDimension(menuItem->menu);
+    BRS_Size *menuSize = BRS_GUI_Menu_getSize(menuItem->menu);
 
     menuItemPosition->x = menuPosition.x;
-    menuItemPosition->y = menuPosition.y + menuDimension->height + menuItem->dimension->height * menuItemIndex;
+    menuItemPosition->y = menuPosition.y + menuSize->height + menuItem->size->height * menuItemIndex;
 }
 
 BRS_GUI_MenuItem *
-BRS_GUI_MenuItem_create(BRS_Dimension *dimension, BRS_GUI_Menu *menu, const char *label, const BRS_GUI_Theme *theme) {
+BRS_GUI_MenuItem_create(BRS_Size *size, BRS_GUI_Menu *menu, const char *label, const BRS_GUI_Theme *theme) {
     BRS_GUI_MenuItem *menuItem = malloc(sizeof(BRS_GUI_MenuItem));
-    menuItem->dimension = BRS_copyDimension(dimension);
+    menuItem->size = BRS_copySize(size);
     menuItem->menu = menu;
     menuItem->label = label;
     menuItem->theme = (BRS_GUI_Theme *) theme;
@@ -29,7 +29,7 @@ BRS_GUI_MenuItem_create(BRS_Dimension *dimension, BRS_GUI_Menu *menu, const char
 }
 
 void BRS_GUI_MenuItem_destroy(BRS_GUI_MenuItem *menuItem) {
-    free(menuItem->dimension);
+    free(menuItem->size);
     free(menuItem);
 }
 
@@ -38,7 +38,7 @@ void BRS_GUI_MenuItem_render(BRS_VideoContext *context, BRS_GUI_MenuItem *menuIt
     calculatePosition(menuItem, &position);
 
     BRS_setColor(context, menuItem->theme->menuItemBackColor);
-    BRS_Rect menuItemRect = {.x = position.x, .y = position.y, .width=menuItem->dimension->width, .height=menuItem->dimension->height};
+    BRS_Rect menuItemRect = {.x = position.x, .y = position.y, .width=menuItem->size->width, .height=menuItem->size->height};
     BRS_drawlFillRect(context, &menuItemRect);
 
     BRS_setColor(context, menuItem->highlighted ? menuItem->theme->menuItemHighlightedColor
@@ -57,8 +57,8 @@ static void processMouseButtonDown(BRS_GUI_MenuItem *menuItem, SDL_MouseButtonEv
         BRS_Point menuItemPosition;
         calculatePosition(menuItem, &menuItemPosition);
 
-        BRS_Rect menuItemRect = {.x = menuItemPosition.x, .y = menuItemPosition.y, .width = menuItem->dimension->width,
-                menuItem->dimension->height};
+        BRS_Rect menuItemRect = {.x = menuItemPosition.x, .y = menuItemPosition.y, .width = menuItem->size->width,
+                menuItem->size->height};
         BRS_Point mousePoint = {.x = button->x, .y = button->y};
         bool clickedInMenuItem = BRS_PointInRect(&mousePoint, &menuItemRect);
 
@@ -72,7 +72,7 @@ static void processMouseMove(BRS_GUI_MenuItem *menuItem, SDL_MouseMotionEvent *m
     BRS_Point mousePoint = {.x = motion->x, .y = motion->y};
     BRS_Point position;
     calculatePosition(menuItem, &position);
-    BRS_Rect widgetRect = {.x = position.x, .y = position.y, .width = menuItem->dimension->width, .height = menuItem->dimension->height};
+    BRS_Rect widgetRect = {.x = position.x, .y = position.y, .width = menuItem->size->width, .height = menuItem->size->height};
     menuItem->highlighted = BRS_PointInRect(&mousePoint, &widgetRect);
 }
 

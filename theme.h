@@ -6,6 +6,7 @@
 #define FONTEDIT_THEME_H
 
 #include "video.h"
+#include "color.h"
 #include "util.h"
 
 const BRS_Color COLOR_RED;

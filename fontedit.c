@@ -38,7 +38,7 @@ static BRS_ApplicationState *createApplicationState() {
 static void freeApplicationState(BRS_ApplicationState *applicationState) {
     BRS_GUI_Theme_destroy(applicationState->theme);
     BRS_GUI_destroyGUI(applicationState->gui);
-    BRS_destroyFont(applicationState->fontEdited);
+    BRS_Font_destroy(applicationState->fontEdited);
     free(applicationState);
 }
 
@@ -50,7 +50,7 @@ static void *initApplication(const BRS_ApplicationConfig *config) {
     }
     applicationState->videoContext = videoContext;
     applicationState->theme = BRS_GUI_Theme_create();
-    applicationState->fontEdited = BRS_copyFont(applicationState->theme->font);
+    applicationState->fontEdited = BRS_Font_copy(applicationState->theme->font);
     applicationState->gui = BRS_GUI_createGUI(applicationState->theme, applicationState->fontEdited,
                                               config->screenWidth, config->screenHeight);
     applicationState->quit = false;
@@ -99,21 +99,21 @@ static void runApplication(BRS_ApplicationState *applicationState) {
 }
 
 void BRS_FontEdit_createFont() {
-    memset(applicationState->fontEdited->data, 0, BRS_getFontSize(applicationState->fontEdited));
+    memset(applicationState->fontEdited->data, 0, BRS_Font_getSize(applicationState->fontEdited));
 }
 
 void BRS_FontEdit_loadFont(const char *filename) {
-    BRS_LoadFontResult *result = BRS_loadFont(filename);
+    BRS_Font_LoadResult *result = BRS_Font_load(filename);
     if (result->error == BRS_FONT_NO_ERROR) {
-        BRS_destroyFont(applicationState->fontEdited);
-        applicationState->fontEdited = BRS_copyFont(result->font);
+        BRS_Font_destroy(applicationState->fontEdited);
+        applicationState->fontEdited = BRS_Font_copy(result->font);
     }
-    BRS_destroyLoadFontResult(result);
+    BRS_Font_destroyLoadResult(result);
 }
 
 void BRS_FontEdit_saveFont(const char *filename) {
-    BRS_SaveFontResult *result = BRS_saveFont(applicationState->fontEdited, filename);
-    BRS_destroySaveFontResult(result);
+    BRS_Font_SaveResult *result = BRS_Font_save(applicationState->fontEdited, filename);
+    BRS_Font_destroySaveResult(result);
 }
 
 void BRS_FontEdit_quitApplication() {

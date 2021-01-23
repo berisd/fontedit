@@ -272,8 +272,8 @@ static const uint8_t defaultFontData[DEFAULT_FONT_SIZE] = {0, 0, 0, 0, 0, 0, 0, 
 
 
 BRS_Font *BRS_createDefaultFont() {
-    BRS_Font *font = BRS_createFont(256, 8, 16, NULL);
-    int32_t fontSize = BRS_getFontSize(font);
+    BRS_Font *font = BRS_Font_create(256, 8, 16, NULL);
+    int32_t fontSize = BRS_Font_getSize(font);
     font->data = malloc(fontSize);
     memcpy(font->data, &defaultFontData, fontSize);
     return font;

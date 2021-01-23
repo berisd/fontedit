@@ -2,8 +2,8 @@
 #include <string.h>
 #include "font.h"
 
-BRS_LoadFontResult *BRS_loadFont(const char *filename) {
-    BRS_LoadFontResult *result = malloc(sizeof(BRS_LoadFontResult));
+BRS_Font_LoadResult *BRS_Font_load(const char *filename) {
+    BRS_Font_LoadResult *result = malloc(sizeof(BRS_Font_LoadResult));
     result->error = BRS_FONT_NO_ERROR;
     FILE *fontFile = fopen(filename, "rb");
     if (!fontFile) {
@@ -31,8 +31,8 @@ BRS_LoadFontResult *BRS_loadFont(const char *filename) {
     return result;
 }
 
-BRS_SaveFontResult *BRS_saveFont(const BRS_Font *font, const char *filename) {
-    BRS_SaveFontResult *result = malloc(sizeof(BRS_SaveFontResult));
+BRS_Font_SaveResult *BRS_Font_save(const BRS_Font *font, const char *filename) {
+    BRS_Font_SaveResult *result = malloc(sizeof(BRS_Font_SaveResult));
     result->error = BRS_FONT_NO_ERROR;
     FILE *fontFile = fopen(filename, "wb");
     if (!fontFile) {
@@ -52,7 +52,7 @@ BRS_SaveFontResult *BRS_saveFont(const BRS_Font *font, const char *filename) {
     return result;
 }
 
-BRS_Font *BRS_createFont(uint16_t num_chars, uint8_t width_bits, uint8_t height_bits, uint8_t *data) {
+BRS_Font *BRS_Font_create(uint16_t num_chars, uint8_t width_bits, uint8_t height_bits, uint8_t *data) {
     BRS_Font *font = malloc(sizeof(BRS_Font));
     font->width_bits = width_bits;
     font->height_bits = height_bits;
@@ -61,32 +61,32 @@ BRS_Font *BRS_createFont(uint16_t num_chars, uint8_t width_bits, uint8_t height_
     return font;
 }
 
-void BRS_destroyFont(BRS_Font *font) {
+void BRS_Font_destroy(BRS_Font *font) {
     if (font->data) {
         free(font->data);
     }
     free(font);
 }
 
-int32_t BRS_getFontSize(BRS_Font *font) {
+int32_t BRS_Font_getSize(BRS_Font *font) {
     return font->width_bits / 8 * font->height_bits * font->num_chars;
 }
 
-BRS_Font *BRS_copyFont(BRS_Font *font) {
+BRS_Font *BRS_Font_copy(BRS_Font *font) {
     BRS_Font *copy = malloc(sizeof(BRS_Font));
     copy->width_bits = font->width_bits;
     copy->height_bits = font->height_bits;
     copy->num_chars = font->num_chars;
-    size_t fontSize = BRS_getFontSize(font);
+    size_t fontSize = BRS_Font_getSize(font);
     copy->data = malloc(fontSize);
     memcpy(copy->data, font->data, fontSize);
     return copy;
 }
 
-void BRS_destroyLoadFontResult(BRS_LoadFontResult * result) {
-    BRS_destroyFont(result->font);
+void BRS_Font_destroyLoadResult(BRS_Font_LoadResult * result) {
+    BRS_Font_destroy(result->font);
     free(result);
 }
-void BRS_destroySaveFontResult(BRS_SaveFontResult * result) {
+void BRS_Font_destroySaveResult(BRS_Font_SaveResult * result) {
     free(result);
 }

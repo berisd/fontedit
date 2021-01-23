@@ -37,6 +37,6 @@ BRS_GUI_Theme *BRS_GUI_Theme_create() {
 }
 
 void BRS_GUI_Theme_destroy(BRS_GUI_Theme *theme) {
-    free(theme->font);
+    BRS_destroyFont(theme->font);
     free(theme);
 }

@@ -33,18 +33,44 @@ static void onClickCharTable(BRS_GUI_CharTable *charTable) {
     charEditWidget->object->charEdit->selectedChar = charTable->selectedCharIndex;
 }
 
+static void onConfirmInputBoxLoad(BRS_GUI_InputBox *inputBox) {
+    BRS_FontEdit_loadFont(inputBox->text);
+}
+
+static void onConfirmInputBoxSave(BRS_GUI_InputBox *inputBox) {
+    BRS_FontEdit_saveFont(inputBox->text);
+}
+
+static void onCancelInputBox(BRS_GUI_InputBox *inputBox) {
+}
+
 static void onChangeCharTableSelectedCharIndex(BRS_GUI_CharTable *charTable) {
     BRS_GUI_Widget *charEditWidget = BRS_GUI_Widget_getByType(BRS_GUI_WIDGET_CHAREDIT);
     charEditWidget->object->charEdit->selectedChar = charTable->selectedCharIndex;
 }
 
-static void onClickMenuItemLoad(BRS_GUI_MenuItem *load) {
+static void onClickMenuItemLoad(BRS_GUI_MenuItem *menuItem) {
     BRS_GUI_Widget *inputBoxWidget = BRS_GUI_Widget_getByType(BRS_GUI_WIDGET_INPUTBOX);
     BRS_GUI_InputBox *inputBox = inputBoxWidget->object->inputBox;
+    BRS_GUI_InputBox_setConfirmHandler(inputBox, onConfirmInputBoxLoad);
     inputBox->title = "Load file";
     inputBox->textLabel = "Name?";
     BRS_GUI_InputBox_clearText(inputBox);
     inputBox->visible = true;
+}
+
+static void onClickMenuItemSave(BRS_GUI_MenuItem *menuItem) {
+    BRS_GUI_Widget *inputBoxWidget = BRS_GUI_Widget_getByType(BRS_GUI_WIDGET_INPUTBOX);
+    BRS_GUI_InputBox *inputBox = inputBoxWidget->object->inputBox;
+    BRS_GUI_InputBox_setConfirmHandler(inputBox, onConfirmInputBoxSave);
+    inputBox->title = "Save file";
+    inputBox->textLabel = "Name?";
+    BRS_GUI_InputBox_clearText(inputBox);
+    inputBox->visible = true;
+}
+
+static void onClickMenuItemNew(BRS_GUI_MenuItem *menuItem) {
+    BRS_FontEdit_createFont();
 }
 
 static void onClickMenuItemQuit(BRS_GUI_MenuItem *menuItem) {
@@ -64,7 +90,9 @@ static BRS_GUI_Menu *createFileMenu(BRS_GUI_MenuBar *menuBar, BRS_GUI_Theme *the
     BRS_GUI_MenuItemList_push(menuItemSave, menu->itemList);
     BRS_GUI_MenuItemList_push(menuItemQuit, menu->itemList);
 
+    BRS_GUI_setMenuItemClickHandler(menuItemNew, onClickMenuItemNew);
     BRS_GUI_setMenuItemClickHandler(menuItemLoad, onClickMenuItemLoad);
+    BRS_GUI_setMenuItemClickHandler(menuItemSave, onClickMenuItemSave);
     BRS_GUI_setMenuItemClickHandler(menuItemQuit, onClickMenuItemQuit);
 
     return menu;
@@ -106,6 +134,7 @@ static BRS_GUI_Widget *createInputBox(BRS_GUI_Theme *theme, uint32_t screenWidth
     BRS_Point position = {.x = (screenWidth - size.width) / 2, .y = (screenHeight - size.height) / 2 -
                                                                     size.height};
     BRS_GUI_Widget *widget = BRS_GUI_Widget_createInputBox(&position, &size, theme, "Input", "?");
+    BRS_GUI_InputBox_setCancelHandler(widget->object->inputBox, onCancelInputBox);
     return widget;
 }
 

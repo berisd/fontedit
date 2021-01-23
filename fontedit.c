@@ -38,6 +38,7 @@ static BRS_ApplicationState *createApplicationState() {
 static void freeApplicationState(BRS_ApplicationState *applicationState) {
     BRS_GUI_Theme_destroy(applicationState->theme);
     BRS_GUI_destroyGUI(applicationState->gui);
+    BRS_destroyFont(applicationState->fontEdited);
     free(applicationState);
 }
 
@@ -87,12 +88,32 @@ static void runApplication(BRS_ApplicationState *applicationState) {
     SDL_Event event;
     while (!applicationState->quit) {
         if (SDL_PollEvent(&event) != 0) {
-            if (! BRS_GUI_processEvent(applicationState->gui, &event)) {
-                applicationState->quit = checkQuitApplication(&event);
+            if (!BRS_GUI_processEvent(applicationState->gui, &event)) {
+                if (!applicationState->quit) {
+                    applicationState->quit = checkQuitApplication(&event);
+                }
             }
         }
         handleVideo(applicationState);
     }
+}
+
+void BRS_FontEdit_createFont() {
+    memset(applicationState->fontEdited->data, 0, BRS_getFontSize(applicationState->fontEdited));
+}
+
+void BRS_FontEdit_loadFont(const char *filename) {
+    BRS_LoadFontResult *result = BRS_loadFont(filename);
+    if (result->error == BRS_FONT_NO_ERROR) {
+        BRS_destroyFont(applicationState->fontEdited);
+        applicationState->fontEdited = BRS_copyFont(result->font);
+    }
+    BRS_destroyLoadFontResult(result);
+}
+
+void BRS_FontEdit_saveFont(const char *filename) {
+    BRS_SaveFontResult *result = BRS_saveFont(applicationState->fontEdited, filename);
+    BRS_destroySaveFontResult(result);
 }
 
 void BRS_FontEdit_quitApplication() {

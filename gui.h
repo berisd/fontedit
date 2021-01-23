@@ -13,6 +13,12 @@ typedef BRS_GUI_WidgetList BRS_GUI;
 // External
 extern BRS_GUI_WidgetList *BRS_FontEdit_getWidgetList();
 
+extern void BRS_FontEdit_createFont();
+
+extern void BRS_FontEdit_loadFont(const char *filename);
+
+extern void BRS_FontEdit_saveFont(const char *filename);
+
 extern void BRS_FontEdit_quitApplication();
 // External End
 

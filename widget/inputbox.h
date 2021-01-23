@@ -10,6 +10,10 @@
 
 typedef struct _BRS_GUI_InputBox BRS_GUI_InputBox;
 
+typedef void (*BRS_GUI_InputBox_ConfirmHandler)(BRS_GUI_InputBox *);
+
+typedef void (*BRS_GUI_InputBox_CancelHandler)(BRS_GUI_InputBox *);
+
 struct _BRS_GUI_InputBox {
     BRS_Point *position;
     BRS_Size *size;
@@ -18,6 +22,8 @@ struct _BRS_GUI_InputBox {
     const char *textLabel;
     uint8_t *text;
     bool visible;
+    BRS_GUI_InputBox_ConfirmHandler confirmHandler;
+    BRS_GUI_InputBox_CancelHandler cancelHandler;
 };
 
 BRS_GUI_InputBox *
@@ -31,5 +37,9 @@ void BRS_GUI_InputBox_render(BRS_VideoContext *context, BRS_GUI_InputBox *inputB
 bool BRS_GUI_InputBox_processEvent(BRS_GUI_InputBox *inputBox, SDL_Event *event);
 
 void BRS_GUI_InputBox_clearText(BRS_GUI_InputBox *inputBox);
+
+void BRS_GUI_InputBox_setConfirmHandler(BRS_GUI_InputBox *inputBox, BRS_GUI_InputBox_ConfirmHandler handler);
+
+void BRS_GUI_InputBox_setCancelHandler(BRS_GUI_InputBox *inputBox, BRS_GUI_InputBox_CancelHandler handler);
 
 #endif //FONTEDIT_INPUTBOX_H

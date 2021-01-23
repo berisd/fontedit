@@ -17,6 +17,8 @@ BRS_GUI_InputBox_create(BRS_Point *position, BRS_Size *size, const BRS_GUI_Theme
     inputBox->textLabel = textLabel;
     inputBox->text = malloc(MAX_TEXT_LEN);
     inputBox->visible = false;
+    inputBox->cancelHandler = NULL;
+    inputBox->confirmHandler = NULL;
     return inputBox;
 }
 
@@ -96,10 +98,24 @@ bool BRS_GUI_InputBox_processEvent(BRS_GUI_InputBox *inputBox, SDL_Event *event)
             }
         } else if (event->key.keysym.sym == SDLK_RETURN || event->key.keysym.sym == SDLK_KP_ENTER) {
             inputBox->visible = false;
+            if (inputBox->confirmHandler != NULL) {
+                inputBox->confirmHandler(inputBox);
+            }
         } else if (event->key.keysym.sym == SDLK_ESCAPE) {
             inputBox->visible = false;
+            if (inputBox->cancelHandler != NULL) {
+                inputBox->cancelHandler(inputBox);
+            }
             return true;
         }
     }
     return false;
+}
+
+void BRS_GUI_InputBox_setConfirmHandler(BRS_GUI_InputBox *inputBox, BRS_GUI_InputBox_ConfirmHandler handler) {
+    inputBox->confirmHandler = handler;
+}
+
+void BRS_GUI_InputBox_setCancelHandler(BRS_GUI_InputBox *inputBox, BRS_GUI_InputBox_CancelHandler handler) {
+    inputBox->cancelHandler = handler;
 }

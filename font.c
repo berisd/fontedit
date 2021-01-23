@@ -31,6 +31,27 @@ BRS_LoadFontResult *BRS_loadFont(const char *filename) {
     return result;
 }
 
+BRS_SaveFontResult *BRS_saveFont(const BRS_Font *font, const char *filename) {
+    BRS_SaveFontResult *result = malloc(sizeof(BRS_SaveFontResult));
+    result->error = BRS_FONT_NO_ERROR;
+    FILE *fontFile = fopen(filename, "wb");
+    if (!fontFile) {
+        result->error = BRS_FONT_ERR_OPENING_FILE;
+    } else {
+        uint8_t fontCharSizeBytes = font->width_bits * font->height_bits / 8;
+        uint32_t fontSizeBytes = fontCharSizeBytes * font->num_chars;
+        size_t bytesWritten = fwrite(font->data, sizeof(uint8_t), fontSizeBytes, fontFile);
+
+        if (bytesWritten != fontSizeBytes) {
+            result->error = BRS_FONT_ERR_WRITING_FILE;
+        }
+
+        fclose(fontFile);
+    }
+
+    return result;
+}
+
 BRS_Font *BRS_createFont(uint16_t num_chars, uint8_t width_bits, uint8_t height_bits, uint8_t *data) {
     BRS_Font *font = malloc(sizeof(BRS_Font));
     font->width_bits = width_bits;
@@ -60,4 +81,12 @@ BRS_Font *BRS_copyFont(BRS_Font *font) {
     copy->data = malloc(fontSize);
     memcpy(copy->data, font->data, fontSize);
     return copy;
+}
+
+void BRS_destroyLoadFontResult(BRS_LoadFontResult * result) {
+    BRS_destroyFont(result->font);
+    free(result);
+}
+void BRS_destroySaveFontResult(BRS_SaveFontResult * result) {
+    free(result);
 }

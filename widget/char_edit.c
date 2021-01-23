@@ -164,7 +164,7 @@ static void setCharDotAtPoint(BRS_GUI_CharEdit *charEdit, BRS_Point *mousePoint)
     setCharDot(charEdit, &gridPosition);
 }
 
-void BRS_GUI_CharEdit_processEvent(BRS_GUI_CharEdit *charEdit, SDL_Event *event) {
+bool BRS_GUI_CharEdit_processEvent(BRS_GUI_CharEdit *charEdit, SDL_Event *event) {
     BRS_Rect widgetRect = {.x = charEdit->position->x, .y = charEdit->position->y, .width = calcTableWith(
             charEdit), .height = calcTableHeight(charEdit)};
 
@@ -190,4 +190,5 @@ void BRS_GUI_CharEdit_processEvent(BRS_GUI_CharEdit *charEdit, SDL_Event *event)
             charEdit->_buttonPressed = NO_BUTTON;
             break;
     }
+    return false;
 }

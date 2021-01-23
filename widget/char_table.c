@@ -167,7 +167,7 @@ void BRS_GUI_CharTable_render(BRS_VideoContext *context, BRS_GUI_CharTable *char
     drawChars(context, charTable);
 }
 
-void BRS_GUI_CharTable_processEvent(BRS_GUI_CharTable *charTable, SDL_Event *event) {
+bool BRS_GUI_CharTable_processEvent(BRS_GUI_CharTable *charTable, SDL_Event *event) {
     BRS_Rect widgetRect = {.x = charTable->position->x, .y = charTable->position->y, .width = calcTableWith(
             charTable), .height = calcTableHeight(charTable)};
 
@@ -189,6 +189,7 @@ void BRS_GUI_CharTable_processEvent(BRS_GUI_CharTable *charTable, SDL_Event *eve
         }
             break;
     }
+    return false;
 }
 
 void BRS_GUI_CharTable_setClickHandler(BRS_GUI_CharTable *charTable, BRS_GUI_CharTable_ClickHandler handler) {

@@ -26,6 +26,6 @@ void BRS_GUI_MessageBox_destroy(BRS_GUI_MessageBox *messageBox);
 
 void BRS_GUI_MessageBox_render(BRS_VideoContext *context, BRS_GUI_MessageBox *messageBox);
 
-void BRS_GUI_MessageBox_processEvent(BRS_GUI_MessageBox *messageBox, SDL_Event *event);
+bool BRS_GUI_MessageBox_processEvent(BRS_GUI_MessageBox *messageBox, SDL_Event *event);
 
 #endif //FONTEDIT_MESSAGEBOX_H

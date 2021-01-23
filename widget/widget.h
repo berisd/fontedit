@@ -56,7 +56,7 @@ void BRS_GUI_Widget_render(BRS_VideoContext *context, BRS_GUI_Widget *widget);
 
 void BRS_GUI_Widget_destroy(BRS_GUI_Widget *widget);
 
-void BRS_GUI_Widget_processEvent(BRS_GUI_Widget *widget, SDL_Event *event);
+bool BRS_GUI_Widget_processEvent(BRS_GUI_Widget *widget, SDL_Event *event);
 
 BRS_GUI_Widget *BRS_GUI_Widget_getByType(BRS_GUI_WidgetType type);
 

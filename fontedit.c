@@ -87,8 +87,9 @@ static void runApplication(BRS_ApplicationState *applicationState) {
     SDL_Event event;
     while (!applicationState->quit) {
         if (SDL_PollEvent(&event) != 0) {
-            applicationState->quit = checkQuitApplication(&event);
-            BRS_GUI_processEvent(applicationState->gui, &event);
+            if (! BRS_GUI_processEvent(applicationState->gui, &event)) {
+                applicationState->quit = checkQuitApplication(&event);
+            }
         }
         handleVideo(applicationState);
     }

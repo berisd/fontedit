@@ -28,7 +28,7 @@ void BRS_GUI_InputBox_destroy(BRS_GUI_InputBox *inputBox);
 
 void BRS_GUI_InputBox_render(BRS_VideoContext *context, BRS_GUI_InputBox *inputBox);
 
-void BRS_GUI_InputBox_processEvent(BRS_GUI_InputBox *inputBox, SDL_Event *event);
+bool BRS_GUI_InputBox_processEvent(BRS_GUI_InputBox *inputBox, SDL_Event *event);
 
 void BRS_GUI_InputBox_clearText(BRS_GUI_InputBox *inputBox);
 

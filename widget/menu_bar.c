@@ -50,7 +50,7 @@ static void processMouseButtonDown(BRS_GUI_MenuBar *menuBar, SDL_MouseButtonEven
     }
 }
 
-void BRS_GUI_MenuBar_processEvent(BRS_GUI_MenuBar *menuBar, SDL_Event *event) {
+bool BRS_GUI_MenuBar_processEvent(BRS_GUI_MenuBar *menuBar, SDL_Event *event) {
     switch (event->type) {
         case SDL_MOUSEBUTTONUP:
             processMouseButtonDown(menuBar, &event->button);
@@ -63,6 +63,7 @@ void BRS_GUI_MenuBar_processEvent(BRS_GUI_MenuBar *menuBar, SDL_Event *event) {
         BRS_GUI_Menu_processEvent(menu, event);
         menuEntry = menuEntry->next;
     }
+    return false;
 }
 
 BRS_Point *BRS_GUI_MenuBar_getPosition(BRS_GUI_MenuBar *menuBar) {

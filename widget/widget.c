@@ -106,23 +106,20 @@ void BRS_GUI_Widget_render(BRS_VideoContext *context, BRS_GUI_Widget *widget) {
     }
 }
 
-void BRS_GUI_Widget_processEvent(BRS_GUI_Widget *widget, SDL_Event *event) {
+bool BRS_GUI_Widget_processEvent(BRS_GUI_Widget *widget, SDL_Event *event) {
     switch (widget->type) {
         case BRS_GUI_WIDGET_MENUBAR:
-            BRS_GUI_MenuBar_processEvent(widget->object->menuBar, event);
-            break;
+            return BRS_GUI_MenuBar_processEvent(widget->object->menuBar, event);
         case BRS_GUI_WIDGET_CHARTABLE:
-            BRS_GUI_CharTable_processEvent(widget->object->charTable, event);
-            break;
+            return BRS_GUI_CharTable_processEvent(widget->object->charTable, event);
         case BRS_GUI_WIDGET_CHAREDIT:
-            BRS_GUI_CharEdit_processEvent(widget->object->charEdit, event);
-            break;
+            return BRS_GUI_CharEdit_processEvent(widget->object->charEdit, event);
         case BRS_GUI_WIDGET_MESSAGEBOX:
-            BRS_GUI_MessageBox_processEvent(widget->object->messageBox, event);
-            break;
+            return BRS_GUI_MessageBox_processEvent(widget->object->messageBox, event);
         case BRS_GUI_WIDGET_INPUTBOX:
-            BRS_GUI_InputBox_processEvent(widget->object->inputBox, event);
-            break;
+            return BRS_GUI_InputBox_processEvent(widget->object->inputBox, event);
+        default:
+            return false;
     }
 }
 

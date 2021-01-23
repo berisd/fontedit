@@ -27,6 +27,6 @@ void BRS_GUI_CharEdit_render(BRS_VideoContext *context, BRS_GUI_CharEdit *charEd
 
 void BRS_GUI_CharEdit_destroy(BRS_GUI_CharEdit *charEdit);
 
-void BRS_GUI_CharEdit_processEvent(BRS_GUI_CharEdit *charEdit, SDL_Event *event);
+bool BRS_GUI_CharEdit_processEvent(BRS_GUI_CharEdit *charEdit, SDL_Event *event);
 
 #endif //FONTEDIT_CHAR_EDIT_H

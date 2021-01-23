@@ -35,7 +35,7 @@ void BRS_GUI_CharTable_destroy(BRS_GUI_CharTable *charTable);
 
 void BRS_GUI_CharTable_render(BRS_VideoContext *context, BRS_GUI_CharTable *charTable);
 
-void BRS_GUI_CharTable_processEvent(BRS_GUI_CharTable *charTable, SDL_Event *event);
+bool BRS_GUI_CharTable_processEvent(BRS_GUI_CharTable *charTable, SDL_Event *event);
 
 void BRS_GUI_CharTable_setClickHandler(BRS_GUI_CharTable *charTable, BRS_GUI_CharTable_ClickHandler handler);
 

@@ -79,9 +79,9 @@ static bool isKeycodeAlphaNumeric(SDL_Keycode keycode) {
            keycode == SDLK_v || keycode == SDLK_w || keycode == SDLK_x || keycode == SDLK_y || keycode == SDLK_z;
 }
 
-void BRS_GUI_InputBox_processEvent(BRS_GUI_InputBox *inputBox, SDL_Event *event) {
+bool BRS_GUI_InputBox_processEvent(BRS_GUI_InputBox *inputBox, SDL_Event *event) {
     if (!inputBox->visible) {
-        return;
+        return false;
     }
 
     if (event->type == SDL_KEYDOWN) {
@@ -96,7 +96,10 @@ void BRS_GUI_InputBox_processEvent(BRS_GUI_InputBox *inputBox, SDL_Event *event)
             }
         } else if (event->key.keysym.sym == SDLK_RETURN || event->key.keysym.sym == SDLK_KP_ENTER) {
             inputBox->visible = false;
+        } else if (event->key.keysym.sym == SDLK_ESCAPE) {
+            inputBox->visible = false;
+            return true;
         }
-        //TODO handle SDLK_ESCAPE. currently quits application.
     }
+    return false;
 }

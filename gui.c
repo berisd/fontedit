@@ -164,16 +164,21 @@ void BRS_GUI_renderGUI(BRS_VideoContext *videoContext, BRS_GUI_WidgetList *gui) 
     BRS_GUI_renderWidgetList(videoContext, gui);
 }
 
-static void BRS_GUI_processEventForList(BRS_GUI_WidgetList *widgetList, SDL_Event *event) {
+static bool BRS_GUI_processEventForList(BRS_GUI_WidgetList *widgetList, SDL_Event *event) {
     BRS_GUI_WidgetListEntry *entry = widgetList->firstEntry;
     while (entry != NULL) {
         BRS_GUI_Widget *widget = entry->value;
-        BRS_GUI_Widget_processEvent(widget, event);
-        BRS_GUI_processEventForList(widget->children, event);
+        if (BRS_GUI_Widget_processEvent(widget, event)) {
+            return true;
+        }
+        if (BRS_GUI_processEventForList(widget->children, event)) {
+            return true;
+        }
         entry = entry->next;
     }
+    return false;
 }
 
-void BRS_GUI_processEvent(BRS_GUI *gui, SDL_Event *event) {
-    BRS_GUI_processEventForList(gui, event);
+bool BRS_GUI_processEvent(BRS_GUI *gui, SDL_Event *event) {
+    return BRS_GUI_processEventForList(gui, event);
 }

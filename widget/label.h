@@ -13,7 +13,7 @@ typedef struct _BRS_GUI_Label BRS_GUI_Label;
 struct _BRS_GUI_Label {
     BRS_Point *position;
     BRS_GUI_Theme *theme;
-    const char *text;
+    char *text;
 };
 
 BRS_GUI_Label *BRS_GUI_Label_create(BRS_Point *position, const BRS_GUI_Theme *theme, const char *text);
@@ -21,5 +21,7 @@ BRS_GUI_Label *BRS_GUI_Label_create(BRS_Point *position, const BRS_GUI_Theme *th
 void BRS_GUI_Label_destroy(BRS_GUI_Label *label);
 
 void BRS_GUI_Label_render(BRS_VideoContext *context, BRS_GUI_Label *label);
+
+void BRS_GUI_Label_setText(BRS_GUI_Label* label, const char *text);
 
 #endif //BRS_GUI_LABEL_H

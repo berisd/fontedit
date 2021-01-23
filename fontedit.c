@@ -99,20 +99,37 @@ static void runApplication(BRS_ApplicationState *applicationState) {
 }
 
 void BRS_FontEdit_createFont() {
+    BRS_GUI_Label *label = BRS_GUI_Widget_getByType(BRS_GUI_WIDGET_LABEL)->object->label;
     memset(applicationState->fontEdited->data, 0, BRS_Font_getSize(applicationState->fontEdited));
+    BRS_GUI_Label_setText(label, "New font created!");
 }
 
 void BRS_FontEdit_loadFont(const char *filename) {
+    BRS_GUI_Label *label = BRS_GUI_Widget_getByType(BRS_GUI_WIDGET_LABEL)->object->label;
     BRS_Font_LoadResult *result = BRS_Font_load(filename);
     if (result->error == BRS_FONT_NO_ERROR) {
         BRS_Font_destroy(applicationState->fontEdited);
         applicationState->fontEdited = BRS_Font_copy(result->font);
+        char str[255];
+        sprintf(str, "Font %s loaded successfully!", filename);
+        BRS_GUI_Label_setText(label, str);
+    } else if (result->error == BRS_FONT_ERR_OPENING_FILE || result->error == BRS_FONT_ERR_READING_FILE) {
+        BRS_GUI_Label_setText(label, "Error loading font!");
     }
     BRS_Font_destroyLoadResult(result);
 }
 
 void BRS_FontEdit_saveFont(const char *filename) {
+    BRS_GUI_Label *label = BRS_GUI_Widget_getByType(BRS_GUI_WIDGET_LABEL)->object->label;
     BRS_Font_SaveResult *result = BRS_Font_save(applicationState->fontEdited, filename);
+    if (result->error == BRS_FONT_NO_ERROR) {
+        char str[255];
+        sprintf(str, "Font %s saved successfully!", filename);
+        BRS_GUI_Label_setText(label, str);
+    } else if (result->error == BRS_FONT_ERR_CREATING_FILE || result->error == BRS_FONT_ERR_WRITING_FILE) {
+        BRS_GUI_Label_setText(label, "Error saving font!");
+    }
+
     BRS_Font_destroySaveResult(result);
 }
 

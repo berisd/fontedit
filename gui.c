@@ -145,7 +145,7 @@ createMainWindow(BRS_GUI_Theme *theme, BRS_Font *fontEdited, uint32_t screenWidt
     BRS_Point *labelPosition = malloc(sizeof(BRS_Point));
     const char *labelText = "Ready.";
 
-    labelPosition->x = (screenWidth - strlen(labelText) * theme->font->width_bits) / 2;
+    labelPosition->x = 1;
     labelPosition->y = screenHeight - theme->font->height_bits - 1;
 
     BRS_GUI_WidgetList_push(createCharTable(fontEdited, theme), window->children);

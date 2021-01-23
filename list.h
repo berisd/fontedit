@@ -33,6 +33,9 @@ LIST_NAME *LIST_NAME##_create() { \
 }                                            \
                                              \
 void LIST_NAME##_destroy(LIST_NAME *list) { \
+    if (list == NULL)                        \
+        return;                              \
+        \
     LIST_NAME##Entry *entry = list->firstEntry; \
     while (entry != NULL) { \
         LIST_NAME##Entry *tmp = entry; \

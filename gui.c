@@ -3,17 +3,24 @@
 //
 #include "gui.h"
 
-BRS_GUI_Widget *BRS_GUI_Widget_getByType(BRS_GUI_WidgetType type) {
-    BRS_GUI_WidgetList *widgetList = getWidgetList();
+static BRS_GUI_Widget *BRS_GUI_Widget_getByTypeFromList(BRS_GUI_WidgetList *widgetList, BRS_GUI_WidgetType type) {
     BRS_GUI_WidgetListEntry *entry = widgetList->firstEntry;
     while (entry != NULL) {
         BRS_GUI_Widget *widget = entry->value;
         if (widget->type == type) {
             return widget;
         }
+        BRS_GUI_Widget *widgetFound = BRS_GUI_Widget_getByTypeFromList(widget->children, type);
+        if (widgetFound != NULL) {
+            return widgetFound;
+        }
         entry = entry->next;
     }
     return NULL;
+}
+
+BRS_GUI_Widget *BRS_GUI_Widget_getByType(BRS_GUI_WidgetType type) {
+    return BRS_GUI_Widget_getByTypeFromList(getWidgetList(), type);
 }
 
 static void onClickMenuBar(BRS_GUI_MenuBar *menuBar) {
@@ -102,9 +109,9 @@ static BRS_GUI_Widget *createInputBox(BRS_GUI_Theme *theme, uint32_t screenWidth
     return widget;
 }
 
-BRS_GUI_WidgetList *
-createWidgets(BRS_GUI_Theme *theme, BRS_Font *fontEdited, uint32_t screenWidth, uint32_t screenHeight) {
-    BRS_GUI_WidgetList *list = BRS_GUI_WidgetList_create();
+static BRS_GUI_Widget *
+createMainWindow(BRS_GUI_Theme *theme, BRS_Font *fontEdited, uint32_t screenWidth, uint32_t screenHeight) {
+    BRS_GUI_Widget *window = BRS_GUI_Widget_createWindow();
 
     BRS_Point *labelPosition = malloc(sizeof(BRS_Point));
     const char *labelText = "Ready.";
@@ -112,20 +119,61 @@ createWidgets(BRS_GUI_Theme *theme, BRS_Font *fontEdited, uint32_t screenWidth, 
     labelPosition->x = (screenWidth - strlen(labelText) * theme->font->width_bits) / 2;
     labelPosition->y = screenHeight - theme->font->height_bits - 1;
 
-    BRS_GUI_WidgetList_push(createCharTable(fontEdited, theme), list);
-    BRS_GUI_WidgetList_push(createCharEdit(fontEdited, theme), list);
-    BRS_GUI_WidgetList_push(BRS_GUI_Widget_createLabel(labelPosition, theme, labelText), list);
-    BRS_GUI_WidgetList_push(createMenuBar(theme), list);
-    BRS_GUI_WidgetList_push(createInputBox(theme, screenWidth, screenHeight), list);
+    BRS_GUI_WidgetList_push(createCharTable(fontEdited, theme), window->children);
+    BRS_GUI_WidgetList_push(createCharEdit(fontEdited, theme), window->children);
+    BRS_GUI_WidgetList_push(BRS_GUI_Widget_createLabel(labelPosition, theme, labelText), window->children);
+    BRS_GUI_WidgetList_push(createMenuBar(theme), window->children);
+    BRS_GUI_WidgetList_push(createInputBox(theme, screenWidth, screenHeight), window->children);
 
+    return window;
+}
+
+BRS_GUI *
+BRS_GUI_createGUI(BRS_GUI_Theme *theme, BRS_Font *fontEdited, uint32_t screenWidth, uint32_t screenHeight) {
+    BRS_GUI_Widget *window = createMainWindow(theme, fontEdited, screenWidth, screenHeight);
+    BRS_GUI_WidgetList *list = BRS_GUI_WidgetList_create();
+    BRS_GUI_WidgetList_push(window, list);
     return list;
 }
 
-void destroyWidgets(BRS_GUI_WidgetList *widgetList) {
-    BRS_GUI_WidgetListEntry *entry = widgetList->firstEntry;
+void BRS_GUI_initGUI(BRS_GUI_WidgetList *gui) {
+    // TODO pass gui to BRS_GUI_Widget_getByType
+    BRS_GUI_CharTable_setSelectedCharIndex(BRS_GUI_Widget_getByType(BRS_GUI_WIDGET_CHARTABLE)->object->charTable, 0);
+}
+
+void BRS_GUI_destroyGUI(BRS_GUI_WidgetList *gui) {
+    BRS_GUI_WidgetListEntry *entry = gui->firstEntry;
     while (entry != NULL) {
         BRS_GUI_Widget_destroy(entry->value);
         entry = entry->next;
     }
-    BRS_GUI_WidgetList_destroy(widgetList);
+    BRS_GUI_WidgetList_destroy(gui);
+}
+
+static void BRS_GUI_renderWidgetList(BRS_VideoContext *videoContext, BRS_GUI_WidgetList *widgetList) {
+    BRS_GUI_WidgetListEntry *listEntry = widgetList->firstEntry;
+    while (listEntry != NULL) {
+        BRS_GUI_Widget *widget = listEntry->value;
+        BRS_GUI_Widget_render(videoContext, widget);
+        BRS_GUI_renderWidgetList(videoContext, widget->children);
+        listEntry = listEntry->next;
+    }
+}
+
+void BRS_GUI_renderGUI(BRS_VideoContext *videoContext, BRS_GUI_WidgetList *gui) {
+    BRS_GUI_renderWidgetList(videoContext, gui);
+}
+
+static void BRS_GUI_processEventForList(BRS_GUI_WidgetList *widgetList, SDL_Event *event) {
+    BRS_GUI_WidgetListEntry *entry = widgetList->firstEntry;
+    while (entry != NULL) {
+        BRS_GUI_Widget *widget = entry->value;
+        BRS_GUI_Widget_processEvent(widget, event);
+        BRS_GUI_processEventForList(widget->children, event);
+        entry = entry->next;
+    }
+}
+
+void BRS_GUI_processEvent(BRS_GUI *gui, SDL_Event *event) {
+    BRS_GUI_processEventForList(gui, event);
 }

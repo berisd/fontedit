@@ -13,7 +13,7 @@ typedef struct ApplicationConfig {
 typedef struct ApplicationState {
     BRS_VideoContext *videoContext;
     BRS_GUI_Theme *theme;
-    BRS_GUI_WidgetList *widgets;
+    BRS_GUI *gui;
     BRS_Font *fontEdited;
     bool quit;
 } ApplicationState;
@@ -38,12 +38,12 @@ static ApplicationState *createApplicationState() {
 
 static void freeApplicationState(ApplicationState *applicationState) {
     BRS_GUI_Theme_destroy(applicationState->theme);
-    destroyWidgets(applicationState->widgets);
+    BRS_GUI_destroyGUI(applicationState->gui);
     free(applicationState);
 }
 
-static ApplicationState *initApplication(const ApplicationConfig *config) {
-    ApplicationState *applicationState = createApplicationState();
+static void *initApplication(const ApplicationConfig *config) {
+    applicationState = createApplicationState();
     BRS_VideoContext *videoContext = BRS_initVideo(config->screenWidth, config->screenHeight);
     if (videoContext == NULL) {
         return NULL;
@@ -51,11 +51,12 @@ static ApplicationState *initApplication(const ApplicationConfig *config) {
     applicationState->videoContext = videoContext;
     applicationState->theme = BRS_GUI_Theme_create();
     applicationState->fontEdited = BRS_copyFont(applicationState->theme->font);
-    applicationState->widgets = createWidgets(applicationState->theme, applicationState->fontEdited,
+    applicationState->gui = BRS_GUI_createGUI(applicationState->theme, applicationState->fontEdited,
                                               config->screenWidth, config->screenHeight);
     applicationState->quit = false;
     atexit(SDL_Quit);
-    return applicationState;
+
+    BRS_GUI_initGUI(applicationState->gui);
 }
 
 static void shutdownApplication(ApplicationState *applicationState) {
@@ -76,25 +77,10 @@ static bool checkQuitApplication(SDL_Event *event) {
     return false;
 }
 
-static void processEvent(SDL_Event *event, ApplicationState *applicationState) {
-    BRS_GUI_WidgetList *widgetList = applicationState->widgets;
-    BRS_GUI_WidgetListEntry *entry = widgetList->firstEntry;
-    while (entry != NULL) {
-        BRS_GUI_Widget_processEvent(entry->value, event);
-        entry = entry->next;
-    }
-}
-
 static void handleVideo(ApplicationState *applicationState) {
     BRS_setColor(applicationState->videoContext, &COLOR_BLACK);
     BRS_clearVideo(applicationState->videoContext);
-
-    BRS_GUI_WidgetListEntry *listEntry = applicationState->widgets->firstEntry;
-    while (listEntry != NULL) {
-        BRS_GUI_Widget_render(applicationState->videoContext, listEntry->value);
-        listEntry = listEntry->next;
-    }
-
+    BRS_GUI_renderGUI(applicationState->videoContext, applicationState->gui);
     BRS_updateVideo(applicationState->videoContext);
 }
 
@@ -103,7 +89,7 @@ static void runApplication(ApplicationState *applicationState) {
     while (!applicationState->quit) {
         if (SDL_PollEvent(&event) != 0) {
             applicationState->quit = checkQuitApplication(&event);
-            processEvent(&event, applicationState);
+            BRS_GUI_processEvent(applicationState->gui, &event);
         }
         handleVideo(applicationState);
     }
@@ -114,13 +100,12 @@ void BRS_FontEdit_quitApplication() {
 }
 
 BRS_GUI_WidgetList *getWidgetList() {
-    return applicationState->widgets;
+    return applicationState->gui;
 }
 
 int main() {
     ApplicationConfig *config = createConfig();
-    applicationState = initApplication(config);
-    BRS_GUI_CharTable_setSelectedCharIndex(BRS_GUI_Widget_getByType(BRS_GUI_WIDGET_CHARTABLE)->object->charTable, 0);
+    initApplication(config);
     if (applicationState != NULL) {
         runApplication(applicationState);
     }

@@ -10,8 +10,12 @@ static BRS_GUI_Widget *createWidget(BRS_GUI_WidgetType type, void *object) {
     BRS_GUI_Widget *widget = malloc(sizeof(BRS_GUI_Widget));
     widget->type = type;
     widget->object = malloc(sizeof(BRS_GUI_Widget_Object));
+    widget->children = BRS_GUI_WidgetList_create();
 
     switch (type) {
+        case BRS_GUI_WIDGET_WINDOW:
+            widget->object->window = object;
+            break;
         case BRS_GUI_WIDGET_LABEL:
             widget->object->label = object;
             break;
@@ -33,6 +37,12 @@ static BRS_GUI_Widget *createWidget(BRS_GUI_WidgetType type, void *object) {
     }
 
     return widget;
+}
+
+BRS_GUI_Widget *
+BRS_GUI_Widget_createWindow() {
+    BRS_GUI_Window *window = BRS_GUI_Window_create();
+    return createWidget(BRS_GUI_WIDGET_WINDOW, window);
 }
 
 BRS_GUI_Widget *
@@ -118,6 +128,9 @@ void BRS_GUI_Widget_processEvent(BRS_GUI_Widget *widget, SDL_Event *event) {
 
 void BRS_GUI_Widget_destroy(BRS_GUI_Widget *widget) {
     switch (widget->type) {
+        case BRS_GUI_WIDGET_WINDOW:
+            BRS_GUI_Window_destroy(widget->object->window);
+            break;
         case BRS_GUI_WIDGET_LABEL:
             BRS_GUI_Label_destroy(widget->object->label);
             break;
@@ -137,8 +150,13 @@ void BRS_GUI_Widget_destroy(BRS_GUI_Widget *widget) {
             BRS_GUI_InputBox_destroy(widget->object->inputBox);
             break;
     }
+    BRS_GUI_WidgetList_destroy(widget->children);
     free(widget->object);
     free(widget);
+}
+
+void BRS_GUI_Widget_addChild(BRS_GUI_Widget *widget, BRS_GUI_Widget *child) {
+    BRS_GUI_WidgetList_push(child, widget->children);
 }
 
 void BRS_GUI_Widget_setClickHandler(BRS_GUI_Widget *widget, void *handler) {

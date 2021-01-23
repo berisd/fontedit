@@ -16,6 +16,7 @@
 #include "char_table.h"
 #include "messagebox.h"
 #include "inputbox.h"
+#include "window.h"
 
 typedef enum _BRS_GUI_WidgetType BRS_GUI_WidgetType;
 
@@ -31,10 +32,12 @@ enum _BRS_GUI_WidgetType {
     BRS_GUI_WIDGET_CHAREDIT,
     BRS_GUI_WIDGET_CHARTABLE,
     BRS_GUI_WIDGET_MESSAGEBOX,
-    BRS_GUI_WIDGET_INPUTBOX
+    BRS_GUI_WIDGET_INPUTBOX,
+    BRS_GUI_WIDGET_WINDOW
 };
 
 union _BRS_GUI_Widget_Object {
+    BRS_GUI_Window *window;
     BRS_GUI_MenuBar *menuBar;
     BRS_GUI_Label *label;
     BRS_GUI_CharEdit *charEdit;
@@ -46,6 +49,7 @@ union _BRS_GUI_Widget_Object {
 struct _BRS_GUI_Widget {
     BRS_GUI_WidgetType type;
     BRS_GUI_Widget_Object *object;
+    BRS_GUI_WidgetList *children;
 };
 
 void BRS_GUI_Widget_render(BRS_VideoContext *context, BRS_GUI_Widget *widget);
@@ -74,6 +78,11 @@ BRS_GUI_Widget_createCharEdit(BRS_Point *position, const BRS_GUI_Theme *theme, B
 BRS_GUI_Widget *
 BRS_GUI_Widget_createCharTable(BRS_Point *position, const BRS_GUI_Theme *theme, BRS_Font *fontEdited);
 
+BRS_GUI_Widget *
+BRS_GUI_Widget_createWindow();
+
 void BRS_GUI_Widget_setClickHandler(BRS_GUI_Widget *widget, void *handler);
+
+void BRS_GUI_Widget_addChild(BRS_GUI_Widget *widget, BRS_GUI_Widget *child);
 
 #endif //BRS_GUI_WIDGET_H

@@ -4,45 +4,45 @@
 #include "font.h"
 #include "gui.h"
 
-typedef struct _BRS_ApplicationConfig {
+typedef struct _ApplicationConfig {
     uint32_t screenWidth;
     uint32_t screenHeight;
-} BRS_ApplicationConfig;
+} ApplicationConfig;
 
-typedef struct _BRS_ApplicationState {
+typedef struct _ApplicationState {
     BRS_VideoContext *videoContext;
     BRS_GUI_Theme *theme;
     BRS_GUI *gui;
     BRS_Font *fontEdited;
     bool quit;
-} BRS_ApplicationState;
+} ApplicationState;
 
-static BRS_ApplicationState *applicationState = NULL;
+static ApplicationState *applicationState = NULL;
 
-static BRS_ApplicationConfig *createConfig() {
-    BRS_ApplicationConfig *config = malloc(sizeof(BRS_ApplicationConfig));
+static ApplicationConfig *createConfig() {
+    ApplicationConfig *config = malloc(sizeof(ApplicationConfig));
     config->screenWidth = 800;
     config->screenHeight = 600;
     return config;
 }
 
-static void destroyConfig(BRS_ApplicationConfig *config) {
+static void destroyConfig(ApplicationConfig *config) {
     free(config);
 }
 
-static BRS_ApplicationState *createApplicationState() {
-    BRS_ApplicationState *applicationState = malloc(sizeof(BRS_ApplicationState));
+static ApplicationState *createApplicationState() {
+    ApplicationState *applicationState = malloc(sizeof(ApplicationState));
     return applicationState;
 }
 
-static void freeApplicationState(BRS_ApplicationState *applicationState) {
+static void freeApplicationState(ApplicationState *applicationState) {
     BRS_GUI_Theme_destroy(applicationState->theme);
     BRS_GUI_destroyGUI(applicationState->gui);
     BRS_Font_destroy(applicationState->fontEdited);
     free(applicationState);
 }
 
-static void *initApplication(const BRS_ApplicationConfig *config) {
+static void *initApplication(const ApplicationConfig *config) {
     applicationState = createApplicationState();
     BRS_VideoContext *videoContext = BRS_initVideo(config->screenWidth, config->screenHeight);
     if (videoContext == NULL) {
@@ -59,7 +59,7 @@ static void *initApplication(const BRS_ApplicationConfig *config) {
     BRS_GUI_initGUI(applicationState->gui);
 }
 
-static void shutdownApplication(BRS_ApplicationState *applicationState) {
+static void shutdownApplication(ApplicationState *applicationState) {
     BRS_shutdownVideo(applicationState->videoContext);
     freeApplicationState(applicationState);
 }
@@ -77,14 +77,14 @@ static bool checkQuitApplication(SDL_Event *event) {
     return false;
 }
 
-static void handleVideo(BRS_ApplicationState *applicationState) {
+static void handleVideo(ApplicationState *applicationState) {
     BRS_setColor(applicationState->videoContext, &COLOR_BLACK);
     BRS_clearVideo(applicationState->videoContext);
     BRS_GUI_renderGUI(applicationState->videoContext, applicationState->gui);
     BRS_updateVideo(applicationState->videoContext);
 }
 
-static void runApplication(BRS_ApplicationState *applicationState) {
+static void runApplication(ApplicationState *applicationState) {
     SDL_Event event;
     while (!applicationState->quit) {
         if (SDL_PollEvent(&event) != 0) {
@@ -142,7 +142,7 @@ BRS_GUI_WidgetList *BRS_FontEdit_getWidgetList() {
 }
 
 int main() {
-    BRS_ApplicationConfig *config = createConfig();
+    ApplicationConfig *config = createConfig();
     initApplication(config);
     if (applicationState != NULL) {
         runApplication(applicationState);

@@ -82,8 +82,8 @@ void BRS_GUI_Menu_processEvent(BRS_GUI_Menu *menu, SDL_Event *event) {
 
     BRS_GUI_MenuItemListEntry *menuItemEntry = menu->itemList->firstEntry;
     while (menuItemEntry != NULL) {
-        BRS_GUI_MenuItem *menu = menuItemEntry->value;
-        BRS_GUI_MenuItem_processEvent(menu, event);
+        BRS_GUI_MenuItem *menuItem = menuItemEntry->value;
+        BRS_GUI_MenuItem_processEvent(menuItem, event);
         menuItemEntry = menuItemEntry->next;
     }
 }

@@ -192,10 +192,6 @@ bool BRS_GUI_CharTable_processEvent(BRS_GUI_CharTable *charTable, SDL_Event *eve
     return false;
 }
 
-void BRS_GUI_CharTable_setClickHandler(BRS_GUI_CharTable *charTable, BRS_GUI_CharTable_ClickHandler handler) {
-    charTable->clickHandler = handler;
-}
-
 void
 BRS_GUI_CharTable_setChangedSelectedCharIndexHandler(BRS_GUI_CharTable *charTable,
                                                      BRS_GUI_CharTable_ChangedSelectedCharIndex handler) {

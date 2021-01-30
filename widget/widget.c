@@ -152,14 +152,13 @@ void BRS_GUI_Widget_destroy(BRS_GUI_Widget *widget) {
     free(widget);
 }
 
-void BRS_GUI_Widget_addChild(BRS_GUI_Widget *widget, BRS_GUI_Widget *child) {
-    BRS_GUI_WidgetList_push(child, widget->children);
-}
-
 void BRS_GUI_Widget_setClickHandler(BRS_GUI_Widget *widget, void *handler) {
     switch (widget->type) {
         case BRS_GUI_WIDGET_MENUBAR:
             widget->object->menuBar->clickHandler = handler;
+            break;
+        case BRS_GUI_WIDGET_CHARTABLE:
+            widget->object->charTable->clickHandler = handler;
             break;
     }
 }

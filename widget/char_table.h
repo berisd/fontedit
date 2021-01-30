@@ -37,8 +37,6 @@ void BRS_GUI_CharTable_render(BRS_VideoContext *context, BRS_GUI_CharTable *char
 
 bool BRS_GUI_CharTable_processEvent(BRS_GUI_CharTable *charTable, SDL_Event *event);
 
-void BRS_GUI_CharTable_setClickHandler(BRS_GUI_CharTable *charTable, BRS_GUI_CharTable_ClickHandler handler);
-
 void
 BRS_GUI_CharTable_setChangedSelectedCharIndexHandler(BRS_GUI_CharTable *charTable,
                                                      BRS_GUI_CharTable_ChangedSelectedCharIndex handler);

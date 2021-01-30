@@ -118,7 +118,7 @@ static BRS_GUI_Widget *createMenuBar(BRS_GUI_Theme *theme) {
 static BRS_GUI_Widget *createCharTable(BRS_Font *fontEdited, BRS_GUI_Theme *theme) {
     BRS_Point position = {.x = 10, .y = 50};
     BRS_GUI_Widget *widget = BRS_GUI_Widget_createCharTable(&position, theme, fontEdited);
-    BRS_GUI_CharTable_setClickHandler(widget->object->charTable, onClickCharTable);
+    BRS_GUI_Widget_setClickHandler(widget, onClickCharTable);
     BRS_GUI_CharTable_setChangedSelectedCharIndexHandler(widget->object->charTable, onChangeCharTableSelectedCharIndex);
     return widget;
 }

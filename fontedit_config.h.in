@@ -1,0 +1,11 @@
+//
+// Created by bernd on 30.01.21.
+//
+
+#ifndef FONTEDIT_FONT_CONFIG_H
+#define FONTEDIT_FONT_CONFIG_H
+
+#define FONTEDIT_VERSION_MAJOR @fontedit_VERSION_MAJOR@
+#define FONTEDIT_VERSION_MINOR @fontedit_VERSION_MINOR@
+
+#endif //FONTEDIT_FONT_CONFIG_H

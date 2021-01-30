@@ -79,11 +79,11 @@ static void onClickMenuItemQuit(BRS_GUI_MenuItem *menuItem) {
 
 static BRS_GUI_Menu *createFileMenu(BRS_GUI_MenuBar *menuBar, BRS_GUI_Theme *theme) {
     BRS_Size dim = {.width = 50, .height = 20};
-    BRS_GUI_Menu *menu = BRS_GUI_Menu_create(menuBar, &dim, "File", theme, false);
-    BRS_GUI_MenuItem *menuItemNew = BRS_GUI_MenuItem_create(&dim, menu, "New", theme);
-    BRS_GUI_MenuItem *menuItemLoad = BRS_GUI_MenuItem_create(&dim, menu, "Load", theme);
-    BRS_GUI_MenuItem *menuItemSave = BRS_GUI_MenuItem_create(&dim, menu, "Save", theme);
-    BRS_GUI_MenuItem *menuItemQuit = BRS_GUI_MenuItem_create(&dim, menu, "Quit", theme);
+    BRS_GUI_Menu *menu = BRS_GUI_Menu_create(&dim, "File", false);
+    BRS_GUI_MenuItem *menuItemNew = BRS_GUI_MenuItem_create(&dim, "New");
+    BRS_GUI_MenuItem *menuItemLoad = BRS_GUI_MenuItem_create(&dim, "Load");
+    BRS_GUI_MenuItem *menuItemSave = BRS_GUI_MenuItem_create(&dim, "Save");
+    BRS_GUI_MenuItem *menuItemQuit = BRS_GUI_MenuItem_create(&dim, "Quit");
 
     BRS_GUI_MenuItemList_push(menuItemNew, menu->itemList);
     BRS_GUI_MenuItemList_push(menuItemLoad, menu->itemList);

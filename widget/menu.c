@@ -6,43 +6,11 @@
 
 BRS_LIST_DEFN(BRS_GUI_MenuList, BRS_GUI_Menu)
 
-static uint16_t _countMenuItems(BRS_GUI_Menu *menu) {
-    uint16_t count = 0;
-    BRS_GUI_MenuItemListEntry *entry = menu->itemList->firstEntry;
-    while (entry != NULL) {
-        count++;
-        entry = entry->next;
-    }
-    return count;
-}
-
-void BRS_GUI_Menu_render(BRS_VideoContext *context, BRS_GUI_Menu *menu) {
-    BRS_Point position;
-    BRS_GUI_Menu_calcPosition(menu, &position);
-    BRS_setColor(context, menu->theme->menuBackColor);
-    BRS_Rect menuRect = {.x = position.x, .y = position.y, .width = menu->size->width, .height = menu->size->height};
-    BRS_drawlFillRect(context, &menuRect);
-
-    BRS_setColor(context, menu->selected ? menu->theme->menuSelectedForeColor : menu->theme->menuForeColor);
-    BRS_drawString(context, menu->label, strlen(menu->label), menu->theme->font, &position);
-
-    if (menu->selected) {
-        BRS_GUI_MenuItemListEntry *entry = menu->itemList->firstEntry;
-        while (entry != NULL) {
-            BRS_GUI_MenuItem_render(context, entry->value);
-            entry = entry->next;
-        }
-    }
-}
-
 BRS_GUI_Menu *
-BRS_GUI_Menu_create(BRS_GUI_MenuBar *menuBar, BRS_Size *size, const char *label, const BRS_GUI_Theme *theme,
-                    bool selected) {
+BRS_GUI_Menu_create(BRS_Size *size, const char *label, bool selected) {
     BRS_GUI_Menu *menu = malloc(sizeof(BRS_GUI_Menu));
-    menu->menuBar = menuBar;
     menu->size = BRS_copySize(size);
     menu->label = label;
-    menu->theme = (BRS_GUI_Theme *) theme;
     menu->itemList = BRS_GUI_MenuItemList_create();
     menu->selected = selected;
     menu->itemList = BRS_GUI_MenuItemList_create();
@@ -58,58 +26,4 @@ void BRS_GUI_Menu_destroy(BRS_GUI_Menu *menu) {
     }
     free(menu->size);
     free(menu);
-}
-
-void BRS_GUI_Menu_processEvent(BRS_GUI_Menu *menu, SDL_Event *event) {
-    if (event->type == SDL_MOUSEMOTION && menu->selected) {
-        BRS_Point position;
-        BRS_GUI_Menu_calcPosition(menu, &position);
-
-        BRS_Size *menuItemSize = menu->itemList->firstEntry->value->size;
-        int16_t menuItemsHeight = _countMenuItems(menu) * menuItemSize->height;
-
-        BRS_Rect menuRect = {.x = position.x, .y = position.y, .width = menu->size->width, .height =
-        menu->size->height + menuItemsHeight};
-
-        BRS_Point mousePoint = {.x = event->motion.x, .y = event->motion.y};
-        if (!BRS_PointInRect(&mousePoint, &menuRect)) {
-            menu->selected = false;
-        }
-    }
-    if (!menu->selected) {
-        return;
-    }
-
-    BRS_GUI_MenuItemListEntry *menuItemEntry = menu->itemList->firstEntry;
-    while (menuItemEntry != NULL) {
-        BRS_GUI_MenuItem *menuItem = menuItemEntry->value;
-        BRS_GUI_MenuItem_processEvent(menuItem, event);
-        menuItemEntry = menuItemEntry->next;
-    }
-}
-
-BRS_Size *BRS_GUI_Menu_getSize(BRS_GUI_Menu *menu) {
-    return menu->size;
-}
-
-void BRS_GUI_Menu_calcPosition(BRS_GUI_Menu *menu, BRS_Point *menuPosition) {
-    BRS_Point *menuBarPos = BRS_GUI_MenuBar_getPosition(menu->menuBar);
-    int32_t menuIndex = BRS_GUI_MenuBar_getMenuIndex(menu->menuBar, menu);
-    menuPosition->x = menuBarPos->x + menu->size->width * menuIndex;
-    menuPosition->y = menuBarPos->y;
-}
-
-int32_t BRS_GUI_Menu_getMenuItemIndex(BRS_GUI_Menu *menu, BRS_GUI_MenuItem *menuItem) {
-    int32_t index = -1;
-    if (menu->itemList != NULL) {
-        BRS_GUI_MenuItemListEntry *menuItemEntry = menu->itemList->firstEntry;
-        while (menuItemEntry != NULL) {
-            index++;
-            if (menuItemEntry->value == menuItem) {
-                break;
-            }
-            menuItemEntry = menuItemEntry->next;
-        }
-    }
-    return index;
 }

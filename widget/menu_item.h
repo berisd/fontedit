@@ -14,6 +14,7 @@ typedef struct _BRS_GUI_MenuItem BRS_GUI_MenuItem;
 typedef void (*BRS_GUI_MenuItem_ClickHandler)(BRS_GUI_MenuItem *);
 
 struct _BRS_GUI_MenuItem {
+    BRS_Point *position;
     BRS_Size *size;
     const char *label;
     BRS_GUI_MenuItem_ClickHandler clickHandler;

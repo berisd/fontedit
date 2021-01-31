@@ -13,11 +13,13 @@ BRS_GUI_MenuItem_create(BRS_Size *size, const char *label) {
     menuItem->label = label;
     menuItem->clickHandler = NULL;
     menuItem->highlighted = false;
+    menuItem->position = malloc(sizeof(BRS_Point));
     return menuItem;
 }
 
 void BRS_GUI_MenuItem_destroy(BRS_GUI_MenuItem *menuItem) {
     free(menuItem->size);
+    free(menuItem->position);
     free(menuItem);
 }
 

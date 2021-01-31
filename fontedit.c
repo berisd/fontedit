@@ -89,6 +89,7 @@ static void handleVideo(ApplicationState *applicationState) {
 static void runApplication(ApplicationState *applicationState) {
     SDL_Event event;
     while (!applicationState->quit) {
+        BRS_GUI_calculateGUI(applicationState->videoContext, applicationState->gui);
         if (SDL_PollEvent(&event) != 0) {
             if (!BRS_GUI_processEvent(applicationState->gui, &event)) {
                 if (!applicationState->quit) {

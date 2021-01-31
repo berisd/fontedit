@@ -60,6 +60,14 @@ BRS_GUI_Widget_createCharEdit(BRS_Point *position, const BRS_GUI_Theme *theme, B
     return createWidget(BRS_GUI_WIDGET_CHAREDIT, position, &size, theme, BRS_GUI_CharEdit_create(fontEdited));
 }
 
+void BRS_GUI_Widget_calculate(BRS_VideoContext *context, BRS_GUI_Widget *widget) {
+    switch (widget->type) {
+        case BRS_GUI_WIDGET_MENUBAR:
+            BRS_GUI_MenuBar_calculate(context, widget);
+            break;
+    }
+}
+
 void BRS_GUI_Widget_render(BRS_VideoContext *context, BRS_GUI_Widget *widget) {
     switch (widget->type) {
         case BRS_GUI_WIDGET_LABEL:

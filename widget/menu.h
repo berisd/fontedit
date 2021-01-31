@@ -13,6 +13,7 @@
 typedef struct _BRS_GUI_Menu BRS_GUI_Menu;
 
 struct _BRS_GUI_Menu {
+    BRS_Point *position;
     BRS_Size *size;
     const char *label;
     bool selected;

@@ -61,12 +61,12 @@ static void onClickMenuItemQuit(BRS_GUI_MenuItem *menuItem) {
 }
 
 static BRS_GUI_Menu *createFileMenu() {
-    BRS_Size dim = {.width = 50, .height = 20};
-    BRS_GUI_Menu *menu = BRS_GUI_Menu_create(&dim, "File", false);
-    BRS_GUI_MenuItem *menuItemNew = BRS_GUI_MenuItem_create(&dim, "New");
-    BRS_GUI_MenuItem *menuItemLoad = BRS_GUI_MenuItem_create(&dim, "Load");
-    BRS_GUI_MenuItem *menuItemSave = BRS_GUI_MenuItem_create(&dim, "Save");
-    BRS_GUI_MenuItem *menuItemQuit = BRS_GUI_MenuItem_create(&dim, "Quit");
+    BRS_Size size = {.width = 50, .height = 20};
+    BRS_GUI_Menu *menu = BRS_GUI_Menu_create(&size, "File", false);
+    BRS_GUI_MenuItem *menuItemNew = BRS_GUI_MenuItem_create(&size, "New");
+    BRS_GUI_MenuItem *menuItemLoad = BRS_GUI_MenuItem_create(&size, "Load");
+    BRS_GUI_MenuItem *menuItemSave = BRS_GUI_MenuItem_create(&size, "Save");
+    BRS_GUI_MenuItem *menuItemQuit = BRS_GUI_MenuItem_create(&size, "Quit");
 
     BRS_GUI_MenuItemList_push(menuItemNew, menu->itemList);
     BRS_GUI_MenuItemList_push(menuItemLoad, menu->itemList);
@@ -173,6 +173,20 @@ static void BRS_GUI_renderWidgetList(BRS_VideoContext *videoContext, BRS_GUI_Wid
         BRS_GUI_renderWidgetList(videoContext, widget->children);
         listEntry = listEntry->next;
     }
+}
+
+static void BRS_GUI_calculateWidgetList(BRS_VideoContext *videoContext, BRS_GUI_WidgetList *widgetList) {
+    BRS_GUI_WidgetListEntry *listEntry = widgetList->firstEntry;
+    while (listEntry != NULL) {
+        BRS_GUI_Widget *widget = listEntry->value;
+        BRS_GUI_Widget_calculate(videoContext, widget);
+        BRS_GUI_calculateWidgetList(videoContext, widget->children);
+        listEntry = listEntry->next;
+    }
+}
+
+void BRS_GUI_calculateGUI(BRS_VideoContext *videoContext, BRS_GUI_WidgetList *gui) {
+    BRS_GUI_calculateWidgetList(videoContext, gui);
 }
 
 void BRS_GUI_renderGUI(BRS_VideoContext *videoContext, BRS_GUI_WidgetList *gui) {

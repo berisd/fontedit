@@ -6,9 +6,9 @@
 
 BRS_GUI_MenuBar *
 BRS_GUI_MenuBar_create() {
-    BRS_GUI_MenuBar *menubar = malloc(sizeof(BRS_GUI_MenuBar));
-    menubar->menuList = BRS_GUI_MenuList_create();
-    return menubar;
+    BRS_GUI_MenuBar *menuBar = malloc(sizeof(BRS_GUI_MenuBar));
+    menuBar->menuList = BRS_GUI_MenuList_create();
+    return menuBar;
 }
 
 void BRS_GUI_MenuBar_destroy(BRS_GUI_MenuBar *menuBar) {
@@ -21,83 +21,121 @@ void BRS_GUI_MenuBar_destroy(BRS_GUI_MenuBar *menuBar) {
     free(menuBar);
 }
 
-static uint16_t _countMenuItems(BRS_GUI_Menu *menu) {
-    uint16_t count = 0;
-    BRS_GUI_MenuItemListEntry *entry = menu->itemList->firstEntry;
-    while (entry != NULL) {
-        count++;
-        entry = entry->next;
-    }
-    return count;
+static void
+BRS_GUI_Menu_calcPosition(BRS_MenuBar_RenderContext *renderContext) {
+    BRS_Point *menuBarPos = renderContext->menuBarWidget->position;
+    BRS_Size *menuSize = renderContext->menu->size;
+    renderContext->menu->position->x = menuBarPos->x + menuSize->width * renderContext->menuIndex;
+    renderContext->menu->position->y = menuBarPos->y;
+}
+
+static void calculateMenuItemPosition(BRS_MenuBar_RenderContext *renderContext) {
+    BRS_Point *menuPosition = renderContext->menu->position;
+    BRS_Point *menuItemPosition = renderContext->menuItem->position;
+    BRS_Size *menuSize = renderContext->menu->size;
+
+    menuItemPosition->x = menuPosition->x;
+    menuItemPosition->y = menuPosition->y + menuSize->height + menuSize->height * renderContext->menuItemIndex;
+}
+
+
+static void BRS_GUI_MenuItem_render(BRS_MenuBar_RenderContext *renderContext) {
+    BRS_GUI_MenuItem *menuItem = renderContext->menuItem;
+    BRS_Point *position = renderContext->menuItem->position;
+
+    const BRS_GUI_Theme *theme = renderContext->menuBarWidget->theme;
+    BRS_setColor(renderContext->videoContext, theme->menuItemBackColor);
+    BRS_Rect menuItemRect = {.x = position->x, .y = position->y, .width=menuItem->size->width, .height=menuItem->size->height};
+    BRS_drawlFillRect(renderContext->videoContext, &menuItemRect);
+
+    BRS_setColor(renderContext->videoContext,
+                 menuItem->highlighted ? theme->menuItemHighlightedColor
+                                       : theme->menuItemForeColor);
+    BRS_drawString(renderContext->videoContext, menuItem->label, strlen(menuItem->label),
+                   theme->font, position);
+}
+
+static void BRS_MenuItemConsumer_render(BRS_GUI_MenuItem *menuItem, void *context) {
+    BRS_MenuBar_RenderContext *ctx = context;
+    ctx->menuItem = menuItem;
+    BRS_GUI_MenuItem_render(ctx);
+    ctx->menuItemIndex++;
 }
 
 static void
-BRS_GUI_Menu_calcPosition(BRS_GUI_Menu *menu, BRS_Point *menuPosition, int32_t menuIndex, BRS_Point *menuBarPos) {
-    menuPosition->x = menuBarPos->x + menu->size->width * menuIndex;
-    menuPosition->y = menuBarPos->y;
-}
+BRS_GUI_Menu_render(BRS_MenuBar_RenderContext *renderContext) {
+    BRS_Point *position = renderContext->menu->position;
+    BRS_GUI_Widget *menuBarWidget = renderContext->menuBarWidget;
+    BRS_setColor(renderContext->videoContext, menuBarWidget->theme->menuBackColor);
+    BRS_Rect menuRect = {.x = position->x, .y = position->y, .width = renderContext->menu->size->width, .height = renderContext->menu->size->height};
+    BRS_drawlFillRect(renderContext->videoContext, &menuRect);
 
-static void calculateMenuItemPosition(BRS_GUI_MenuItem *menuItem, BRS_Point *menuItemPosition, int32_t menuItemIndex,
-                                      BRS_GUI_Menu *menu, int32_t menuIndex, BRS_Point *menuBarPos) {
-    BRS_Point menuPosition;
-    BRS_GUI_Menu_calcPosition(menu, &menuPosition, menuIndex, menuBarPos);
+    BRS_setColor(renderContext->videoContext,
+                 renderContext->menu->selected ? menuBarWidget->theme->menuSelectedForeColor
+                                               : menuBarWidget->theme->menuForeColor);
+    BRS_drawString(renderContext->videoContext, renderContext->menu->label, strlen(renderContext->menu->label),
+                   menuBarWidget->theme->font, position);
 
-    menuItemPosition->x = menuPosition.x;
-    menuItemPosition->y = menuPosition.y + menu->size->height + menuItem->size->height * menuItemIndex;
-}
-
-
-static void BRS_GUI_MenuItem_render(BRS_VideoContext *context, BRS_GUI_MenuItem *menuItem, int32_t menuItemIndex,
-                                    BRS_GUI_Menu *menu, int32_t menuIndex, BRS_GUI_Widget *menuBarWidget) {
-    BRS_Point position;
-    calculateMenuItemPosition(menuItem, &position, menuItemIndex, menu, menuIndex, menuBarWidget->position);
-
-    BRS_setColor(context, menuBarWidget->theme->menuItemBackColor);
-    BRS_Rect menuItemRect = {.x = position.x, .y = position.y, .width=menuItem->size->width, .height=menuItem->size->height};
-    BRS_drawlFillRect(context, &menuItemRect);
-
-    BRS_setColor(context, menuItem->highlighted ? menuBarWidget->theme->menuItemHighlightedColor
-                                                : menuBarWidget->theme->menuItemForeColor);
-    BRS_drawString(context, menuItem->label, strlen(menuItem->label), menuBarWidget->theme->font, &position);
-}
-
-static void
-BRS_GUI_Menu_render(BRS_VideoContext *context, BRS_GUI_Menu *menu, int32_t menuIndex, BRS_GUI_Widget *menuBarWidget) {
-    BRS_Point position;
-    BRS_GUI_Menu_calcPosition(menu, &position, menuIndex, menuBarWidget->position);
-    BRS_setColor(context, menuBarWidget->theme->menuBackColor);
-    BRS_Rect menuRect = {.x = position.x, .y = position.y, .width = menu->size->width, .height = menu->size->height};
-    BRS_drawlFillRect(context, &menuRect);
-
-    BRS_setColor(context,
-                 menu->selected ? menuBarWidget->theme->menuSelectedForeColor : menuBarWidget->theme->menuForeColor);
-    BRS_drawString(context, menu->label, strlen(menu->label), menuBarWidget->theme->font, &position);
-
-    if (menu->selected) {
-        int32_t menuItemIndex = 0;
-        BRS_GUI_MenuItemListEntry *entry = menu->itemList->firstEntry;
-        while (entry != NULL) {
-            BRS_GUI_MenuItem_render(context, entry->value, menuItemIndex, menu, menuIndex, menuBarWidget);
-            entry = entry->next;
-            menuItemIndex++;
-        }
+    if (renderContext->menu->selected) {
+        BRS_GUI_MenuItemList_iterate(renderContext->menu->itemList, BRS_MenuItemConsumer_render, renderContext);
     }
+}
+
+static void BRS_MenuConsumer_render(BRS_GUI_Menu *menu, void *context) {
+    BRS_MenuBar_RenderContext *ctx = context;
+    ctx->menu = menu;
+    BRS_GUI_Menu_render(ctx);
+    ctx->menuIndex++;
+}
+
+static void BRS_GUI_MenuBar_renderMenus(BRS_MenuBar_RenderContext *renderContext) {
+    BRS_GUI_MenuBar *menuBar = BRS_GUI_MenuBar_getFromWidget(renderContext->menuBarWidget);
+    BRS_GUI_MenuList_iterate(menuBar->menuList, BRS_MenuConsumer_render, renderContext);
 }
 
 void BRS_GUI_MenuBar_render(BRS_VideoContext *context, BRS_GUI_Widget *widget) {
-    BRS_GUI_MenuBar *menuBar = widget->object;
     BRS_setColor(context, widget->theme->menuBarColor);
     BRS_Rect r = {.x = widget->position->x, .y = widget->position->y, .width=widget->size->width, .height=widget->size->height};
     BRS_drawlFillRect(context, &r);
+    BRS_MenuBar_RenderContext renderContext = {.videoContext = context, .menuBarWidget = widget};
+    BRS_GUI_MenuBar_renderMenus(&renderContext);
+}
 
-    BRS_GUI_MenuListEntry *entry = menuBar->menuList->firstEntry;
-    int32_t menuIndex = 0;
-    while (entry != NULL) {
-        BRS_GUI_Menu *menu = entry->value;
-        BRS_GUI_Menu_render(context, menu, menuIndex, widget);
-        entry = entry->next;
-        menuIndex++;
+static void BRS_GUI_MenuItem_calculate(BRS_MenuBar_RenderContext *renderContext) {
+    calculateMenuItemPosition(renderContext);
+}
+
+static void BRS_MenuItemConsumer_calculate(BRS_GUI_MenuItem *menuItem, void *context) {
+    BRS_MenuBar_RenderContext *ctx = context;
+    ctx->menuItem = menuItem;
+    BRS_GUI_MenuItem_calculate(ctx);
+    ctx->menuItemIndex++;
+}
+
+static void
+BRS_GUI_Menu_calculate(BRS_MenuBar_RenderContext *renderContext) {
+    BRS_GUI_Menu_calcPosition(renderContext);
+
+    if (renderContext->menu->selected) {
+        BRS_GUI_MenuItemList_iterate(renderContext->menu->itemList, BRS_MenuItemConsumer_calculate, renderContext);
     }
+}
+
+static void BRS_MenuConsumer_calculate(BRS_GUI_Menu *menu, void *context) {
+    BRS_MenuBar_RenderContext *ctx = context;
+    ctx->menu = menu;
+    BRS_GUI_Menu_calculate(ctx);
+    ctx->menuIndex++;
+}
+
+static void BRS_GUI_MenuBar_calculateMenus(BRS_MenuBar_RenderContext *renderContext) {
+    BRS_GUI_MenuBar *menuBar = BRS_GUI_MenuBar_getFromWidget(renderContext->menuBarWidget);
+    BRS_GUI_MenuList_iterate(menuBar->menuList, BRS_MenuConsumer_calculate, renderContext);
+}
+
+void BRS_GUI_MenuBar_calculate(BRS_VideoContext *context, BRS_GUI_Widget *widget) {
+    BRS_MenuBar_RenderContext renderContext = {.videoContext = context, .menuBarWidget = widget, .menu = NULL, .menuItem = NULL};
+    BRS_GUI_MenuBar_calculateMenus(&renderContext);
 }
 
 static void processMouseButtonDown(BRS_GUI_Widget *widget, SDL_MouseButtonEvent *button) {
@@ -116,12 +154,7 @@ static void
 processMenuItemMouseButtonDown(BRS_GUI_MenuItem *menuItem, SDL_MouseButtonEvent *button, int32_t menuItemIndex,
                                BRS_GUI_Menu *menu, int32_t menuIndex, BRS_GUI_Widget *menuBarWidget) {
     if (button->button == SDL_BUTTON_LEFT) {
-        BRS_Point menuPosition;
-        BRS_GUI_Menu_calcPosition(menu, &menuPosition, menuIndex, menuBarWidget->position);
-        BRS_Point menuItemPosition;
-        calculateMenuItemPosition(menuItem, &menuItemPosition, menuItemIndex, menu, menuIndex, menuBarWidget->position);
-
-        BRS_Rect menuItemRect = {.x = menuItemPosition.x, .y = menuItemPosition.y, .width = menuItem->size->width,
+        BRS_Rect menuItemRect = {.x = menuItem->position->x, .y = menuItem->position->y, .width = menuItem->size->width,
                 menuItem->size->height};
         BRS_Point mousePoint = {.x = button->x, .y = button->y};
         bool clickedInMenuItem = BRS_PointInRect(&mousePoint, &menuItemRect);
@@ -135,35 +168,43 @@ processMenuItemMouseButtonDown(BRS_GUI_MenuItem *menuItem, SDL_MouseButtonEvent 
 static void processMenuItemMouseMove(BRS_GUI_MenuItem *menuItem, SDL_MouseMotionEvent *motion, int32_t menuItemIndex,
                                      BRS_GUI_Menu *menu, int32_t menuIndex, BRS_GUI_Widget *menuBarWidget) {
     BRS_Point mousePoint = {.x = motion->x, .y = motion->y};
-    BRS_Point position;
-    calculateMenuItemPosition(menuItem, &position, menuItemIndex, menu, menuIndex, menuBarWidget->position);
-    BRS_Rect widgetRect = {.x = position.x, .y = position.y, .width = menuItem->size->width, .height = menuItem->size->height};
+    BRS_Rect widgetRect = {.x = menuItem->position->x, .y = menuItem->position->y, .width = menuItem->size->width, .height = menuItem->size->height};
     menuItem->highlighted = BRS_PointInRect(&mousePoint, &widgetRect);
 }
 
 static void
-BRS_GUI_MenuItem_processEvent(BRS_GUI_MenuItem *menuItem, SDL_Event *event, int32_t menuItemIndex, BRS_GUI_Menu *menu,
-                              int32_t menuIndex, BRS_GUI_Widget *menuBarWidget) {
+BRS_GUI_MenuItem_processEvent(BRS_MenuBar_ProcessEventContext *context) {
+    SDL_Event *event = context->event;
+    BRS_GUI_MenuItem *menuItem = context->menuItem;
     switch (event->type) {
         case SDL_MOUSEMOTION:
-            processMenuItemMouseMove(menuItem, &event->motion, menuItemIndex, menu, menuIndex, menuBarWidget);
+            processMenuItemMouseMove(menuItem, &event->motion, context->menuItemIndex, context->menu,
+                                     context->menuIndex, context->menuBarWidget);
             break;
         case SDL_MOUSEBUTTONUP:
-            processMenuItemMouseButtonDown(menuItem, &event->button, menuItemIndex, menu, menuIndex, menuBarWidget);
+            processMenuItemMouseButtonDown(menuItem, &event->button, context->menuItemIndex, context->menu,
+                                           context->menuIndex, context->menuBarWidget);
             break;
     }
 }
 
+static void BRS_MenuItemConsumer_processEvent(BRS_GUI_MenuItem *menuItem, void *context) {
+    BRS_MenuBar_ProcessEventContext *ctx = context;
+    ctx->menuItem = menuItem;
+    BRS_GUI_MenuItem_processEvent(ctx);
+    ctx->menuItemIndex++;
+}
+
 static void
-BRS_GUI_Menu_processEvent(BRS_GUI_Menu *menu, SDL_Event *event, int32_t menuIndex, BRS_GUI_Widget *menuBarWidget) {
+BRS_GUI_Menu_processEvent(BRS_MenuBar_ProcessEventContext *context) {
+    SDL_Event *event = context->event;
+    BRS_GUI_Menu *menu = context->menu;
+
     if (event->type == SDL_MOUSEMOTION && menu->selected) {
-        BRS_Point position;
-        BRS_GUI_Menu_calcPosition(menu, &position, menuIndex, menuBarWidget->position);
-
         BRS_Size *menuItemSize = menu->itemList->firstEntry->value->size;
-        int16_t menuItemsHeight = _countMenuItems(menu) * menuItemSize->height;
+        int16_t menuItemsHeight = menu->itemList->size * menuItemSize->height;
 
-        BRS_Rect menuRect = {.x = position.x, .y = position.y, .width = menu->size->width, .height =
+        BRS_Rect menuRect = {.x = menu->position->x, .y = menu->position->y, .width = menu->size->width, .height =
         menu->size->height + menuItemsHeight};
 
         BRS_Point mousePoint = {.x = event->motion.x, .y = event->motion.y};
@@ -175,14 +216,14 @@ BRS_GUI_Menu_processEvent(BRS_GUI_Menu *menu, SDL_Event *event, int32_t menuInde
         return;
     }
 
-    BRS_GUI_MenuItemListEntry *menuItemEntry = menu->itemList->firstEntry;
-    int32_t menuItemIndex = 0;
-    while (menuItemEntry != NULL) {
-        BRS_GUI_MenuItem *menuItem = menuItemEntry->value;
-        BRS_GUI_MenuItem_processEvent(menuItem, event, menuItemIndex, menu, menuIndex, menuBarWidget);
-        menuItemEntry = menuItemEntry->next;
-        menuItemIndex++;
-    }
+    BRS_GUI_MenuItemList_iterate(menu->itemList, BRS_MenuItemConsumer_processEvent, context);
+}
+
+static void BRS_MenuConsumer_processEvent(BRS_GUI_Menu *menu, void *context) {
+    BRS_MenuBar_ProcessEventContext *ctx = context;
+    ctx->menu = menu;
+    BRS_GUI_Menu_processEvent(ctx);
+    ctx->menuIndex++;
 }
 
 bool BRS_GUI_MenuBar_processEvent(BRS_GUI_Widget *widget, SDL_Event *event) {
@@ -193,14 +234,9 @@ bool BRS_GUI_MenuBar_processEvent(BRS_GUI_Widget *widget, SDL_Event *event) {
             break;
     }
 
-    BRS_GUI_MenuListEntry *menuEntry = menuBar->menuList->firstEntry;
-    int32_t menuIndex = 0;
-    while (menuEntry != NULL) {
-        BRS_GUI_Menu *menu = menuEntry->value;
-        BRS_GUI_Menu_processEvent(menu, event, menuIndex, widget);
-        menuEntry = menuEntry->next;
-        menuIndex++;
-    }
+    BRS_MenuBar_ProcessEventContext context = {.event = event, .menuBarWidget = widget};
+    BRS_GUI_MenuList_iterate(menuBar->menuList, BRS_MenuConsumer_processEvent, &context);
+
     return false;
 }
 

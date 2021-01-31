@@ -28,6 +28,8 @@ void BRS_GUI_destroyGUI(BRS_GUI *gui);
 
 void BRS_GUI_initGUI(BRS_GUI_WidgetList *gui);
 
+void BRS_GUI_calculateGUI(BRS_VideoContext *videoContext, BRS_GUI_WidgetList *gui);
+
 void BRS_GUI_renderGUI(BRS_VideoContext *videoContext, BRS_GUI *gui);
 
 bool BRS_GUI_processEvent(BRS_GUI *gui, SDL_Event *event);

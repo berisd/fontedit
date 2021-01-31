@@ -14,6 +14,7 @@ BRS_GUI_Menu_create(BRS_Size *size, const char *label, bool selected) {
     menu->itemList = BRS_GUI_MenuItemList_create();
     menu->selected = selected;
     menu->itemList = BRS_GUI_MenuItemList_create();
+    menu->position = malloc(sizeof(BRS_Point));
     return menu;
 }
 
@@ -25,5 +26,6 @@ void BRS_GUI_Menu_destroy(BRS_GUI_Menu *menu) {
         entry = entry->next;
     }
     free(menu->size);
+    free(menu->position);
     free(menu);
 }

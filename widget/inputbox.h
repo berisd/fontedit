@@ -7,6 +7,7 @@
 
 #include "../render.h"
 #include "../theme.h"
+#include "widget.h"
 
 typedef struct _BRS_GUI_InputBox BRS_GUI_InputBox;
 
@@ -15,9 +16,6 @@ typedef void (*BRS_GUI_InputBox_ConfirmHandler)(BRS_GUI_InputBox *);
 typedef void (*BRS_GUI_InputBox_CancelHandler)(BRS_GUI_InputBox *);
 
 struct _BRS_GUI_InputBox {
-    BRS_Point *position;
-    BRS_Size *size;
-    BRS_GUI_Theme *theme;
     const char *title;
     const char *textLabel;
     uint8_t *text;
@@ -27,14 +25,15 @@ struct _BRS_GUI_InputBox {
 };
 
 BRS_GUI_InputBox *
-BRS_GUI_InputBox_create(BRS_Point *position, BRS_Size *size, const BRS_GUI_Theme *theme, const char *title,
-                        const char *textLabel);
+BRS_GUI_InputBox_create(const char *title, const char *textLabel);
 
 void BRS_GUI_InputBox_destroy(BRS_GUI_InputBox *inputBox);
 
-void BRS_GUI_InputBox_render(BRS_VideoContext *context, BRS_GUI_InputBox *inputBox);
+void BRS_GUI_InputBox_render(BRS_VideoContext *context, BRS_GUI_Widget *widget);
 
-bool BRS_GUI_InputBox_processEvent(BRS_GUI_InputBox *inputBox, SDL_Event *event);
+bool BRS_GUI_InputBox_processEvent(BRS_GUI_Widget *widget, SDL_Event *event);
+
+BRS_GUI_InputBox *BRS_GUI_InputBox_getFromWidget(BRS_GUI_Widget *widget);
 
 void BRS_GUI_InputBox_clearText(BRS_GUI_InputBox *inputBox);
 

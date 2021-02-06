@@ -141,7 +141,7 @@ void BRS_FontEdit_quitApplication() {
 }
 
 BRS_GUI_WidgetList *BRS_FontEdit_getWidgetList() {
-    return applicationState->gui;
+    return applicationState->gui->widgetList;
 }
 
 int main() {

@@ -8,7 +8,9 @@
 #include "widget/widget.h"
 #include "theme.h"
 
-typedef BRS_GUI_WidgetList BRS_GUI;
+typedef struct _BRS_GUI {
+    BRS_GUI_WidgetList *widgetList;
+} BRS_GUI;
 
 // External
 extern BRS_GUI_WidgetList *BRS_FontEdit_getWidgetList();
@@ -26,9 +28,9 @@ BRS_GUI *BRS_GUI_createGUI(BRS_GUI_Theme *theme, BRS_Font *fontEdited, uint32_t 
 
 void BRS_GUI_destroyGUI(BRS_GUI *gui);
 
-void BRS_GUI_initGUI(BRS_GUI_WidgetList *gui);
+void BRS_GUI_initGUI(BRS_GUI *gui);
 
-void BRS_GUI_calculateGUI(BRS_VideoContext *videoContext, BRS_GUI_WidgetList *gui);
+void BRS_GUI_calculateGUI(BRS_VideoContext *videoContext, BRS_GUI *gui);
 
 void BRS_GUI_renderGUI(BRS_VideoContext *videoContext, BRS_GUI *gui);
 

@@ -146,23 +146,29 @@ BRS_GUI_createGUI(BRS_GUI_Theme *theme, BRS_Font *fontEdited, uint32_t screenWid
     BRS_Point windowOrigin = {.x = 0, .y=0};
     BRS_Size windowSize = {.width = screenWidth, .height = screenHeight};
     BRS_GUI_Widget *window = createMainWindow(theme, fontEdited, &windowOrigin, &windowSize);
-    BRS_GUI_WidgetList *list = BRS_GUI_WidgetList_create();
-    BRS_GUI_WidgetList_push(window, list);
-    return list;
+    BRS_GUI_WidgetList *widgetList = BRS_GUI_WidgetList_create();
+    BRS_GUI_WidgetList_push(window, widgetList);
+
+    BRS_GUI *gui = malloc(sizeof(BRS_GUI));
+    gui->widgetList = widgetList;
+
+    return gui;
 }
 
-void BRS_GUI_initGUI(BRS_GUI_WidgetList *gui) {
+void BRS_GUI_initGUI(BRS_GUI *gui) {
     BRS_GUI_CharTable_setSelectedCharIndex(
-            BRS_GUI_CharTable_getFromWidget(BRS_GUI_Widget_getByType(BRS_GUI_WIDGET_CHARTABLE, gui)), 0);
+            BRS_GUI_CharTable_getFromWidget(BRS_GUI_Widget_getByType(BRS_GUI_WIDGET_CHARTABLE, gui->widgetList)), 0);
 }
 
-void BRS_GUI_destroyGUI(BRS_GUI_WidgetList *gui) {
-    BRS_GUI_WidgetListEntry *entry = gui->firstEntry;
+void BRS_GUI_destroyGUI(BRS_GUI *gui) {
+    BRS_GUI_WidgetList *widgetList = gui->widgetList;
+    BRS_GUI_WidgetListEntry *entry = widgetList->firstEntry;
     while (entry != NULL) {
         BRS_GUI_Widget_destroy(entry->value);
         entry = entry->next;
     }
-    BRS_GUI_WidgetList_destroy(gui);
+    BRS_GUI_WidgetList_destroy(widgetList);
+    free(gui);
 }
 
 static void BRS_GUI_renderWidgetList(BRS_VideoContext *videoContext, BRS_GUI_WidgetList *widgetList) {
@@ -185,12 +191,12 @@ static void BRS_GUI_calculateWidgetList(BRS_VideoContext *videoContext, BRS_GUI_
     }
 }
 
-void BRS_GUI_calculateGUI(BRS_VideoContext *videoContext, BRS_GUI_WidgetList *gui) {
-    BRS_GUI_calculateWidgetList(videoContext, gui);
+void BRS_GUI_calculateGUI(BRS_VideoContext *videoContext, BRS_GUI *gui) {
+    BRS_GUI_calculateWidgetList(videoContext, gui->widgetList);
 }
 
-void BRS_GUI_renderGUI(BRS_VideoContext *videoContext, BRS_GUI_WidgetList *gui) {
-    BRS_GUI_renderWidgetList(videoContext, gui);
+void BRS_GUI_renderGUI(BRS_VideoContext *videoContext, BRS_GUI *gui) {
+    BRS_GUI_renderWidgetList(videoContext, gui->widgetList);
 }
 
 static bool BRS_GUI_processEventForList(BRS_GUI_WidgetList *widgetList, SDL_Event *event) {
@@ -209,5 +215,5 @@ static bool BRS_GUI_processEventForList(BRS_GUI_WidgetList *widgetList, SDL_Even
 }
 
 bool BRS_GUI_processEvent(BRS_GUI *gui, SDL_Event *event) {
-    return BRS_GUI_processEventForList(gui, event);
+    return BRS_GUI_processEventForList(gui->widgetList, event);
 }

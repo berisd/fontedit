@@ -27,11 +27,12 @@ static int32_t calcTableHeight(BRS_GUI_CharEdit *charEdit) {
 }
 
 static void calcGridPosition(GridPosition *gridPosition, BRS_GUI_Widget *widget, BRS_Point *mousePoint) {
+    BRS_GUI_Widget_Properties *widgetProps = widget->properties;
     int32_t cellWidth = calcCellWidth();
     int32_t cellHeight = calcCellHeight();
 
-    int32_t relX = mousePoint->x - widget->position->x;
-    int32_t relY = mousePoint->y - widget->position->y;
+    int32_t relX = mousePoint->x - widgetProps->position->x;
+    int32_t relY = mousePoint->y - widgetProps->position->y;
 
     gridPosition->columnIndex = relX / cellWidth;
     gridPosition->rowIndex = relY / cellHeight;
@@ -51,11 +52,12 @@ void BRS_GUI_CharEdit_destroy(BRS_GUI_CharEdit *charEdit) {
 }
 
 static void drawTableBorder(BRS_VideoContext *context, BRS_GUI_Widget *widget) {
+    BRS_GUI_Widget_Properties *widgetProps = widget->properties;
     BRS_GUI_CharEdit *charEdit = widget->object;
-    BRS_setColor(context, widget->theme->charEditForeColor);
+    BRS_setColor(context, widgetProps->theme->charEditForeColor);
     BRS_Rect rect = {
-            .x = widget->position->x,
-            .y = widget->position->y,
+            .x = widgetProps->position->x,
+            .y = widgetProps->position->y,
             .width = charEdit->fontEdited->width_bits * (PIXELS_PER_DOT + PIXELS_PADDING * 2 + PIXELS_BORDER * 2),
             .height = charEdit->fontEdited->height_bits * (PIXELS_PER_DOT + PIXELS_PADDING * 2 + PIXELS_BORDER * 2)
     };
@@ -63,15 +65,16 @@ static void drawTableBorder(BRS_VideoContext *context, BRS_GUI_Widget *widget) {
 }
 
 static void drawVerticalLines(const BRS_VideoContext *context, const BRS_GUI_Widget *widget) {
+    BRS_GUI_Widget_Properties *widgetProps = widget->properties;
     BRS_GUI_CharEdit *charEdit = widget->object;
     uint32_t i;
-    BRS_Point p1 = {.x = widget->position->x, .y = widget->position->y};
-    BRS_Point p2 = {.x = widget->position->x, .y = widget->position->y +
-                                                     charEdit->fontEdited->height_bits *
-                                                     (PIXELS_PER_DOT + PIXELS_PADDING * 2 + PIXELS_BORDER * 2)};
+    BRS_Point p1 = {.x = widgetProps->position->x, .y = widgetProps->position->y};
+    BRS_Point p2 = {.x = widgetProps->position->x, .y = widgetProps->position->y +
+                                                        charEdit->fontEdited->height_bits *
+                                                        (PIXELS_PER_DOT + PIXELS_PADDING * 2 + PIXELS_BORDER * 2)};
     BRS_Line line = {.p1 = &p1, .p2 = &p2};
     int32_t x_diff = PIXELS_PER_DOT + PIXELS_PADDING * 2 + PIXELS_BORDER * 2;
-    BRS_setColor(context, widget->theme->charEditForeColor);
+    BRS_setColor(context, widgetProps->theme->charEditForeColor);
     for (i = 0; i < charEdit->fontEdited->width_bits; i++) {
         BRS_drawline(context, &line);
         line.p1->x += x_diff;
@@ -80,15 +83,16 @@ static void drawVerticalLines(const BRS_VideoContext *context, const BRS_GUI_Wid
 }
 
 static void drawHorizontalLines(const BRS_VideoContext *context, const BRS_GUI_Widget *widget) {
+    BRS_GUI_Widget_Properties *widgetProps = widget->properties;
     BRS_GUI_CharEdit *charEdit = widget->object;
     uint32_t i;
-    BRS_Point p1 = {.x = widget->position->x, .y = widget->position->y};
-    BRS_Point p2 = {.x = widget->position->x +
+    BRS_Point p1 = {.x = widgetProps->position->x, .y = widgetProps->position->y};
+    BRS_Point p2 = {.x = widgetProps->position->x +
                          charEdit->fontEdited->width_bits *
-                         (PIXELS_PER_DOT + PIXELS_PADDING * 2 + PIXELS_BORDER * 2), .y = widget->position->y};
+                         (PIXELS_PER_DOT + PIXELS_PADDING * 2 + PIXELS_BORDER * 2), .y = widgetProps->position->y};
     BRS_Line line = {.p1 = &p1, .p2 = &p2};
     int32_t y_diff = PIXELS_PER_DOT + PIXELS_PADDING * 2 + PIXELS_BORDER * 2;
-    BRS_setColor(context, widget->theme->charEditForeColor);
+    BRS_setColor(context, widgetProps->theme->charEditForeColor);
     for (i = 0; i < charEdit->fontEdited->height_bits; i++) {
         BRS_drawline(context, &line);
         line.p1->y += y_diff;
@@ -97,12 +101,13 @@ static void drawHorizontalLines(const BRS_VideoContext *context, const BRS_GUI_W
 }
 
 static void drawDotsForChar(const BRS_VideoContext *context, const BRS_GUI_Widget *widget) {
+    BRS_GUI_Widget_Properties *widgetProps = widget->properties;
     BRS_GUI_CharEdit *charEdit = widget->object;
     BRS_Font *font = charEdit->fontEdited;
     int32_t ch = charEdit->selectedChar;
     int16_t fontCharPos = ch * font->height_bits;
-    BRS_Rect rect = {.x= widget->position->x, .y=widget->position->y, .width=PIXELS_PER_DOT, .height=PIXELS_PER_DOT};
-    BRS_setColor(context, widget->theme->charEditDotColor);
+    BRS_Rect rect = {.x= widgetProps->position->x, .y=widgetProps->position->y, .width=PIXELS_PER_DOT, .height=PIXELS_PER_DOT};
+    BRS_setColor(context, widgetProps->theme->charEditDotColor);
     for (int fontCharByteCounter = 0; fontCharByteCounter < font->height_bits; fontCharByteCounter++) {
         uint8_t fontCharByte = font->data[fontCharPos + fontCharByteCounter];
         for (int fontCharBitCounter = 0; fontCharBitCounter < font->width_bits; fontCharBitCounter++) {
@@ -115,16 +120,17 @@ static void drawDotsForChar(const BRS_VideoContext *context, const BRS_GUI_Widge
             rect.x += PIXELS_PER_DOT + PIXELS_PADDING * 2 + PIXELS_BORDER * 2;
         }
         rect.y += PIXELS_PER_DOT + PIXELS_PADDING * 2 + PIXELS_BORDER * 2;
-        rect.x = widget->position->x;
+        rect.x = widgetProps->position->x;
     }
 }
 
 static void clearTable(BRS_VideoContext *context, BRS_GUI_Widget *widget) {
+    BRS_GUI_Widget_Properties *widgetProps = widget->properties;
     BRS_GUI_CharEdit *charEdit = widget->object;
-    BRS_setColor(context, widget->theme->screenColor);
+    BRS_setColor(context, widgetProps->theme->screenColor);
     BRS_Rect rect = {
-            .x = widget->position->x,
-            .y = widget->position->y,
+            .x = widgetProps->position->x,
+            .y = widgetProps->position->y,
             .width = charEdit->fontEdited->width_bits * (PIXELS_PER_DOT + PIXELS_PADDING * 2 + PIXELS_BORDER * 2),
             .height = charEdit->fontEdited->height_bits * (PIXELS_PER_DOT + PIXELS_PADDING * 2 + PIXELS_BORDER * 2)
     };
@@ -169,8 +175,9 @@ static void setCharDotAtPoint(BRS_GUI_Widget *widget, BRS_Point *mousePoint) {
 }
 
 bool BRS_GUI_CharEdit_processEvent(BRS_GUI_Widget *widget, SDL_Event *event) {
+    BRS_GUI_Widget_Properties *widgetProps = widget->properties;
     BRS_GUI_CharEdit *charEdit = widget->object;
-    BRS_Rect widgetRect = {.x = widget->position->x, .y = widget->position->y, .width = calcTableWith(
+    BRS_Rect widgetRect = {.x = widgetProps->position->x, .y = widgetProps->position->y, .width = calcTableWith(
             charEdit), .height = calcTableHeight(charEdit)};
 
     switch (event->type) {

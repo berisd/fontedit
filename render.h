@@ -31,6 +31,13 @@ typedef struct _BRS_Rect {
     int32_t height;
 } BRS_Rect;
 
+typedef struct _BRS_Padding {
+    int16_t left;
+    int16_t right;
+    int16_t top;
+    int16_t bottom;
+} BRS_Padding;
+
 void BRS_setColor(const BRS_VideoContext *context, const BRS_Color *color);
 
 void BRS_drawPoint(const BRS_VideoContext *context, const BRS_Point *point);
@@ -49,5 +56,7 @@ bool BRS_PointInRect(BRS_Point *point, BRS_Rect *rect);
 BRS_Point *BRS_copyPoint(BRS_Point *source);
 
 BRS_Size *BRS_copySize(BRS_Size *source);
+
+BRS_Padding *BRS_copyPadding(BRS_Padding *source);
 
 #endif //FONTEDIT_RENDER_H

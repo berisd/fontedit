@@ -73,3 +73,9 @@ BRS_Size *BRS_copySize(BRS_Size *source) {
     memcpy(copy, source, sizeof(source));
     return copy;
 }
+
+BRS_Padding *BRS_copyPadding(BRS_Padding *source) {
+    BRS_Padding *copy = malloc(sizeof(source));
+    memcpy(copy, source, sizeof(source));
+    return copy;
+}

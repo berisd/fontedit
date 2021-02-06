@@ -39,7 +39,7 @@ static ApplicationState *createApplicationState() {
 
 static void freeApplicationState(ApplicationState *applicationState) {
     BRS_GUI_Theme_destroy(applicationState->theme);
-    BRS_GUI_destroyGUI(applicationState->gui);
+    BRS_GUI_destroy(applicationState->gui);
     BRS_Font_destroy(applicationState->fontEdited);
     free(applicationState);
 }
@@ -53,12 +53,12 @@ static void *initApplication(const ApplicationConfig *config) {
     applicationState->videoContext = videoContext;
     applicationState->theme = BRS_GUI_Theme_create();
     applicationState->fontEdited = BRS_Font_copy(applicationState->theme->font);
-    applicationState->gui = BRS_GUI_createGUI(applicationState->theme, applicationState->fontEdited,
-                                              config->screenWidth, config->screenHeight);
+    applicationState->gui = BRS_GUI_create(applicationState->theme, applicationState->fontEdited,
+                                           config->screenWidth, config->screenHeight);
     applicationState->quit = false;
     atexit(SDL_Quit);
 
-    BRS_GUI_initGUI(applicationState->gui);
+    BRS_GUI_init(applicationState->gui);
 }
 
 static void shutdownApplication(ApplicationState *applicationState) {
@@ -82,14 +82,14 @@ static bool checkQuitApplication(SDL_Event *event) {
 static void handleVideo(ApplicationState *applicationState) {
     BRS_setColor(applicationState->videoContext, &COLOR_BLACK);
     BRS_clearVideo(applicationState->videoContext);
-    BRS_GUI_renderGUI(applicationState->videoContext, applicationState->gui);
+    BRS_GUI_render(applicationState->videoContext, applicationState->gui);
     BRS_updateVideo(applicationState->videoContext);
 }
 
 static void runApplication(ApplicationState *applicationState) {
     SDL_Event event;
     while (!applicationState->quit) {
-        BRS_GUI_calculateGUI(applicationState->videoContext, applicationState->gui);
+        BRS_GUI_calculate(applicationState->gui);
         if (SDL_PollEvent(&event) != 0) {
             if (!BRS_GUI_processEvent(applicationState->gui, &event)) {
                 if (!applicationState->quit) {

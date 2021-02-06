@@ -13,7 +13,6 @@ BRS_GUI_InputBox_create(const char *title,
     inputBox->title = title;
     inputBox->textLabel = textLabel;
     inputBox->text = malloc(MAX_TEXT_LEN);
-    inputBox->visible = false;
     inputBox->cancelHandler = NULL;
     inputBox->confirmHandler = NULL;
     return inputBox;
@@ -25,38 +24,41 @@ void BRS_GUI_InputBox_destroy(BRS_GUI_InputBox *inputBox) {
 }
 
 void BRS_GUI_InputBox_render(BRS_VideoContext *context, BRS_GUI_Widget *widget) {
+    BRS_GUI_Widget_Properties *widgetProps = widget->properties;
     BRS_GUI_InputBox *inputBox = widget->object;
-    if (inputBox->visible) {
-        BRS_Rect rect = {.x = widget->position->x, .y = widget->position->y, .width = widget->size->width, .height = widget->size->height};
-        BRS_setColor(context, widget->theme->inputBoxBackColor);
+    if (widgetProps->visible) {
+        BRS_Rect rect = {.x = widgetProps->position->x, .y = widgetProps->position->y,
+                .width = widgetProps->size->width, .height = widgetProps->size->height};
+        BRS_setColor(context, widgetProps->theme->inputBoxBackColor);
         BRS_drawlFillRect(context, &rect);
-        BRS_setColor(context, widget->theme->borderColor);
+        BRS_setColor(context, widgetProps->theme->borderColor);
         BRS_drawlRect(context, &rect);
 
-        BRS_Point titlePoint = {.x = widget->position->x + 1, .y = widget->position->y + 1};
-        BRS_setColor(context, widget->theme->inputBoxTitleForeColor);
-        BRS_drawString(context, inputBox->title, strlen(inputBox->title), widget->theme->font, &titlePoint);
+        BRS_Point titlePoint = {.x = widgetProps->position->x + 1, .y = widgetProps->position->y + 1};
+        BRS_setColor(context, widgetProps->theme->inputBoxTitleForeColor);
+        BRS_drawString(context, inputBox->title, strlen(inputBox->title), widgetProps->theme->font, &titlePoint);
 
-        BRS_Point titleLineP1 = {.x = widget->position->x + 1, .y = widget->position->y + 1 + 20};
-        BRS_Point titleLineP2 = {.x = widget->position->x + widget->size->width, .y = widget->position->y +
-                                                                                      1 + 20};
+        BRS_Point titleLineP1 = {.x = widgetProps->position->x + 1, .y = widgetProps->position->y + 1 + 20};
+        BRS_Point titleLineP2 = {.x = widgetProps->position->x + widgetProps->size->width, .y =
+        widgetProps->position->y +
+        1 + 20};
         BRS_Line titleLine = {.p1 = &titleLineP1, .p2 = &titleLineP2};
-        BRS_setColor(context, widget->theme->borderColor);
+        BRS_setColor(context, widgetProps->theme->borderColor);
         BRS_drawline(context, &titleLine);
 
-        BRS_Point textLabelPoint = {.x = widget->position->x + 1, .y = widget->position->y + 1 + 25};
-        BRS_setColor(context, widget->theme->inputBoxTextForeColor);
-        BRS_drawString(context, inputBox->textLabel, strlen(inputBox->textLabel), widget->theme->font,
+        BRS_Point textLabelPoint = {.x = widgetProps->position->x + 1, .y = widgetProps->position->y + 1 + 25};
+        BRS_setColor(context, widgetProps->theme->inputBoxTextForeColor);
+        BRS_drawString(context, inputBox->textLabel, strlen(inputBox->textLabel), widgetProps->theme->font,
                        &textLabelPoint);
 
-        BRS_Point textBeginPoint = {.x = widget->position->x + 50, .y = widget->position->y + 1 + 25};
-        BRS_drawString(context, inputBox->text, strlen(inputBox->text), widget->theme->font, &textBeginPoint);
+        BRS_Point textBeginPoint = {.x = widgetProps->position->x + 50, .y = widgetProps->position->y + 1 + 25};
+        BRS_drawString(context, inputBox->text, strlen(inputBox->text), widgetProps->theme->font, &textBeginPoint);
 
-        uint32_t textWidth = strlen(inputBox->text) * (widget->theme->font->width_bits + 1);
+        uint32_t textWidth = strlen(inputBox->text) * (widgetProps->theme->font->width_bits + 1);
 
-        BRS_Point cursorBeginPoint = {.x = textBeginPoint.x + textWidth, .y = widget->position->y + 1 + 25};
+        BRS_Point cursorBeginPoint = {.x = textBeginPoint.x + textWidth, .y = widgetProps->position->y + 1 + 25};
         BRS_Point cursorEndPoint = {.x = cursorBeginPoint.x, .y = cursorBeginPoint.y +
-                                                                  widget->theme->font->height_bits};
+                                                                  widgetProps->theme->font->height_bits};
         BRS_Line cursorLine = {.p1 = &cursorBeginPoint, .p2 = &cursorEndPoint};
         BRS_drawline(context, &cursorLine);
     }
@@ -79,7 +81,8 @@ static bool isKeycodeAlphaNumeric(SDL_Keycode keycode) {
 
 bool BRS_GUI_InputBox_processEvent(BRS_GUI_Widget *widget, SDL_Event *event) {
     BRS_GUI_InputBox *inputBox = widget->object;
-    if (!inputBox->visible) {
+    BRS_GUI_Widget_Properties *widgetProps = widget->properties;
+    if (!widgetProps->visible) {
         return false;
     }
 
@@ -94,12 +97,12 @@ bool BRS_GUI_InputBox_processEvent(BRS_GUI_Widget *widget, SDL_Event *event) {
                 inputBox->text[inputTextLength] = event->key.keysym.sym;
             }
         } else if (event->key.keysym.sym == SDLK_RETURN || event->key.keysym.sym == SDLK_KP_ENTER) {
-            inputBox->visible = false;
+            widgetProps->visible = false;
             if (inputBox->confirmHandler != NULL) {
                 inputBox->confirmHandler(inputBox);
             }
         } else if (event->key.keysym.sym == SDLK_ESCAPE) {
-            inputBox->visible = false;
+            widgetProps->visible = false;
             if (inputBox->cancelHandler != NULL) {
                 inputBox->cancelHandler(inputBox);
             }
@@ -115,8 +118,4 @@ void BRS_GUI_InputBox_setConfirmHandler(BRS_GUI_InputBox *inputBox, BRS_GUI_Inpu
 
 void BRS_GUI_InputBox_setCancelHandler(BRS_GUI_InputBox *inputBox, BRS_GUI_InputBox_CancelHandler handler) {
     inputBox->cancelHandler = handler;
-}
-
-BRS_GUI_InputBox *BRS_GUI_InputBox_getFromWidget(BRS_GUI_Widget *widget) {
-    return widget->object;
 }

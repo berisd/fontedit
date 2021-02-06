@@ -13,8 +13,6 @@ BRS_GUI_MessageBox_create(const char *title, const char *text) {
 }
 
 void BRS_GUI_MessageBox_destroy(BRS_GUI_MessageBox *messageBox) {
-    free(messageBox->position);
-    free(messageBox->size);
     free(messageBox);
 }
 

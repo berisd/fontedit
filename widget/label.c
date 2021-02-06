@@ -17,9 +17,10 @@ void BRS_GUI_Label_destroy(BRS_GUI_Label *label) {
 }
 
 void BRS_GUI_Label_render(BRS_VideoContext *context, BRS_GUI_Widget *widget) {
+    BRS_GUI_Widget_Properties *widgetProps = widget->properties;
     BRS_GUI_Label *label = widget->object;
-    BRS_setColor(context, widget->theme->labelForeColor);
-    BRS_drawString(context, label->text, strlen(label->text), widget->theme->font, widget->position);
+    BRS_setColor(context, widgetProps->theme->labelForeColor);
+    BRS_drawString(context, label->text, strlen(label->text), widgetProps->theme->font, widgetProps->position);
 }
 
 void BRS_GUI_Label_setText(BRS_GUI_Label *label, const char *text) {

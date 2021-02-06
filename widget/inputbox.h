@@ -19,7 +19,6 @@ struct _BRS_GUI_InputBox {
     const char *title;
     const char *textLabel;
     uint8_t *text;
-    bool visible;
     BRS_GUI_InputBox_ConfirmHandler confirmHandler;
     BRS_GUI_InputBox_CancelHandler cancelHandler;
 };

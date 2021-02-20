@@ -4,9 +4,17 @@
 #include "gui.h"
 #include "widget/widgets.h"
 
+static const char *WIDGET_ID_MENU_FILE = "MENU_FILE";
+static const char *WIDGET_ID_MENU_BAR = "MENU_BAR";
+static const char *WIDGET_ID_LABEL_STATUS = "LABEL_STATUS";
+static const char *WIDGET_ID_CHAR_TABLE = "CHAR_TABLE";
+static const char *WIDGET_ID_CHAR_EDIT = "CHAR_EDIT";
+static const char *WIDGET_ID_INPUT_BOX = "INPUT_BOX";
+static const char *WIDGET_ID_WINDOW_MAIN = "WINDOW_MAIN";
+
 static void onClickCharTable(BRS_GUI_Widget *widget) {
     BRS_GUI_Widget *rootWidget = BRS_GUI_Widget_findRootWidget(widget);
-    BRS_GUI_Widget *charEditWidget = BRS_GUI_Widget_findWidgetByType(BRS_GUI_WIDGET_CHAREDIT, rootWidget);
+    BRS_GUI_Widget *charEditWidget = BRS_GUI_Widget_findWidgetById(WIDGET_ID_CHAR_EDIT, rootWidget);
     BRS_GUI_CharTable *charTable = widget->object;
     ((BRS_GUI_CharEdit *) charEditWidget->object)->selectedChar = charTable->selectedCharIndex;
 }
@@ -15,7 +23,7 @@ static void onConfirmInputBoxLoad(BRS_GUI_Widget *widget) {
     BRS_GUI_InputBox *inputBox = widget->object;
     bool success = BRS_FontEdit_loadFont(inputBox->text);
     BRS_GUI_Widget *rootWidget = BRS_GUI_Widget_findRootWidget(widget);
-    BRS_GUI_Widget *label = BRS_GUI_Widget_findWidgetByType(BRS_GUI_WIDGET_LABEL, rootWidget);
+    BRS_GUI_Widget *label = BRS_GUI_Widget_findWidgetById(WIDGET_ID_LABEL_STATUS, rootWidget);
     if (success) {
         char str[255];
         sprintf(str, "Font %s loaded successfully!", inputBox->text);
@@ -29,7 +37,7 @@ static void onConfirmInputBoxSave(BRS_GUI_Widget *widget) {
     BRS_GUI_InputBox *inputBox = widget->object;
     bool success = BRS_FontEdit_saveFont(inputBox->text);
     BRS_GUI_Widget *rootWidget = BRS_GUI_Widget_findRootWidget(widget);
-    BRS_GUI_Widget *label = BRS_GUI_Widget_findWidgetByType(BRS_GUI_WIDGET_LABEL, rootWidget);
+    BRS_GUI_Widget *label = BRS_GUI_Widget_findWidgetById(WIDGET_ID_LABEL_STATUS, rootWidget);
     if (success) {
         char str[255];
         sprintf(str, "Font %s saved successfully!", inputBox->text);
@@ -45,13 +53,13 @@ static void onCancelInputBox(BRS_GUI_Widget *widget) {
 static void onChangeCharTableSelectedCharIndex(BRS_GUI_Widget *widget) {
     BRS_GUI_CharTable *charTable = widget->object;
     BRS_GUI_Widget *rootWidget = BRS_GUI_Widget_findRootWidget(widget);
-    BRS_GUI_Widget *charEditWidget = BRS_GUI_Widget_findWidgetByType(BRS_GUI_WIDGET_CHAREDIT, rootWidget);
+    BRS_GUI_Widget *charEditWidget = BRS_GUI_Widget_findWidgetById(WIDGET_ID_CHAR_EDIT, rootWidget);
     ((BRS_GUI_CharEdit *) charEditWidget->object)->selectedChar = charTable->selectedCharIndex;
 }
 
 static void onClickMenuItemLoad(BRS_GUI_Widget *widget) {
     BRS_GUI_Widget *rootWidget = BRS_GUI_Widget_findRootWidget(widget);
-    BRS_GUI_Widget *inputBoxWidget = BRS_GUI_Widget_findWidgetByType(BRS_GUI_WIDGET_INPUTBOX, rootWidget);
+    BRS_GUI_Widget *inputBoxWidget = BRS_GUI_Widget_findWidgetById(WIDGET_ID_INPUT_BOX, rootWidget);
     BRS_GUI_InputBox *inputBox = inputBoxWidget->object;
     BRS_GUI_InputBox_setConfirmHandler(inputBoxWidget, onConfirmInputBoxLoad);
     inputBox->title = "Load file";
@@ -62,7 +70,7 @@ static void onClickMenuItemLoad(BRS_GUI_Widget *widget) {
 
 static void onClickMenuItemSave(BRS_GUI_Widget *widget) {
     BRS_GUI_Widget *rootWidget = BRS_GUI_Widget_findRootWidget(widget);
-    BRS_GUI_Widget *inputBoxWidget = BRS_GUI_Widget_findWidgetByType(BRS_GUI_WIDGET_INPUTBOX, rootWidget);
+    BRS_GUI_Widget *inputBoxWidget = BRS_GUI_Widget_findWidgetById(WIDGET_ID_INPUT_BOX, rootWidget);
     BRS_GUI_InputBox *inputBox = inputBoxWidget->object;
     BRS_GUI_InputBox_setConfirmHandler(inputBoxWidget, onConfirmInputBoxSave);
     inputBox->title = "Save file";
@@ -73,10 +81,10 @@ static void onClickMenuItemSave(BRS_GUI_Widget *widget) {
 
 static void onClickMenuItemNew(BRS_GUI_Widget *widget) {
     BRS_GUI_Widget *rootWidget = BRS_GUI_Widget_findRootWidget(widget);
-    BRS_GUI_Widget *label = BRS_GUI_Widget_findWidgetByType(BRS_GUI_WIDGET_LABEL, rootWidget);
+    BRS_GUI_Widget *label = BRS_GUI_Widget_findWidgetById(WIDGET_ID_LABEL_STATUS, rootWidget);
     BRS_FontEdit_createFont();
     BRS_GUI_Label_setText(label, "New font created!");
-    BRS_GUI_Widget *charTableWidget = BRS_GUI_Widget_findWidgetByType(BRS_GUI_WIDGET_CHARTABLE, rootWidget);
+    BRS_GUI_Widget *charTableWidget = BRS_GUI_Widget_findWidgetById(WIDGET_ID_CHAR_TABLE, rootWidget);
     BRS_GUI_CharTable_setSelectedCharIndex(charTableWidget, 0);
 }
 
@@ -85,7 +93,7 @@ static void onClickMenuItemQuit(BRS_GUI_Widget *widget) {
 }
 
 static BRS_GUI_Widget *createFileMenu(BRS_GUI_Widget *menuBarWidget) {
-    BRS_GUI_Widget_Properties *widgetFileMenuProps = BRS_GUI_Widget_Properties_create();
+    BRS_GUI_Widget_Properties *widgetFileMenuProps = BRS_GUI_Widget_Properties_create(WIDGET_ID_MENU_FILE);
     widgetFileMenuProps->size->width = 100;
     widgetFileMenuProps->size->height = 20;
     widgetFileMenuProps->padding->left = 5;
@@ -112,7 +120,7 @@ static BRS_GUI_Widget *createFileMenu(BRS_GUI_Widget *menuBarWidget) {
 }
 
 static BRS_GUI_Widget *createMenuBar(BRS_GUI_Theme *theme, BRS_GUI_Widget *parent) {
-    BRS_GUI_Widget_Properties *widgetProps = BRS_GUI_Widget_Properties_create();
+    BRS_GUI_Widget_Properties *widgetProps = BRS_GUI_Widget_Properties_create(WIDGET_ID_MENU_BAR);
     widgetProps->size->width = 800;
     widgetProps->size->height = 20;
     widgetProps->theme = theme;
@@ -125,7 +133,7 @@ static BRS_GUI_Widget *createMenuBar(BRS_GUI_Theme *theme, BRS_GUI_Widget *paren
 }
 
 static BRS_GUI_Widget *createLabelStatus(BRS_GUI_Theme *theme, BRS_Size *windowSize, BRS_GUI_Widget *parent) {
-    BRS_GUI_Widget_Properties *widgetProps = BRS_GUI_Widget_Properties_create();
+    BRS_GUI_Widget_Properties *widgetProps = BRS_GUI_Widget_Properties_create(WIDGET_ID_LABEL_STATUS);
     widgetProps->position->x = 1;
     widgetProps->position->y = windowSize->height - theme->font->height_bits - 1;
     widgetProps->theme = theme;
@@ -137,7 +145,7 @@ static BRS_GUI_Widget *createLabelStatus(BRS_GUI_Theme *theme, BRS_Size *windowS
 }
 
 static BRS_GUI_Widget *createCharTable(BRS_GUI_Theme *theme, BRS_Font *fontEdited, BRS_GUI_Widget *parent) {
-    BRS_GUI_Widget_Properties *widgetProps = BRS_GUI_Widget_Properties_create();
+    BRS_GUI_Widget_Properties *widgetProps = BRS_GUI_Widget_Properties_create(WIDGET_ID_CHAR_TABLE);
     widgetProps->position->x = 10;
     widgetProps->position->y = 60;
     widgetProps->theme = theme;
@@ -150,7 +158,7 @@ static BRS_GUI_Widget *createCharTable(BRS_GUI_Theme *theme, BRS_Font *fontEdite
 }
 
 static BRS_GUI_Widget *createCharEdit(BRS_GUI_Theme *theme, BRS_Font *fontEdited, BRS_GUI_Widget *parent) {
-    BRS_GUI_Widget_Properties *widgetProps = BRS_GUI_Widget_Properties_create();
+    BRS_GUI_Widget_Properties *widgetProps = BRS_GUI_Widget_Properties_create(WIDGET_ID_CHAR_EDIT);
     widgetProps->position->x = 500;
     widgetProps->position->y = 50;
     widgetProps->theme = theme;
@@ -162,7 +170,7 @@ static BRS_GUI_Widget *createCharEdit(BRS_GUI_Theme *theme, BRS_Font *fontEdited
 }
 
 static BRS_GUI_Widget *createInputBox(BRS_GUI_Theme *theme, BRS_Size *windowSize, BRS_GUI_Widget *parent) {
-    BRS_GUI_Widget_Properties *widgetProps = BRS_GUI_Widget_Properties_create();
+    BRS_GUI_Widget_Properties *widgetProps = BRS_GUI_Widget_Properties_create(WIDGET_ID_INPUT_BOX);
     widgetProps->size->width = 200;
     widgetProps->size->height = 100;
     widgetProps->position->x = (windowSize->width - widgetProps->size->width) / 2;
@@ -177,7 +185,7 @@ static BRS_GUI_Widget *createInputBox(BRS_GUI_Theme *theme, BRS_Size *windowSize
 
 static BRS_GUI_Widget *
 createMainWindow(BRS_GUI_Theme *theme, uint32_t screenWidth, uint32_t screenHeight) {
-    BRS_GUI_Widget_Properties *widgetProps = BRS_GUI_Widget_Properties_create();
+    BRS_GUI_Widget_Properties *widgetProps = BRS_GUI_Widget_Properties_create(WIDGET_ID_WINDOW_MAIN);
     widgetProps->size->width = screenWidth;
     widgetProps->size->height = screenHeight;
     widgetProps->theme = theme;

@@ -14,7 +14,7 @@
 typedef struct _BRS_GUI_Menu BRS_GUI_Menu;
 
 struct _BRS_GUI_Menu {
-    const char *label;
+    char *label;
 };
 
 BRS_LIST_DECL(BRS_GUI_MenuList, BRS_GUI_Menu)

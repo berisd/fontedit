@@ -15,8 +15,8 @@ struct _BRS_GUI_MessageBox {
     BRS_Point *position;
     BRS_Size *size;
     BRS_GUI_Theme *theme;
-    const char *title;
-    const char *text;
+    char *title;
+    char *text;
 };
 
 BRS_GUI_MessageBox *

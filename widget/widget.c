@@ -196,7 +196,7 @@ BRS_GUI_Widget *BRS_GUI_Widget_getByData(void *data, BRS_GUI_WidgetList *widgetL
     return NULL;
 }
 
-BRS_GUI_Widget_Properties *BRS_GUI_Widget_Properties_create() {
+BRS_GUI_Widget_Properties *BRS_GUI_Widget_Properties_create(const char *id) {
     BRS_GUI_Widget_Properties *properties = malloc(sizeof(BRS_GUI_Widget_Properties));
 
     BRS_Point position = {.x = 0, .y = 0};
@@ -211,6 +211,7 @@ BRS_GUI_Widget_Properties *BRS_GUI_Widget_Properties_create() {
     properties->theme = NULL;
     properties->zIndex = 0;
     properties->visible = false;
+    properties->id = (char *)id;
 
     return properties;
 }
@@ -258,14 +259,14 @@ BRS_GUI_Widget *BRS_GUI_Widget_findRootWidget(BRS_GUI_Widget *widget) {
     return currentWidget;
 }
 
-static BRS_GUI_Widget *BRS_GUI_Widget_getByTypeFromList(BRS_GUI_WidgetType type, BRS_GUI_WidgetList *widgetList) {
+static BRS_GUI_Widget *BRS_GUI_Widget_getByIdFromList(const char *id, BRS_GUI_WidgetList *widgetList) {
     BRS_GUI_WidgetListEntry *entry = widgetList->firstEntry;
     while (entry != NULL) {
         BRS_GUI_Widget *widget = entry->value;
-        if (widget->type == type) {
+        if (strcmp(widget->properties->id, id) == 0) {
             return widget;
         }
-        BRS_GUI_Widget *widgetFound = BRS_GUI_Widget_getByTypeFromList(type, widget->children);
+        BRS_GUI_Widget *widgetFound = BRS_GUI_Widget_getByIdFromList(id, widget->children);
         if (widgetFound != NULL) {
             return widgetFound;
         }
@@ -274,14 +275,14 @@ static BRS_GUI_Widget *BRS_GUI_Widget_getByTypeFromList(BRS_GUI_WidgetType type,
     return NULL;
 }
 
-BRS_GUI_Widget *BRS_GUI_Widget_findWidgetByType(BRS_GUI_WidgetType widgetType, BRS_GUI_Widget *rootWidget) {
+BRS_GUI_Widget *BRS_GUI_Widget_findWidgetById(const char *id, BRS_GUI_Widget *rootWidget) {
     if (rootWidget == NULL) {
         return NULL;
     }
 
-    if (rootWidget->type == widgetType) {
+    if (strcmp(rootWidget->properties->id, id) == 0) {
         return rootWidget;
     } else {
-        return BRS_GUI_Widget_getByTypeFromList(widgetType, rootWidget->children);
+        return BRS_GUI_Widget_getByIdFromList(id, rootWidget->children);
     }
 }

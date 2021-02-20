@@ -7,8 +7,8 @@
 BRS_GUI_MessageBox *
 BRS_GUI_MessageBox_create(const char *title, const char *text) {
     BRS_GUI_MessageBox *messageBox = malloc(sizeof(BRS_GUI_MessageBox));
-    messageBox->title = title;
-    messageBox->text = text;
+    messageBox->title = (char *)title;
+    messageBox->text = (char *)text;
     return messageBox;
 }
 

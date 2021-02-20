@@ -11,7 +11,7 @@ const char *BRS_GUI_MENU_ACTION_HIDE = "CLOSE_MENU";
 BRS_GUI_Menu *
 BRS_GUI_Menu_create(const char *label) {
     BRS_GUI_Menu *menu = malloc(sizeof(BRS_GUI_Menu));
-    menu->label = label;
+    menu->label = (char *)label;
     return menu;
 }
 

@@ -21,7 +21,7 @@ void BRS_GUI_Label_destroy(BRS_GUI_Label *label);
 
 void BRS_GUI_Label_render(BRS_VideoContext *context, BRS_GUI_Widget *widget);
 
-void BRS_GUI_Label_setText(BRS_GUI_Label* label, const char *text);
+void BRS_GUI_Label_setText(BRS_GUI_Widget *widget, const char *text);
 
 BRS_GUI_Label *BRS_GUI_Label_getFromWidget(BRS_GUI_Widget *widget);
 

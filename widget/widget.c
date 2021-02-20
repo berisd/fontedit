@@ -15,6 +15,7 @@ createWidget(BRS_GUI_WidgetType type, BRS_GUI_Widget_Properties *properties, voi
     widget->object = object;
     widget->children = BRS_GUI_WidgetList_create();
     widget->parent = parent;
+    widget->clickHandler = NULL;
     return widget;
 }
 
@@ -25,38 +26,45 @@ BRS_GUI_Widget_createWindow(BRS_GUI_Widget_Properties *properties) {
 }
 
 BRS_GUI_Widget *
-BRS_GUI_Widget_createLabel(BRS_GUI_Widget_Properties *properties, const char *text) {
-    return createWidget(BRS_GUI_WIDGET_LABEL, properties, BRS_GUI_Label_create(text), NULL);
+BRS_GUI_Widget_createLabel(BRS_GUI_Widget_Properties *properties, const char *text, BRS_GUI_Widget *parent) {
+    return createWidget(BRS_GUI_WIDGET_LABEL, properties, BRS_GUI_Label_create(text), parent);
 }
 
 BRS_GUI_Widget *
-BRS_GUI_Widget_createMessageBox(BRS_GUI_Widget_Properties *properties, const char *title, const char *text) {
-    return createWidget(BRS_GUI_WIDGET_MESSAGEBOX, properties, BRS_GUI_MessageBox_create(title, text), NULL);
+BRS_GUI_Widget_createMessageBox(BRS_GUI_Widget_Properties *properties, const char *title, const char *text, BRS_GUI_Widget *parent) {
+    return createWidget(BRS_GUI_WIDGET_MESSAGEBOX, properties, BRS_GUI_MessageBox_create(title, text), parent);
 }
 
 BRS_GUI_Widget *
-BRS_GUI_Widget_createInputBox(BRS_GUI_Widget_Properties *properties, const char *title, const char *textLabel) {
-    return createWidget(BRS_GUI_WIDGET_INPUTBOX, properties, BRS_GUI_InputBox_create(title, textLabel), NULL);
+BRS_GUI_Widget_createInputBox(BRS_GUI_Widget_Properties *properties, const char *title, const char *textLabel, BRS_GUI_Widget *parent) {
+    return createWidget(BRS_GUI_WIDGET_INPUTBOX, properties, BRS_GUI_InputBox_create(title, textLabel), parent);
 }
 
 BRS_GUI_Widget *
-BRS_GUI_Widget_createMenuBar(BRS_GUI_Widget_Properties *properties) {
-    return createWidget(BRS_GUI_WIDGET_MENUBAR, properties, BRS_GUI_MenuBar_create(), NULL);
+BRS_GUI_Widget_createMenuBar(BRS_GUI_Widget_Properties *properties, BRS_GUI_Widget *parent) {
+    return createWidget(BRS_GUI_WIDGET_MENUBAR, properties, BRS_GUI_MenuBar_create(), parent);
 }
 
 BRS_GUI_Widget *
-BRS_GUI_Widget_createMenu(BRS_GUI_Widget_Properties *properties, void *menu, BRS_GUI_Widget *parentWidget) {
-    return createWidget(BRS_GUI_WIDGET_MENU, properties, menu, parentWidget);
+BRS_GUI_Widget_createMenu(BRS_GUI_Widget_Properties *properties, void *menu, BRS_GUI_Widget *parent) {
+    return createWidget(BRS_GUI_WIDGET_MENU, properties, menu, parent);
 }
 
 BRS_GUI_Widget *
-BRS_GUI_Widget_createCharTable(BRS_GUI_Widget_Properties *properties, BRS_Font *fontEdited) {
-    return createWidget(BRS_GUI_WIDGET_CHARTABLE, properties, BRS_GUI_CharTable_create(fontEdited), NULL);
+BRS_GUI_Widget_createMenuItem(BRS_GUI_Widget_Properties *properties, void *menuItem, BRS_GUI_Widget *parentWidget) {
+    BRS_GUI_Widget *menuItemWidget = createWidget(BRS_GUI_WIDGET_MENU_ITEM, properties, menuItem, parentWidget);
+    BRS_GUI_WidgetList_push(menuItemWidget, parentWidget->children);
+    return menuItemWidget;
 }
 
 BRS_GUI_Widget *
-BRS_GUI_Widget_createCharEdit(BRS_GUI_Widget_Properties *properties, BRS_Font *fontEdited) {
-    return createWidget(BRS_GUI_WIDGET_CHAREDIT, properties, BRS_GUI_CharEdit_create(fontEdited), NULL);
+BRS_GUI_Widget_createCharTable(BRS_GUI_Widget_Properties *properties, BRS_Font *fontEdited, BRS_GUI_Widget *parent) {
+    return createWidget(BRS_GUI_WIDGET_CHARTABLE, properties, BRS_GUI_CharTable_create(fontEdited), parent);
+}
+
+BRS_GUI_Widget *
+BRS_GUI_Widget_createCharEdit(BRS_GUI_Widget_Properties *properties, BRS_Font *fontEdited, BRS_GUI_Widget *parent) {
+    return createWidget(BRS_GUI_WIDGET_CHAREDIT, properties, BRS_GUI_CharEdit_create(fontEdited), parent);
 }
 
 void BRS_GUI_Widget_calculate(BRS_GUI_Widget *widget, BRS_GUI_Widget *parentWidget, int32_t widgetIndex) {
@@ -152,12 +160,8 @@ void BRS_GUI_Widget_destroy(BRS_GUI_Widget *widget) {
     free(widget);
 }
 
-void BRS_GUI_Widget_setClickHandler(BRS_GUI_Widget *widget, void *handler) {
-    switch (widget->type) {
-        case BRS_GUI_WIDGET_CHARTABLE:
-            ((BRS_GUI_CharTable *) widget->object)->clickHandler = handler;
-            break;
-    }
+void BRS_GUI_Widget_setClickHandler(BRS_GUI_Widget *widget, BRS_GUI_Widget_ClickHandler handler) {
+    widget->clickHandler = handler;
 }
 
 BRS_GUI_Widget *BRS_GUI_Widget_getByType(BRS_GUI_WidgetType type, BRS_GUI_WidgetList *widgetList) {
@@ -211,6 +215,20 @@ BRS_GUI_Widget_Properties *BRS_GUI_Widget_Properties_create() {
     return properties;
 }
 
+BRS_GUI_Widget_Properties *BRS_GUI_Widget_Properties_copy(BRS_GUI_Widget_Properties* source) {
+    BRS_GUI_Widget_Properties *properties = malloc(sizeof(BRS_GUI_Widget_Properties));
+
+    properties->position = BRS_copyPoint(source->position);
+    properties->size = BRS_copySize(source->size);
+    properties->padding = BRS_copyPadding(source->padding);
+
+    properties->theme = source->theme;
+    properties->zIndex = source->zIndex;
+    properties->visible = source->visible;
+
+    return properties;
+}
+
 void BRS_GUI_Widget_Properties_destroy(BRS_GUI_Widget_Properties *properties) {
     free(properties->padding);
     free(properties->position);
@@ -226,5 +244,44 @@ void BRS_GUI_Widget_executeAction(BRS_GUI_Widget *widget, const char *action) {
         case BRS_GUI_WIDGET_MENUBAR:
             BRS_GUI_MenuBar_executeAction(widget, action);
             break;
+    }
+}
+
+BRS_GUI_Widget *BRS_GUI_Widget_findRootWidget(BRS_GUI_Widget *widget) {
+    if (widget == NULL) {
+        return NULL;
+    }
+    BRS_GUI_Widget *currentWidget = widget;
+    while (currentWidget->parent != NULL) {
+        currentWidget = currentWidget->parent;
+    }
+    return currentWidget;
+}
+
+static BRS_GUI_Widget *BRS_GUI_Widget_getByTypeFromList(BRS_GUI_WidgetType type, BRS_GUI_WidgetList *widgetList) {
+    BRS_GUI_WidgetListEntry *entry = widgetList->firstEntry;
+    while (entry != NULL) {
+        BRS_GUI_Widget *widget = entry->value;
+        if (widget->type == type) {
+            return widget;
+        }
+        BRS_GUI_Widget *widgetFound = BRS_GUI_Widget_getByTypeFromList(type, widget->children);
+        if (widgetFound != NULL) {
+            return widgetFound;
+        }
+        entry = entry->next;
+    }
+    return NULL;
+}
+
+BRS_GUI_Widget *BRS_GUI_Widget_findWidgetByType(BRS_GUI_WidgetType widgetType, BRS_GUI_Widget *rootWidget) {
+    if (rootWidget == NULL) {
+        return NULL;
+    }
+
+    if (rootWidget->type == widgetType) {
+        return rootWidget;
+    } else {
+        return BRS_GUI_Widget_getByTypeFromList(widgetType, rootWidget->children);
     }
 }

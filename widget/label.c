@@ -23,7 +23,8 @@ void BRS_GUI_Label_render(BRS_VideoContext *context, BRS_GUI_Widget *widget) {
     BRS_drawString(context, label->text, strlen(label->text), widgetProps->theme->font, widgetProps->position);
 }
 
-void BRS_GUI_Label_setText(BRS_GUI_Label *label, const char *text) {
+void BRS_GUI_Label_setText(BRS_GUI_Widget *widget, const char *text) {
+    BRS_GUI_Label *label = widget->object;
     memset(label->text, 0, 255);
     memcpy(label->text, text, strlen(text));
 }

@@ -30,7 +30,7 @@ static int32_t calcCellHeight(const BRS_GUI_CharTable *charTable) {
 
 static void calcGridPosition(GridPosition *gridPosition, BRS_GUI_Widget *widget, BRS_Point *mousePoint) {
     BRS_GUI_Widget_Properties *widgetProps = widget->properties;
-    BRS_GUI_CharTable *charTable = BRS_GUI_CharTable_getFromWidget(widget);
+    BRS_GUI_CharTable *charTable = widget->object;
 
     int32_t cellWidth = calcCellWidth(charTable);
     int32_t cellHeight = calcCellHeight(charTable);
@@ -48,7 +48,7 @@ static uint8_t getCharByGridPosition(GridPosition *gridPosition) {
 }
 
 static void processMouseMove(BRS_GUI_Widget *widget, BRS_Point *mousePoint) {
-    BRS_GUI_CharTable *charTable = BRS_GUI_CharTable_getFromWidget(widget);
+    BRS_GUI_CharTable *charTable = widget->object;
     GridPosition gridPosition;
     calcGridPosition(&gridPosition, widget, mousePoint);
     uint8_t ch = getCharByGridPosition(&gridPosition);
@@ -56,14 +56,13 @@ static void processMouseMove(BRS_GUI_Widget *widget, BRS_Point *mousePoint) {
 }
 
 static void processMouseButtonDown(BRS_GUI_Widget *widget, BRS_Point *mousePoint) {
-    BRS_GUI_CharTable *charTable = BRS_GUI_CharTable_getFromWidget(widget);
     GridPosition gridPosition;
     calcGridPosition(&gridPosition, widget, mousePoint);
     uint8_t ch = getCharByGridPosition(&gridPosition);
-    BRS_GUI_CharTable_setSelectedCharIndex(charTable, ch);
+    BRS_GUI_CharTable_setSelectedCharIndex(widget, ch);
 
-    if (charTable->clickHandler) {
-        charTable->clickHandler(charTable);
+    if (widget->clickHandler) {
+        widget->clickHandler(widget);
     }
 }
 
@@ -73,7 +72,6 @@ BRS_GUI_CharTable_create(BRS_Font *fontEdited) {
     charTable->fontEdited = fontEdited;
     charTable->highlightedCharIndex = NO_CHAR;
     charTable->selectedCharIndex = NO_CHAR;
-    charTable->clickHandler = NULL;
     charTable->changedSelectedCharIndexHandler = NULL;
     return charTable;
 }
@@ -116,7 +114,7 @@ static void drawVerticalLines(const BRS_VideoContext *context, const BRS_GUI_Wid
 
 static void drawHorizontalLines(const BRS_VideoContext *context, BRS_GUI_Widget *widget) {
     BRS_GUI_Widget_Properties *widgetProps = widget->properties;
-    BRS_GUI_CharTable *charTable = BRS_GUI_CharTable_getFromWidget(widget);
+    BRS_GUI_CharTable *charTable = widget->object;
     BRS_setColor(context, widgetProps->theme->borderColor);
 
     uint32_t i;
@@ -134,7 +132,7 @@ static void drawHorizontalLines(const BRS_VideoContext *context, BRS_GUI_Widget 
 
 static void drawChars(const BRS_VideoContext *context, BRS_GUI_Widget *widget) {
     BRS_GUI_Widget_Properties *widgetProps = widget->properties;
-    BRS_GUI_CharTable *charTable = BRS_GUI_CharTable_getFromWidget(widget);
+    BRS_GUI_CharTable *charTable = widget->object;
     BRS_Point pos = {.x = widgetProps->position->x + PIXELS_BORDER + PIXELS_PADDING,
             .y = widgetProps->position->y + PIXELS_BORDER + PIXELS_PADDING};
     BRS_Rect charRect = {.x = 0, .y = 0,
@@ -205,23 +203,21 @@ bool BRS_GUI_CharTable_processEvent(BRS_GUI_Widget *widget, SDL_Event *event) {
     return false;
 }
 
-BRS_GUI_CharTable *BRS_GUI_CharTable_getFromWidget(BRS_GUI_Widget *widget) {
-    return widget->object;
-}
-
 void
-BRS_GUI_CharTable_setChangedSelectedCharIndexHandler(BRS_GUI_CharTable *charTable,
+BRS_GUI_CharTable_setChangedSelectedCharIndexHandler(BRS_GUI_Widget *widget,
                                                      BRS_GUI_CharTable_ChangedSelectedCharIndex handler) {
+    BRS_GUI_CharTable *charTable = widget->object;
     charTable->changedSelectedCharIndexHandler = handler;
 }
 
-void BRS_GUI_CharTable_setSelectedCharIndex(BRS_GUI_CharTable *charTable, int32_t selectedCharIndex) {
+void BRS_GUI_CharTable_setSelectedCharIndex(BRS_GUI_Widget *widget, int32_t selectedCharIndex) {
+    BRS_GUI_CharTable *charTable = widget->object;
     if (charTable->selectedCharIndex == selectedCharIndex) {
         return;
     }
 
     charTable->selectedCharIndex = selectedCharIndex;
     if (charTable->changedSelectedCharIndexHandler != NULL) {
-        charTable->changedSelectedCharIndexHandler(charTable);
+        charTable->changedSelectedCharIndexHandler(widget);
     }
 }

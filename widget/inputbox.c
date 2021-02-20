@@ -64,7 +64,8 @@ void BRS_GUI_InputBox_render(BRS_VideoContext *context, BRS_GUI_Widget *widget) 
     }
 }
 
-void BRS_GUI_InputBox_clearText(BRS_GUI_InputBox *inputBox) {
+void BRS_GUI_InputBox_clearText(BRS_GUI_Widget *widget) {
+    BRS_GUI_InputBox *inputBox = widget->object;
     memset(inputBox->text, 0, MAX_TEXT_LEN);
 }
 
@@ -99,12 +100,12 @@ bool BRS_GUI_InputBox_processEvent(BRS_GUI_Widget *widget, SDL_Event *event) {
         } else if (event->key.keysym.sym == SDLK_RETURN || event->key.keysym.sym == SDLK_KP_ENTER) {
             widgetProps->visible = false;
             if (inputBox->confirmHandler != NULL) {
-                inputBox->confirmHandler(inputBox);
+                inputBox->confirmHandler(widget);
             }
         } else if (event->key.keysym.sym == SDLK_ESCAPE) {
             widgetProps->visible = false;
             if (inputBox->cancelHandler != NULL) {
-                inputBox->cancelHandler(inputBox);
+                inputBox->cancelHandler(widget);
             }
             return true;
         }
@@ -112,10 +113,12 @@ bool BRS_GUI_InputBox_processEvent(BRS_GUI_Widget *widget, SDL_Event *event) {
     return false;
 }
 
-void BRS_GUI_InputBox_setConfirmHandler(BRS_GUI_InputBox *inputBox, BRS_GUI_InputBox_ConfirmHandler handler) {
+void BRS_GUI_InputBox_setConfirmHandler(BRS_GUI_Widget *widget, BRS_GUI_InputBox_ConfirmHandler handler) {
+    BRS_GUI_InputBox *inputBox = widget->object;
     inputBox->confirmHandler = handler;
 }
 
-void BRS_GUI_InputBox_setCancelHandler(BRS_GUI_InputBox *inputBox, BRS_GUI_InputBox_CancelHandler handler) {
+void BRS_GUI_InputBox_setCancelHandler(BRS_GUI_Widget *widget, BRS_GUI_InputBox_CancelHandler handler) {
+    BRS_GUI_InputBox *inputBox = widget->object;
     inputBox->cancelHandler = handler;
 }

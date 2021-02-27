@@ -3,6 +3,7 @@
 //
 
 #include "char_edit.h"
+#include "grid.h"
 
 static const int32_t PIXELS_PER_DOT = 16;
 static const int32_t PIXELS_PADDING = 1;
@@ -26,8 +27,8 @@ static int32_t calcTableHeight(BRS_GUI_CharEdit *charEdit) {
     return charEdit->fontEdited->height_bits * calcCellHeight();
 }
 
-static void calcGridPosition(GridPosition *gridPosition, BRS_GUI_Widget *widget, BRS_Point *mousePoint) {
-    BRS_GUI_Widget_Properties *widgetProps = widget->properties;
+static void calcGridPosition(GridPosition *gridPosition, BRS_GUI_CharEdit *charEdit, BRS_Point *mousePoint) {
+    BRS_GUI_Widget_Properties *widgetProps = charEdit->widget.properties;
     int32_t cellWidth = calcCellWidth();
     int32_t cellHeight = calcCellHeight();
 
@@ -38,22 +39,76 @@ static void calcGridPosition(GridPosition *gridPosition, BRS_GUI_Widget *widget,
     gridPosition->rowIndex = relY / cellHeight;
 }
 
-BRS_GUI_CharEdit *
-BRS_GUI_CharEdit_create(BRS_Font *fontEdited) {
-    BRS_GUI_CharEdit *charEdit = malloc(sizeof(BRS_GUI_CharEdit));
-    charEdit->fontEdited = fontEdited;
-    charEdit->selectedChar = NO_CHAR;
-    charEdit->_buttonPressed = NO_BUTTON;
-    return charEdit;
+static void setCharDot(BRS_GUI_CharEdit *charEdit, GridPosition *gridPosition) {
+    if (charEdit->_buttonPressed == NO_BUTTON) {
+        return;
+    }
+
+    BRS_Font *font = charEdit->fontEdited;
+    int32_t ch = charEdit->selectedChar;
+
+    int32_t charRowBytePos = ch * font->height_bits + gridPosition->rowIndex;
+    int8_t charRowByte = font->data[charRowBytePos];
+
+    if (charEdit->_buttonPressed == SDL_BUTTON_LEFT) {
+        charRowByte |= (128 >> gridPosition->columnIndex);
+    } else {
+        charRowByte &= ~(128 >> gridPosition->columnIndex);
+    }
+    font->data[charRowBytePos] = charRowByte;
 }
 
-void BRS_GUI_CharEdit_destroy(BRS_GUI_CharEdit *charEdit) {
-    free(charEdit);
+static void setCharDotAtPoint(BRS_GUI_CharEdit *charEdit, BRS_Point *mousePoint) {
+    GridPosition gridPosition;
+    calcGridPosition(&gridPosition, charEdit, mousePoint);
+    setCharDot(charEdit, &gridPosition);
 }
 
-static void drawTableBorder(BRS_VideoContext *context, BRS_GUI_Widget *widget) {
+static bool BRS_GUI_CharEdit_processEvent(BRS_GUI_Widget *widget, SDL_Event *event) {
     BRS_GUI_Widget_Properties *widgetProps = widget->properties;
-    BRS_GUI_CharEdit *charEdit = widget->object;
+    BRS_GUI_CharEdit *charEdit = (BRS_GUI_CharEdit *) widget;
+    BRS_Rect widgetRect = {.x = widgetProps->position->x, .y = widgetProps->position->y, .width = calcTableWith(
+            charEdit), .height = calcTableHeight(charEdit)};
+
+    switch (event->type) {
+        case SDL_MOUSEMOTION: {
+            BRS_Point mousePoint = {.x = event->motion.x, .y = event->motion.y};
+            if (BRS_PointInRect(&mousePoint, &widgetRect)) {
+                setCharDotAtPoint(charEdit, &mousePoint);
+            }
+        }
+            break;
+        case SDL_MOUSEBUTTONDOWN: {
+            BRS_Point mousePoint = {.x = event->button.x, .y = event->button.y};
+            if (BRS_PointInRect(&mousePoint, &widgetRect)) {
+                charEdit->_buttonPressed = event->button.button;
+                setCharDotAtPoint(charEdit, &mousePoint);
+            } else {
+                charEdit->_buttonPressed = NO_BUTTON;
+            }
+        }
+            break;
+        case SDL_MOUSEBUTTONUP:
+            charEdit->_buttonPressed = NO_BUTTON;
+            break;
+    }
+    return false;
+}
+
+static void clearTable(const BRS_VideoContext *context, const BRS_GUI_CharEdit *charEdit) {
+    BRS_GUI_Widget_Properties *widgetProps = charEdit->widget.properties;
+    BRS_setColor(context, widgetProps->theme->screenColor);
+    BRS_Rect rect = {
+            .x = widgetProps->position->x,
+            .y = widgetProps->position->y,
+            .width = charEdit->fontEdited->width_bits * (PIXELS_PER_DOT + PIXELS_PADDING * 2 + PIXELS_BORDER * 2),
+            .height = charEdit->fontEdited->height_bits * (PIXELS_PER_DOT + PIXELS_PADDING * 2 + PIXELS_BORDER * 2)
+    };
+    BRS_drawlFillRect(context, &rect);
+}
+
+static void drawTableBorder(const BRS_VideoContext *context, const BRS_GUI_CharEdit *charEdit) {
+    BRS_GUI_Widget_Properties *widgetProps = charEdit->widget.properties;
     BRS_setColor(context, widgetProps->theme->charEditForeColor);
     BRS_Rect rect = {
             .x = widgetProps->position->x,
@@ -64,9 +119,8 @@ static void drawTableBorder(BRS_VideoContext *context, BRS_GUI_Widget *widget) {
     BRS_drawlRect(context, &rect);
 }
 
-static void drawVerticalLines(const BRS_VideoContext *context, const BRS_GUI_Widget *widget) {
-    BRS_GUI_Widget_Properties *widgetProps = widget->properties;
-    BRS_GUI_CharEdit *charEdit = widget->object;
+static void drawVerticalLines(const BRS_VideoContext *context, const BRS_GUI_CharEdit *charEdit) {
+    BRS_GUI_Widget_Properties *widgetProps = charEdit->widget.properties;
     uint32_t i;
     BRS_Point p1 = {.x = widgetProps->position->x, .y = widgetProps->position->y};
     BRS_Point p2 = {.x = widgetProps->position->x, .y = widgetProps->position->y +
@@ -82,9 +136,8 @@ static void drawVerticalLines(const BRS_VideoContext *context, const BRS_GUI_Wid
     }
 }
 
-static void drawHorizontalLines(const BRS_VideoContext *context, const BRS_GUI_Widget *widget) {
-    BRS_GUI_Widget_Properties *widgetProps = widget->properties;
-    BRS_GUI_CharEdit *charEdit = widget->object;
+static void drawHorizontalLines(const BRS_VideoContext *context, const BRS_GUI_CharEdit *charEdit) {
+    BRS_GUI_Widget_Properties *widgetProps = charEdit->widget.properties;
     uint32_t i;
     BRS_Point p1 = {.x = widgetProps->position->x, .y = widgetProps->position->y};
     BRS_Point p2 = {.x = widgetProps->position->x +
@@ -100,9 +153,8 @@ static void drawHorizontalLines(const BRS_VideoContext *context, const BRS_GUI_W
     }
 }
 
-static void drawDotsForChar(const BRS_VideoContext *context, const BRS_GUI_Widget *widget) {
-    BRS_GUI_Widget_Properties *widgetProps = widget->properties;
-    BRS_GUI_CharEdit *charEdit = widget->object;
+static void drawDotsForChar(const BRS_VideoContext *context, const BRS_GUI_CharEdit *charEdit) {
+    BRS_GUI_Widget_Properties *widgetProps = charEdit->widget.properties;
     BRS_Font *font = charEdit->fontEdited;
     int32_t ch = charEdit->selectedChar;
     int16_t fontCharPos = ch * font->height_bits;
@@ -124,83 +176,39 @@ static void drawDotsForChar(const BRS_VideoContext *context, const BRS_GUI_Widge
     }
 }
 
-static void clearTable(BRS_VideoContext *context, BRS_GUI_Widget *widget) {
-    BRS_GUI_Widget_Properties *widgetProps = widget->properties;
-    BRS_GUI_CharEdit *charEdit = widget->object;
-    BRS_setColor(context, widgetProps->theme->screenColor);
-    BRS_Rect rect = {
-            .x = widgetProps->position->x,
-            .y = widgetProps->position->y,
-            .width = charEdit->fontEdited->width_bits * (PIXELS_PER_DOT + PIXELS_PADDING * 2 + PIXELS_BORDER * 2),
-            .height = charEdit->fontEdited->height_bits * (PIXELS_PER_DOT + PIXELS_PADDING * 2 + PIXELS_BORDER * 2)
-    };
-    BRS_drawlFillRect(context, &rect);
-}
-
-void BRS_GUI_CharEdit_render(BRS_VideoContext *context, BRS_GUI_Widget *widget) {
-    BRS_GUI_CharEdit *charEdit = widget->object;
-    clearTable(context, widget);
-    drawTableBorder(context, widget);
-    drawVerticalLines(context, widget);
-    drawHorizontalLines(context, widget);
+static void BRS_GUI_CharEdit_render(const BRS_GUI_Widget *widget, const BRS_VideoContext *context) {
+    BRS_GUI_CharEdit *charEdit = (BRS_GUI_CharEdit *) widget;
+    clearTable(context, charEdit);
+    drawTableBorder(context, charEdit);
+    drawVerticalLines(context, charEdit);
+    drawHorizontalLines(context, charEdit);
     if (charEdit->selectedChar != NO_CHAR) {
-        drawDotsForChar(context, widget);
+        drawDotsForChar(context, charEdit);
     }
 }
 
-static void setCharDot(BRS_GUI_Widget *widget, GridPosition *gridPosition) {
-    BRS_GUI_CharEdit *charEdit = widget->object;
-    if (charEdit->_buttonPressed == NO_BUTTON) {
-        return;
-    }
-
-    BRS_Font *font = charEdit->fontEdited;
-    int32_t ch = charEdit->selectedChar;
-
-    int32_t charRowBytePos = ch * font->height_bits + gridPosition->rowIndex;
-    int8_t charRowByte = font->data[charRowBytePos];
-
-    if (charEdit->_buttonPressed == SDL_BUTTON_LEFT) {
-        charRowByte |= (128 >> gridPosition->columnIndex);
-    } else {
-        charRowByte &= ~(128 >> gridPosition->columnIndex);
-    }
-    font->data[charRowBytePos] = charRowByte;
+void BRS_GUI_CharEdit_ctor(BRS_GUI_CharEdit *charEdit, BRS_GUI_Widget_Properties *widgetProps, BRS_Font *fontEdited) {
+    BRS_GUI_Widget_ctor((BRS_GUI_Widget *) charEdit, widgetProps);
+    charEdit->fontEdited = fontEdited;
+    charEdit->selectedChar = NO_CHAR;
+    charEdit->_buttonPressed = NO_BUTTON;
+    widgetProps->processEventHandler = BRS_GUI_CharEdit_processEvent;
+    widgetProps->renderHandler = BRS_GUI_CharEdit_render;
+    widgetProps->destroyHandler = (BRS_GUI_Widget_DestroyHandler) BRS_GUI_CharEdit_destroy;
 }
 
-static void setCharDotAtPoint(BRS_GUI_Widget *widget, BRS_Point *mousePoint) {
-    GridPosition gridPosition;
-    calcGridPosition(&gridPosition, widget, mousePoint);
-    setCharDot(widget, &gridPosition);
+void BRS_GUI_CharEdit_dtor(BRS_GUI_CharEdit *charEdit) {
+    BRS_GUI_Widget_dtor((BRS_GUI_Widget *) charEdit);
 }
 
-bool BRS_GUI_CharEdit_processEvent(BRS_GUI_Widget *widget, SDL_Event *event) {
-    BRS_GUI_Widget_Properties *widgetProps = widget->properties;
-    BRS_GUI_CharEdit *charEdit = widget->object;
-    BRS_Rect widgetRect = {.x = widgetProps->position->x, .y = widgetProps->position->y, .width = calcTableWith(
-            charEdit), .height = calcTableHeight(charEdit)};
+BRS_GUI_CharEdit *
+BRS_GUI_CharEdit_create(BRS_GUI_Widget_Properties *widgetProps, BRS_Font *fontEdited) {
+    BRS_GUI_CharEdit *charEdit = malloc(sizeof(BRS_GUI_CharEdit));
+    BRS_GUI_CharEdit_ctor(charEdit, widgetProps, fontEdited);
+    return charEdit;
+}
 
-    switch (event->type) {
-        case SDL_MOUSEMOTION: {
-            BRS_Point mousePoint = {.x = event->motion.x, .y = event->motion.y};
-            if (BRS_PointInRect(&mousePoint, &widgetRect)) {
-                setCharDotAtPoint(widget, &mousePoint);
-            }
-        }
-            break;
-        case SDL_MOUSEBUTTONDOWN: {
-            BRS_Point mousePoint = {.x = event->button.x, .y = event->button.y};
-            if (BRS_PointInRect(&mousePoint, &widgetRect)) {
-                charEdit->_buttonPressed = event->button.button;
-                setCharDotAtPoint(widget, &mousePoint);
-            } else {
-                charEdit->_buttonPressed = NO_BUTTON;
-            }
-        }
-            break;
-        case SDL_MOUSEBUTTONUP:
-            charEdit->_buttonPressed = NO_BUTTON;
-            break;
-    }
-    return false;
+void BRS_GUI_CharEdit_destroy(BRS_GUI_CharEdit *charEdit) {
+    BRS_GUI_CharEdit_dtor(charEdit);
+    free(charEdit);
 }

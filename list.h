@@ -11,7 +11,8 @@
 #define BRS_LIST_DECL(LIST_NAME, VALUE_TYPE) \
 typedef struct _##LIST_NAME##Entry LIST_NAME##Entry; \
 struct _##LIST_NAME##Entry { \
-    VALUE_TYPE *value; \
+    VALUE_TYPE *value;                       \
+    uint32_t index;                                         \
     LIST_NAME##Entry *next; \
 }; \
 typedef struct _##LIST_NAME LIST_NAME; \
@@ -64,6 +65,7 @@ LIST_NAME *LIST_NAME##_push(VALUE_TYPE *val, LIST_NAME *list) {     \
     list->lastEntry->next = newEntry; \
     }                                        \
     list->lastEntry = newEntry;                                       \
+    newEntry->index = list->size;                                         \
     list->size++;                                             \
 }  \
                                              \

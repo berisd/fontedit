@@ -6,7 +6,6 @@
 #define FONTEDIT_GUI_H
 
 #include "widget/widget.h"
-#include "theme.h"
 
 #define BRS_GUI_WIDGET_DEPTH_MAX 10
 
@@ -32,7 +31,7 @@ void BRS_GUI_init(BRS_GUI *gui);
 
 void BRS_GUI_calculate(BRS_GUI *gui);
 
-void BRS_GUI_render(BRS_VideoContext *videoContext, BRS_GUI *gui);
+void BRS_GUI_render(BRS_GUI *gui, BRS_VideoContext *videoContext);
 
 bool BRS_GUI_processEvent(BRS_GUI *gui, SDL_Event *event);
 

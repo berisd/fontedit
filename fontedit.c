@@ -82,7 +82,7 @@ static bool checkQuitApplication(SDL_Event *event) {
 static void handleVideo(ApplicationState *applicationState) {
     BRS_setColor(applicationState->videoContext, &COLOR_BLACK);
     BRS_clearVideo(applicationState->videoContext);
-    BRS_GUI_render(applicationState->videoContext, applicationState->gui);
+    BRS_GUI_render(applicationState->gui, applicationState->videoContext);
     BRS_updateVideo(applicationState->videoContext);
 }
 

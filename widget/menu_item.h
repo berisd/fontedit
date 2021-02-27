@@ -5,27 +5,25 @@
 #ifndef BRS_GUI_MENU_ITEM_H
 #define BRS_GUI_MENU_ITEM_H
 
-#include "../list.h"
-#include "../render.h"
-#include "../theme.h"
 #include "widget.h"
 
 typedef struct _BRS_GUI_MenuItem BRS_GUI_MenuItem;
 
 struct _BRS_GUI_MenuItem {
-    const char *label;
+    BRS_GUI_Widget widget;
+    char *label;
     bool highlighted;
 };
 
 BRS_LIST_DECL(BRS_GUI_MenuItemList, BRS_GUI_MenuItem)
 
+void BRS_GUI_MenuItem_ctor(BRS_GUI_MenuItem *menuItem, BRS_GUI_Widget_Properties *widgetProps, const char *label);
+
+void BRS_GUI_MenuItem_dtor(BRS_GUI_MenuItem *menuItem);
+
 BRS_GUI_MenuItem *
-BRS_GUI_MenuItem_create(const char *label);
+BRS_GUI_MenuItem_create(BRS_GUI_Widget_Properties *widgetProps, const char *label);
 
 void BRS_GUI_MenuItem_destroy(BRS_GUI_MenuItem *menuItem);
-
-void BRS_GUI_MenuItem_render(BRS_VideoContext *context, BRS_GUI_Widget *widget);
-
-bool BRS_GUI_MenuItem_processEvent(BRS_GUI_Widget *menuItem, SDL_Event *event);
 
 #endif //BRS_GUI_MENU_ITEM_H

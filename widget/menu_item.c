@@ -7,20 +7,14 @@
 
 BRS_LIST_DEFN(BRS_GUI_MenuItemList, BRS_GUI_MenuItem)
 
-BRS_GUI_MenuItem *BRS_GUI_MenuItem_create(const char *label) {
-    BRS_GUI_MenuItem *menuItem = malloc(sizeof(BRS_GUI_MenuItem));
-    menuItem->label = label;
-    menuItem->highlighted = false;
-    return menuItem;
-}
-
-void BRS_GUI_MenuItem_destroy(BRS_GUI_MenuItem *menuItem) {
-    free(menuItem);
-}
-
-void BRS_GUI_MenuItem_render(BRS_VideoContext *context, BRS_GUI_Widget *widget) {
-    BRS_GUI_MenuItem *menuItem = widget->object;
+static void BRS_GUI_MenuItem_render(const BRS_GUI_Widget *widget, const BRS_VideoContext *context) {
+    BRS_GUI_MenuItem *menuItem = (BRS_GUI_MenuItem *) widget;
     BRS_GUI_Widget_Properties *menuItemProps = widget->properties;
+
+    if (!menuItemProps->visible) {
+        return;
+    }
+
     BRS_setColor(context, menuItemProps->theme->menuItemBackColor);
     BRS_Rect menuItemRect = {.x = menuItemProps->position->x, .y = menuItemProps->position->y,
             .width=menuItemProps->size->width, .height=menuItemProps->size->height};
@@ -33,51 +27,76 @@ void BRS_GUI_MenuItem_render(BRS_VideoContext *context, BRS_GUI_Widget *widget) 
     BRS_drawString(context, menuItem->label, strlen(menuItem->label), menuItemProps->theme->font, &labelPosition);
 }
 
-static bool
-processMenuItemMouseButtonDown(BRS_GUI_Widget *widget, SDL_MouseButtonEvent *button) {
-    BRS_GUI_Widget *menuWidget = widget->parent;
-    BRS_GUI_Widget_Properties *menuItemProps = widget->properties;
-    BRS_GUI_MenuItem *menuItem = widget->object;
+static bool processMenuItemMouseButtonDown(BRS_GUI_MenuItem *menuItem, SDL_MouseButtonEvent *button) {
+    BRS_GUI_Menu *menu = (BRS_GUI_Menu *) menuItem->widget.properties->parent;
+    BRS_GUI_Widget_Properties *menuItemProps = menuItem->widget.properties;
     if (button->button == SDL_BUTTON_LEFT) {
         BRS_Rect menuItemRect = {.x = menuItemProps->position->x, .y = menuItemProps->position->y, .width = menuItemProps->size->width,
                 menuItemProps->size->height};
         BRS_Point mousePoint = {.x = button->x, .y = button->y};
         bool clickedInMenuItem = BRS_PointInRect(&mousePoint, &menuItemRect);
 
-        if (clickedInMenuItem && widget->clickHandler) {
-            if (menuWidget->properties->visible) {
-                BRS_GUI_Menu_hide(menuWidget);
+        if (clickedInMenuItem && menuItemProps->clickHandler != NULL) {
+            if (menu->widget.properties->visible) {
+                BRS_GUI_Menu_hide(menu);
             }
-            widget->clickHandler(widget);
+            menuItemProps->clickHandler((BRS_GUI_Widget *) menuItem);
             return true;
         }
     }
     return false;
 }
 
-static bool processMenuItemMouseMove(BRS_GUI_Widget *widget, SDL_MouseMotionEvent *motion) {
-    BRS_GUI_Widget_Properties *widgetProps = widget->properties;
-    BRS_GUI_MenuItem *menuItem = widget->object;
+static bool processMenuItemMouseMove(BRS_GUI_MenuItem *menuItem, SDL_MouseMotionEvent *motion) {
+    BRS_GUI_Widget_Properties *widgetProps = menuItem->widget.properties;
     BRS_Point mousePoint = {.x = motion->x, .y = motion->y};
     BRS_Rect widgetRect = {.x = widgetProps->position->x, .y = widgetProps->position->y,
             .width = widgetProps->size->width, .height = widgetProps->size->height};
     bool inRect = BRS_PointInRect(&mousePoint, &widgetRect);
-    menuItem->highlighted = inRect;
-    BRS_GUI_WidgetListEntry *menuItemEntry = widget->parent->children->firstEntry;
+    BRS_GUI_WidgetListEntry *menuItemEntry = menuItem->widget.properties->parent->properties->children->firstEntry;
     while (menuItemEntry != NULL) {
-        BRS_GUI_Widget *menuItemWidget = menuItemEntry->value;
-        BRS_GUI_MenuItem *menuItem = menuItemWidget->object;
-        menuItem->highlighted = menuItemWidget == widget && inRect;
+        BRS_GUI_MenuItem *aMenuItem = (BRS_GUI_MenuItem *) menuItemEntry->value;
+        aMenuItem->highlighted = aMenuItem == menuItem && inRect;
         menuItemEntry = menuItemEntry->next;
     }
-    return inRect ? true : false;
+    return inRect;
 }
 
-bool BRS_GUI_MenuItem_processEvent(BRS_GUI_Widget *widget, SDL_Event *event) {
+static bool BRS_GUI_MenuItem_processEvent(BRS_GUI_Widget *widget, SDL_Event *event) {
+    if (!widget->properties->visible) {
+        return false;
+    }
+
+    BRS_GUI_MenuItem *menuItem = (BRS_GUI_MenuItem *) widget;
     switch (event->type) {
         case SDL_MOUSEMOTION:
-            return processMenuItemMouseMove(widget, &event->motion);
+            return processMenuItemMouseMove(menuItem, &event->motion);
         case SDL_MOUSEBUTTONUP:
-            return processMenuItemMouseButtonDown(widget, &event->button);
+            return processMenuItemMouseButtonDown(menuItem, &event->button);
     }
+}
+
+void BRS_GUI_MenuItem_ctor(BRS_GUI_MenuItem *menuItem, BRS_GUI_Widget_Properties *widgetProps, const char *label) {
+    BRS_GUI_Widget_ctor((BRS_GUI_Widget *) menuItem, widgetProps);
+    menuItem->label = strdup(label);
+    menuItem->highlighted = false;
+    widgetProps->renderHandler = BRS_GUI_MenuItem_render;
+    widgetProps->processEventHandler = BRS_GUI_MenuItem_processEvent;
+    widgetProps->destroyHandler = (BRS_GUI_Widget_DestroyHandler) BRS_GUI_MenuItem_destroy;
+}
+
+void BRS_GUI_MenuItem_dtor(BRS_GUI_MenuItem *menuItem) {
+    BRS_GUI_Widget_dtor((BRS_GUI_Widget *) menuItem);
+    free(menuItem->label);
+}
+
+BRS_GUI_MenuItem *BRS_GUI_MenuItem_create(BRS_GUI_Widget_Properties *widgetProps, const char *label) {
+    BRS_GUI_MenuItem *menuItem = malloc(sizeof(BRS_GUI_MenuItem));
+    BRS_GUI_MenuItem_ctor(menuItem, widgetProps, label);
+    return menuItem;
+}
+
+void BRS_GUI_MenuItem_destroy(BRS_GUI_MenuItem *menuItem) {
+    BRS_GUI_MenuItem_dtor(menuItem);
+    free(menuItem);
 }

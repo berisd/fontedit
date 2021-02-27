@@ -6,26 +6,9 @@
 
 static const uint8_t MAX_TEXT_LEN = 100;
 
-BRS_GUI_InputBox *
-BRS_GUI_InputBox_create(const char *title,
-                        const char *textLabel) {
-    BRS_GUI_InputBox *inputBox = malloc(sizeof(BRS_GUI_InputBox));
-    inputBox->title = title;
-    inputBox->textLabel = textLabel;
-    inputBox->text = malloc(MAX_TEXT_LEN);
-    inputBox->cancelHandler = NULL;
-    inputBox->confirmHandler = NULL;
-    return inputBox;
-}
-
-void BRS_GUI_InputBox_destroy(BRS_GUI_InputBox *inputBox) {
-    free(inputBox->text);
-    free(inputBox);
-}
-
-void BRS_GUI_InputBox_render(BRS_VideoContext *context, BRS_GUI_Widget *widget) {
+static void BRS_GUI_InputBox_render(const BRS_GUI_Widget *widget, const BRS_VideoContext *context) {
     BRS_GUI_Widget_Properties *widgetProps = widget->properties;
-    BRS_GUI_InputBox *inputBox = widget->object;
+    BRS_GUI_InputBox *inputBox = (BRS_GUI_InputBox *) widget;
     if (widgetProps->visible) {
         BRS_Rect rect = {.x = widgetProps->position->x, .y = widgetProps->position->y,
                 .width = widgetProps->size->width, .height = widgetProps->size->height};
@@ -40,8 +23,7 @@ void BRS_GUI_InputBox_render(BRS_VideoContext *context, BRS_GUI_Widget *widget) 
 
         BRS_Point titleLineP1 = {.x = widgetProps->position->x + 1, .y = widgetProps->position->y + 1 + 20};
         BRS_Point titleLineP2 = {.x = widgetProps->position->x + widgetProps->size->width, .y =
-        widgetProps->position->y +
-        1 + 20};
+        widgetProps->position->y + 1 + 20};
         BRS_Line titleLine = {.p1 = &titleLineP1, .p2 = &titleLineP2};
         BRS_setColor(context, widgetProps->theme->borderColor);
         BRS_drawline(context, &titleLine);
@@ -64,11 +46,6 @@ void BRS_GUI_InputBox_render(BRS_VideoContext *context, BRS_GUI_Widget *widget) 
     }
 }
 
-void BRS_GUI_InputBox_clearText(BRS_GUI_Widget *widget) {
-    BRS_GUI_InputBox *inputBox = widget->object;
-    memset(inputBox->text, 0, MAX_TEXT_LEN);
-}
-
 static bool isKeycodeAlphaNumeric(SDL_Keycode keycode) {
     return keycode == SDLK_0 || keycode == SDLK_1 || keycode == SDLK_2 || keycode == SDLK_3 || keycode == SDLK_4 ||
            keycode == SDLK_5 || keycode == SDLK_6 || keycode == SDLK_7 || keycode == SDLK_8 || keycode == SDLK_9 ||
@@ -80,8 +57,8 @@ static bool isKeycodeAlphaNumeric(SDL_Keycode keycode) {
            keycode == SDLK_v || keycode == SDLK_w || keycode == SDLK_x || keycode == SDLK_y || keycode == SDLK_z;
 }
 
-bool BRS_GUI_InputBox_processEvent(BRS_GUI_Widget *widget, SDL_Event *event) {
-    BRS_GUI_InputBox *inputBox = widget->object;
+static bool BRS_GUI_InputBox_processEvent(BRS_GUI_Widget *widget, SDL_Event *event) {
+    BRS_GUI_InputBox *inputBox = (BRS_GUI_InputBox *) widget;
     BRS_GUI_Widget_Properties *widgetProps = widget->properties;
     if (!widgetProps->visible) {
         return false;
@@ -100,12 +77,12 @@ bool BRS_GUI_InputBox_processEvent(BRS_GUI_Widget *widget, SDL_Event *event) {
         } else if (event->key.keysym.sym == SDLK_RETURN || event->key.keysym.sym == SDLK_KP_ENTER) {
             widgetProps->visible = false;
             if (inputBox->confirmHandler != NULL) {
-                inputBox->confirmHandler(widget);
+                inputBox->confirmHandler(inputBox);
             }
         } else if (event->key.keysym.sym == SDLK_ESCAPE) {
             widgetProps->visible = false;
             if (inputBox->cancelHandler != NULL) {
-                inputBox->cancelHandler(widget);
+                inputBox->cancelHandler(inputBox);
             }
             return true;
         }
@@ -113,12 +90,55 @@ bool BRS_GUI_InputBox_processEvent(BRS_GUI_Widget *widget, SDL_Event *event) {
     return false;
 }
 
-void BRS_GUI_InputBox_setConfirmHandler(BRS_GUI_Widget *widget, BRS_GUI_InputBox_ConfirmHandler handler) {
-    BRS_GUI_InputBox *inputBox = widget->object;
+void BRS_GUI_InputBox_ctor(BRS_GUI_InputBox *inputBox, BRS_GUI_Widget_Properties *widgetProps, const char *title,
+                           const char *textLabel) {
+    BRS_GUI_Widget_ctor((BRS_GUI_Widget *) inputBox, widgetProps);
+    inputBox->title = strdup(title);
+    inputBox->textLabel = strdup(textLabel);
+    inputBox->text = malloc(MAX_TEXT_LEN);
+    widgetProps->processEventHandler = BRS_GUI_InputBox_processEvent;
+    widgetProps->renderHandler = BRS_GUI_InputBox_render;
+    inputBox->cancelHandler = NULL;
+    inputBox->confirmHandler = NULL;
+    widgetProps->destroyHandler = (BRS_GUI_Widget_DestroyHandler) BRS_GUI_InputBox_destroy;
+}
+
+void BRS_GUI_InputBox_dtor(BRS_GUI_InputBox *inputBox) {
+    BRS_GUI_Widget_dtor((BRS_GUI_Widget *) inputBox);
+    free(inputBox->title);
+    free(inputBox->textLabel);
+    free(inputBox->text);
+}
+
+BRS_GUI_InputBox *
+BRS_GUI_InputBox_create(BRS_GUI_Widget_Properties *widgetProps, const char *title, const char *textLabel) {
+    BRS_GUI_InputBox *inputBox = malloc(sizeof(BRS_GUI_InputBox));
+    BRS_GUI_InputBox_ctor(inputBox, widgetProps, title, textLabel);
+    return inputBox;
+}
+
+void BRS_GUI_InputBox_destroy(BRS_GUI_InputBox *inputBox) {
+    BRS_GUI_InputBox_dtor(inputBox);
+    free(inputBox);
+}
+
+
+void BRS_GUI_InputBox_clearText(BRS_GUI_InputBox *inputBox) {
+    memset(inputBox->text, 0, MAX_TEXT_LEN);
+}
+
+void BRS_GUI_InputBox_setConfirmHandler(BRS_GUI_InputBox *inputBox, BRS_GUI_InputBox_ConfirmHandler handler) {
     inputBox->confirmHandler = handler;
 }
 
-void BRS_GUI_InputBox_setCancelHandler(BRS_GUI_Widget *widget, BRS_GUI_InputBox_CancelHandler handler) {
-    BRS_GUI_InputBox *inputBox = widget->object;
+void BRS_GUI_InputBox_setCancelHandler(BRS_GUI_InputBox *inputBox, BRS_GUI_InputBox_CancelHandler handler) {
     inputBox->cancelHandler = handler;
+}
+
+void BRS_GUI_InputBox_setTitle(BRS_GUI_InputBox *inputBox, const char *title) {
+    strcpy(inputBox->title, title);
+}
+
+void BRS_GUI_InputBox_setTextLabel(BRS_GUI_InputBox *inputBox, const char *textLabel) {
+    strcpy(inputBox->textLabel, textLabel);
 }

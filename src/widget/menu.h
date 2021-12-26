@@ -15,7 +15,7 @@ struct _BRS_GUI_Menu {
     char *label;
 };
 
-const char *BRS_GUI_MENU_ACTION_HIDE;
+extern const char *BRS_GUI_MENU_ACTION_HIDE;
 
 BRS_GUI_Menu *BRS_GUI_Menu_create(BRS_GUI_Widget_Properties *widgetProps, const char *label);
 

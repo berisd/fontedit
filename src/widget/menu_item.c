@@ -2,6 +2,7 @@
 // Created by bernd on 05.01.21.
 //
 
+#include "string.h"
 #include "menu_item.h"
 #include "menu.h"
 

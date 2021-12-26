@@ -1,5 +1,6 @@
 #include <malloc.h>
 #include <string.h>
+#include <stdio.h>
 #include "font.h"
 
 BRS_Font_LoadResult *BRS_Font_load(const char *filename) {

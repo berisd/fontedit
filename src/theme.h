@@ -9,13 +9,13 @@
 #include "color.h"
 #include "util.h"
 
-const BRS_Color COLOR_RED;
-const BRS_Color COLOR_BLUE;
-const BRS_Color COLOR_YELLOW;
-const BRS_Color COLOR_WHITE;
-const BRS_Color COLOR_BLACK;
-const BRS_Color COLOR_DARK_GRAY;
-const BRS_Color COLOR_LIGHT_GRAY;
+extern const BRS_Color COLOR_RED;
+extern const BRS_Color COLOR_BLUE;
+extern const BRS_Color COLOR_YELLOW;
+extern const BRS_Color COLOR_WHITE;
+extern const BRS_Color COLOR_BLACK;
+extern const BRS_Color COLOR_DARK_GRAY;
+extern const BRS_Color COLOR_LIGHT_GRAY;
 
 typedef struct _BRS_GUI_Theme {
     BRS_Font *font;

@@ -2,6 +2,7 @@
 // Created by bernd on 10.01.21.
 //
 
+#include <string.h>
 #include "inputbox.h"
 
 static const uint8_t MAX_TEXT_LEN = 100;

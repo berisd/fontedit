@@ -6,7 +6,7 @@
 #define FONTEDIT_VIDEO_H
 
 #include <stdbool.h>
-#include <SDL2/SDL.h>
+#include "SDL.h"
 #include "font.h"
 
 typedef struct BRS_VideoContext {

@@ -1,6 +1,8 @@
 //
 // Created by bernd on 05.01.21.
 //
+#include <stdio.h>
+#include <string.h>
 #include "gui.h"
 #include "widget/char_table.h"
 #include "widget/char_edit.h"
@@ -27,7 +29,7 @@ static void onClickCharTable(BRS_GUI_Widget *widget) {
     BRS_GUI_Widget *rootWidget = BRS_GUI_Widget_findRootWidget(widget);
     BRS_GUI_CharEdit *charEditWidget = (BRS_GUI_CharEdit *) BRS_GUI_Widget_findWidgetById(WIDGET_ID_CHAR_EDIT,
                                                                                           rootWidget);
-    BRS_GUI_CharTable *charTable = charTable;
+    BRS_GUI_CharTable *charTable = (BRS_GUI_CharTable *) widget;
     charEditWidget->selectedChar = charTable->selectedCharIndex;
 }
 

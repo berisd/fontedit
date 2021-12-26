@@ -3,6 +3,7 @@
 // Created by bernd on 02.01.21.
 //
 #include <stdbool.h>
+#include <string.h>
 #include "widget.h"
 
 BRS_LIST_DEFN(BRS_GUI_WidgetList, BRS_GUI_Widget)

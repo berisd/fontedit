@@ -11,8 +11,32 @@ add_library(widget widget/widget.c widget/widget.h widget/label.c widget/label.c
 
 add_executable(fontedit fontedit.c gui.c gui.h)
 
-target_link_libraries(video ${SDL2_LIBRARIES})
+target_link_libraries(video SDL2)
 target_link_libraries(widget video font)
-target_link_libraries(fontedit video widget font)
+target_link_libraries(fontedit SDL2main SDL2 video widget font)
 
-target_include_directories(fontedit PUBLIC "${PROJECT_BINARY_DIR}")
+#target_include_directories(fontedit PRIVATE ${sdl2_SOURCE_DIRS}/include "${PROJECT_BINARY_DIR}/src" "${PROJECT_BINARY_DIR}/src/widget")
+
+IF (WIN32)
+    message(STATUS "Detected Win32!")
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(MY_SDL2_LIB_NAME "SDL2d.dll")
+    ELSEIF(CMAKE_BUILD_TYPE STREQUAL "Release")
+        set(MY_SDL2_LIB_NAME "SDL2.dll")
+    ENDIF()
+elseif(UNIX)
+    message(STATUS "Detected Unix!")
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(MY_SDL2_LIB_NAME "libSDL2-2.0d.so.0")
+    ELSEIF(CMAKE_BUILD_TYPE STREQUAL "Release")
+        set(MY_SDL2_LIB_NAME "libSDL2-2.0.so.0")
+    ENDIF()
+ENDIF()
+
+if (MY_SDL2_LIB_NAME)
+    message("copy from ${CMAKE_CURRENT_BINARY_DIR}/../_deps/sdl2-build/${MY_SDL2_LIB_NAME} to ${CMAKE_CURRENT_BINARY_DIR}")
+    add_custom_command(TARGET fontedit POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy
+            "${CMAKE_CURRENT_BINARY_DIR}/../_deps/sdl2-build/${MY_SDL2_LIB_NAME}"
+            ${CMAKE_CURRENT_BINARY_DIR})
+ENDIF()

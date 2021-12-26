@@ -14,7 +14,7 @@ static void test_render_copy_point(void **state) {
     assert_int_equal(pointCopy->y, 200);
 }
 
-int main(void) {
+int main(int argc, char *argv[]) {
     const struct CMUnitTest render_tests[] = {
             cmocka_unit_test(test_render_copy_point)
     };

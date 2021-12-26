@@ -17,7 +17,7 @@ static void test_widget_properties_copy(void **state) {
     assert_ptr_not_equal(copy, widgetProps);
 }
 
-int main(void) {
+int main(int argc, char *argv[]) {
     const struct CMUnitTest widget_tests[] = {
             cmocka_unit_test(test_widget_properties_create),
             cmocka_unit_test(test_widget_properties_copy)

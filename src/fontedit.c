@@ -136,7 +136,7 @@ void BRS_FontEdit_quitApplication() {
     applicationState->quit = true;
 }
 
-int main() {
+int main(int argc, char *argv[]) {
     ApplicationConfig *config = createConfig();
     initApplication(config);
     if (applicationState != NULL) {

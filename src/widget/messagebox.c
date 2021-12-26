@@ -2,6 +2,7 @@
 // Created by bernd on 10.01.21.
 //
 
+#include <string.h>
 #include "messagebox.h"
 
 void BRS_GUI_MessageBox_ctor(BRS_GUI_MessageBox *messageBox, BRS_GUI_Widget_Properties *widgetProps, const char *title,

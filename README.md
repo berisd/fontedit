@@ -2,7 +2,7 @@
 
 A simple font editor for bitmap and multicolor fonts.
 
-Requires SDL2 library and dev files.
+Uses SDL2 library which is downloaded and configured by cmake.
 
 Build e.g. with:
 ````

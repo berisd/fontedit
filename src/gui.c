@@ -313,7 +313,7 @@ BRS_GUI_processEventForList(BRS_GUI_WidgetList *widgetList, SDL_Event *event, in
     return false;
 }
 
-static int16_t calcZIndexHighestVisible(BRS_GUI_WidgetList *widgetList, int16_t *zIndexHighestVisible, uint8_t depth) {
+static void calcZIndexHighestVisible(BRS_GUI_WidgetList *widgetList, int16_t *zIndexHighestVisible, uint8_t depth) {
     BRS_GUI_WidgetListEntry *entry = widgetList->firstEntry;
     while (entry != NULL) {
         BRS_GUI_Widget *widget = entry->value;

@@ -25,7 +25,7 @@ typedef void (*LIST_NAME##_ValueConsumer)(VALUE_TYPE *, void *context); \
 LIST_NAME *LIST_NAME##_create();             \
 void LIST_NAME##_destroy(LIST_NAME *list); \
 LIST_NAME##Entry *LIST_NAME##Entry_create(VALUE_TYPE *value); \
-LIST_NAME *LIST_NAME##_push(VALUE_TYPE *val, LIST_NAME *list); \
+void LIST_NAME##_push(VALUE_TYPE *val, LIST_NAME *list); \
 void LIST_NAME##_iterate(LIST_NAME *list, LIST_NAME##_ValueConsumer consumer, void *context); \
 
 #define BRS_LIST_DEFN(LIST_NAME, VALUE_TYPE) \
@@ -57,7 +57,7 @@ LIST_NAME##Entry *LIST_NAME##Entry_create(VALUE_TYPE *value) { \
     return entry; \
 }               \
                                              \
-LIST_NAME *LIST_NAME##_push(VALUE_TYPE *val, LIST_NAME *list) {     \
+void LIST_NAME##_push(VALUE_TYPE *val, LIST_NAME *list) {     \
     LIST_NAME##Entry *newEntry = LIST_NAME##Entry_create(val); \
     if (list->lastEntry == NULL) { \
     list->firstEntry = newEntry; \

@@ -74,6 +74,8 @@ static bool BRS_GUI_MenuItem_processEvent(BRS_GUI_Widget *widget, SDL_Event *eve
             return processMenuItemMouseMove(menuItem, &event->motion);
         case SDL_MOUSEBUTTONUP:
             return processMenuItemMouseButtonDown(menuItem, &event->button);
+        default:
+            return true;
     }
 }
 

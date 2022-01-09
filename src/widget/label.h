@@ -6,6 +6,7 @@
 #define BRS_GUI_LABEL_H
 
 #include "widget.h"
+#include <string.h>
 
 typedef struct _BRS_GUI_Label BRS_GUI_Label;
 

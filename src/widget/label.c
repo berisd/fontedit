@@ -14,7 +14,7 @@ static void BRS_GUI_Label_render(const BRS_GUI_Widget *widget, const BRS_VideoCo
 void BRS_GUI_Label_ctor(BRS_GUI_Label *label, BRS_GUI_Widget_Properties *widgetProps, const char *text) {
     BRS_GUI_Widget_ctor((BRS_GUI_Widget *) label, widgetProps);
     label->text = malloc(255);
-    memcpy(label->text, text, strlen(text));
+    strcpy(label->text, text);
     widgetProps->renderHandler = BRS_GUI_Label_render;
     widgetProps->destroyHandler = (BRS_GUI_Widget_DestroyHandler) BRS_GUI_Label_destroy;
 }

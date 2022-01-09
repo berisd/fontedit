@@ -44,11 +44,11 @@ static void freeApplicationState(ApplicationState *applicationState) {
     free(applicationState);
 }
 
-static void *initApplication(const ApplicationConfig *config) {
+static void initApplication(const ApplicationConfig *config) {
     applicationState = createApplicationState();
     BRS_VideoContext *videoContext = BRS_initVideo(config->screenWidth, config->screenHeight);
     if (videoContext == NULL) {
-        return NULL;
+        return;
     }
     applicationState->videoContext = videoContext;
     applicationState->theme = BRS_GUI_Theme_create();
